@@ -1,0 +1,297 @@
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-red: var(--red);
+  --font-display: "Unbounded", system-ui, sans-serif;
+  --font-sans: "Manrope", system-ui, sans-serif;
+}
+
+:root {
+  --radius: 0.25rem;
+  --paper: oklch(0.985 0.003 90);
+  --ink: oklch(0.12 0.01 260);
+  --red: oklch(0.42 0.13 25);
+  --red-deep: oklch(0.32 0.11 25);
+  --red-glow: oklch(0.52 0.15 25);
+  --background: var(--paper);
+  --foreground: var(--ink);
+  --card: oklch(1 0 0);
+  --card-foreground: var(--ink);
+  --popover: oklch(1 0 0);
+  --popover-foreground: var(--ink);
+  --primary: var(--ink);
+  --primary-foreground: var(--paper);
+  --secondary: oklch(0.94 0.005 90);
+  --secondary-foreground: var(--ink);
+  --muted: oklch(0.94 0.005 90);
+  --muted-foreground: oklch(0.45 0.01 260);
+  --accent: var(--red);
+  --accent-foreground: oklch(1 0 0);
+  --destructive: oklch(0.6 0.24 25);
+  --destructive-foreground: oklch(1 0 0);
+  --border: oklch(0.88 0.005 260);
+  --input: oklch(0.88 0.005 260);
+  --ring: var(--red);
+}
+
+.dark {
+  --background: oklch(0.12 0.01 260);
+  --foreground: var(--paper);
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+  html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 96px;
+  }
+  body {
+
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    font-feature-settings: "ss01", "ss02";
+  }
+  ::selection {
+    background: var(--red);
+    color: white;
+  }
+}
+
+@utility stencil {
+  font-family: var(--font-display);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  background: linear-gradient(
+    to bottom,
+    currentColor 0%,
+    currentColor 44%,
+    transparent 44%,
+    transparent 56%,
+    currentColor 56%,
+    currentColor 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@utility grid-lines {
+  background-image:
+    linear-gradient(to right, oklch(0 0 0 / 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0 0 0 / 0.04) 1px, transparent 1px);
+  background-size: 80px 80px;
+}
+
+/* ---------- Liquid Glass ---------- */
+
+@utility glass {
+  position: relative;
+  isolation: isolate;
+  background:
+    radial-gradient(
+      600px circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in oklab, white 55%, transparent),
+      transparent 40%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in oklab, white 60%, transparent) 0%,
+      color-mix(in oklab, white 20%, transparent) 40%,
+      color-mix(in oklab, white 8%, transparent) 100%
+    );
+  backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid color-mix(in oklab, white 55%, transparent);
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in oklab, white 70%, transparent),
+    inset 0 -1px 0 0 color-mix(in oklab, white 20%, transparent),
+    0 20px 60px -20px color-mix(in oklab, var(--ink) 25%, transparent),
+    0 1px 2px color-mix(in oklab, var(--ink) 10%, transparent);
+  transition: transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+@utility glass-dark {
+  background:
+    radial-gradient(
+      600px circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in oklab, white 22%, transparent),
+      transparent 45%
+    ),
+    linear-gradient(
+      135deg,
+      color-mix(in oklab, white 14%, transparent) 0%,
+      color-mix(in oklab, white 4%, transparent) 100%
+    );
+  backdrop-filter: blur(24px) saturate(160%);
+  border: 1px solid color-mix(in oklab, white 18%, transparent);
+  box-shadow:
+    inset 0 1px 0 0 color-mix(in oklab, white 28%, transparent),
+    0 30px 80px -20px oklch(0 0 0 / 0.5);
+}
+
+@utility glass-specular {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background:
+    radial-gradient(
+      160px circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in oklab, white 70%, transparent),
+      transparent 55%
+    ),
+    radial-gradient(
+      360px circle at var(--mx, 50%) var(--my, 50%),
+      color-mix(in oklab, white 22%, transparent),
+      transparent 70%
+    );
+  mix-blend-mode: overlay;
+  opacity: var(--spec-opacity, 0.35);
+  transition: opacity 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@utility glass-edge {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  background: conic-gradient(
+    from var(--edge-angle, 210deg) at 50% 50%,
+    transparent 0deg,
+    color-mix(in oklab, white 70%, transparent) 40deg,
+    transparent 90deg,
+    color-mix(in oklab, var(--red) 50%, transparent) 200deg,
+    transparent 260deg,
+    color-mix(in oklab, white 60%, transparent) 320deg,
+    transparent 360deg
+  );
+  padding: 1px;
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask-composite: exclude;
+  opacity: 0.65;
+}
+
+/* Edge refraction — magnifies + blurs the background along the card perimeter
+   to fake a lensing/meniscus effect at the glass rim. */
+@utility glass-refract {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  backdrop-filter: blur(6px) saturate(160%) contrast(105%);
+  transform: scale(1.04);
+  transform-origin: center;
+  mask:
+    radial-gradient(
+      120% 120% at 50% 50%,
+      transparent 58%,
+      #000 82%,
+      transparent 100%
+    );
+  opacity: 0.9;
+  transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+
+@keyframes liquid-spin {
+  to { transform: rotate(360deg); }
+}
+@keyframes liquid-morph {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); }
+  33% { transform: translate3d(6%, -4%, 0) scale(1.08); }
+  66% { transform: translate3d(-5%, 5%, 0) scale(0.94); }
+}
+@keyframes breathe {
+  0%, 100% { transform: translate3d(0,0,0) scale(1); opacity: 0.85; }
+  50% { transform: translate3d(0,-2%,0) scale(1.06); opacity: 1; }
+}
+@keyframes drift-slow {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  20%  { transform: translate3d(24vw, -12vh, 0) rotate(60deg); }
+  40%  { transform: translate3d(-18vw, 18vh, 0) rotate(-40deg); }
+  60%  { transform: translate3d(30vw, 22vh, 0) rotate(80deg); }
+  80%  { transform: translate3d(-22vw, -20vh, 0) rotate(-70deg); }
+  100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+}
+@keyframes drift-wide {
+  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
+  25%  { transform: translate3d(-28vw, 20vh, 0) rotate(-90deg); }
+  50%  { transform: translate3d(20vw, 30vh, 0) rotate(45deg); }
+  75%  { transform: translate3d(32vw, -18vh, 0) rotate(120deg); }
+  100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+}
+
+/* ---------- Reduced motion / calm mode ---------- */
+
+html[data-calm="true"] *,
+html[data-calm="true"] *::before,
+html[data-calm="true"] *::after {
+  animation-duration: 0.001ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 120ms !important;
+  scroll-behavior: auto !important;
+}
+
+html[data-calm="true"] .glass,
+html[data-calm="true"] .glass-dark {
+  backdrop-filter: blur(14px) saturate(140%);
+}
+html[data-calm="true"] .glass-refract { display: none; }
+
+@media (prefers-reduced-motion: reduce) {
+  html:not([data-calm="false"]) *,
+  html:not([data-calm="false"]) *::before,
+  html:not([data-calm="false"]) *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 120ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Cheaper glass on small screens — backdrop-filter is the main hit. */
+@media (max-width: 767px) {
+  .glass, .glass-dark {
+    backdrop-filter: blur(14px) saturate(150%);
+  }
+  .glass-refract { display: none; }
+}
+
+
+
+

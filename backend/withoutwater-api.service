@@ -1,0 +1,24 @@
+[Unit]
+Description=withoutwater.ru lead API (форма сайта → лог + Telegram)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=www-data
+Group=www-data
+WorkingDirectory=/opt/withoutwater/backend
+EnvironmentFile=/opt/withoutwater/.env
+ExecStart=/usr/bin/node /opt/withoutwater/backend/server.mjs
+Restart=on-failure
+RestartSec=3
+
+# hardening
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ReadWritePaths=/opt/withoutwater/data
+
+[Install]
+WantedBy=multi-user.target

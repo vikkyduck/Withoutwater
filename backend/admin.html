@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Заявки — Без Воды</title>
+<style>
+/* админка в той же системе «Чернила»: монохром, системный шрифт */
+:root{--ink:#111114;--soft:#5c5c66;--line:#e3e3e8;--bg:#fff;--paper:#f4f4f6;--r:8px;
+  --ok:#0d7a4f;--work:#8a6d00;--err:#c9331f}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;font-size:16px;line-height:1.5;
+  color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1080px;margin:0 auto;padding:0 20px}
+header{border-bottom:1px solid var(--line);padding:20px 0;margin-bottom:24px}
+header .wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+h1{font-size:20px;font-weight:800;letter-spacing:-.01em;margin-right:auto}
+.btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 16px;border-radius:var(--r);
+  font-weight:700;font-size:14px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer;
+  transition:transform .15s cubic-bezier(.34,1.56,.64,1),border-color .12s;text-decoration:none}
+.btn:hover{border-color:var(--ink)}
+.btn:active{transform:scale(.95)}
+.btn-dark{background:var(--ink);color:#fff;border-color:var(--ink)}
+.filters{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;align-items:center}
+.chip{border:1px solid var(--line);border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600;
+  cursor:pointer;background:var(--bg);color:var(--soft);transition:.12s}
+.chip.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.chip:active{transform:scale(.95)}
+input[type=search]{padding:9px 14px;border:1px solid var(--line);border-radius:var(--r);font-size:14.5px;
+  font-family:inherit;min-width:220px;flex:1;max-width:320px}
+input[type=search]:focus{outline:none;border-color:var(--ink)}
+.lead{border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;margin-bottom:14px;
+  display:grid;grid-template-columns:auto 1fr auto;gap:6px 20px;align-items:start}
+.lead .num{font-weight:900;font-size:15px;padding-top:2px;white-space:nowrap}
+.lead .num span{display:block;font-weight:500;font-size:12px;color:var(--soft);white-space:nowrap}
+.lead .body b{font-size:16px;font-weight:800;display:block;overflow:hidden;text-overflow:ellipsis}
+.lead .body .contact{font-size:15px;font-weight:600}
+.lead .body .contact a{color:inherit}
+.lead .meta{font-size:13.5px;color:var(--soft);margin-top:4px;overflow-wrap:anywhere}
+.lead .comment{font-size:14px;color:var(--ink);margin-top:8px;background:var(--paper);border-radius:6px;
+  padding:10px 12px;overflow-wrap:anywhere}
+.lead .consents{font-size:12.5px;color:var(--soft);margin-top:6px}
+.actions{display:grid;gap:8px;justify-items:stretch;min-width:130px}
+select.status{padding:8px 10px;border-radius:var(--r);border:1px solid var(--line);font-family:inherit;
+  font-size:13.5px;font-weight:700;cursor:pointer;background:var(--bg)}
+.status.s-new{border-color:var(--ink)}
+.status.s-work{border-color:var(--work);color:var(--work)}
+.status.s-done{border-color:var(--ok);color:var(--ok)}
+.del{border:none;background:none;color:var(--soft);font-size:13px;cursor:pointer;text-decoration:underline}
+.del:hover{color:var(--err)}
+.empty,.loading{border:1px dashed var(--line);border-radius:var(--r);padding:48px 20px;text-align:center;
+  color:var(--soft);font-size:15.5px}
+.skeleton{height:92px;border-radius:var(--r);background:linear-gradient(90deg,var(--paper) 25%,#ebebef 40%,var(--paper) 55%);
+  background-size:400% 100%;animation:sk 1.2s infinite linear;margin-bottom:14px}
+@keyframes sk{to{background-position:-140% 0}}
+.counts{font-size:13.5px;color:var(--soft)}
+footer{padding:32px 0;color:var(--soft);font-size:13px}
+@media(max-width:640px){
+  .lead{grid-template-columns:1fr;gap:10px}
+  .actions{grid-auto-flow:column;justify-content:start;align-items:center}
+  input[type=search]{max-width:none}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <h1>Заявки — withoutwater.ru</h1>
+    <span class="counts" id="counts"></span>
+    <a class="btn" href="/admin/api/export.csv">Выгрузить CSV</a>
+    <a class="btn btn-dark" href="/" target="_blank" rel="noopener">Открыть сайт</a>
+  </div>
+</header>
+<div class="wrap">
+  <div class="filters">
+    <button class="chip on" data-status="">Все</button>
+    <button class="chip" data-status="new">Новые</button>
+    <button class="chip" data-status="work">В работе</button>
+    <button class="chip" data-status="done">Закрытые</button>
+    <input type="search" id="q" placeholder="Поиск: имя, контакт, компания…">
+  </div>
+  <div id="list"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+</div>
+<footer>
+  <div class="wrap">Данные заявок хранятся 5 лет с последнего контакта либо до отзыва согласия. Удаление записи здесь — безвозвратное (для исполнения запросов на удаление персональных данных).</div>
+</footer>
+
+<script>
+(function(){
+  'use strict';
+  var list = document.getElementById('list');
+  var qInput = document.getElementById('q');
+  var counts = document.getElementById('counts');
+  var status = '', q = '', t = null;
+
+  var STATUS_LABELS = { new: 'Новая', work: 'В работе', done: 'Закрыта' };
+
+  function fmtTs(ts){
+    try {
+      return new Intl.DateTimeFormat('ru-RU', {timeZone:'Europe/Moscow',dateStyle:'short',timeStyle:'short'})
+        .format(new Date(ts)) + ' МСК';
+    } catch(e){ return ts; }
+  }
+  function esc(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+    });
+  }
+  function contactLink(c){
+    if (/^@[\w\d_]+$/.test(c)) return '<a href="https://t.me/' + esc(c.slice(1)) + '" target="_blank" rel="noopener">' + esc(c) + '</a>';
+    if (/^[+\d][\d\s()-]{5,}$/.test(c)) return '<a href="tel:' + esc(c.replace(/[^+\d]/g,'')) + '">' + esc(c) + '</a>';
+    if (/@.+\./.test(c)) return '<a href="mailto:' + esc(c) + '">' + esc(c) + '</a>';
+    return esc(c);
+  }
+
+  function load(){
+    list.innerHTML = '<div class="skeleton"></div><div class="skeleton"></div>';
+    fetch('/admin/api/leads?status=' + encodeURIComponent(status) + '&q=' + encodeURIComponent(q))
+      .then(function(r){ return r.json(); })
+      .then(function(d){
+        counts.textContent = 'новых ' + d.counts.new + ' · в работе ' + d.counts.work + ' · закрыто ' + d.counts.done;
+        if (!d.leads.length){
+          list.innerHTML = '<div class="empty">Заявок пока нет' + (q || status ? ' по этому фильтру' : '') + '</div>';
+          return;
+        }
+        list.innerHTML = d.leads.map(function(L){
+          return '<div class="lead" data-id="' + L.id + '">' +
+            '<div class="num">№' + L.id + '<span>' + esc(fmtTs(L.ts)) + '</span></div>' +
+            '<div class="body">' +
+              '<b>' + (esc(L.name) || '<span style="color:#9a9aa4">Без имени</span>') + '</b>' +
+              '<div class="contact">' + contactLink(L.contact) + '</div>' +
+              (L.company ? '<div class="meta">Компания: ' + esc(L.company) + '</div>' : '') +
+              (L.comment ? '<div class="comment">' + esc(L.comment) + '</div>' : '') +
+              (L.legacy_fields ? '<div class="meta">Старая форма: ' + esc(L.legacy_fields).slice(0, 300) + '</div>' : '') +
+              '<div class="consents">Согласие ПД: ' + esc(L.consent_pd_version || '—') +
+              ' · Рассылка: ' + (L.consent_ads ? 'да' : 'нет') +
+              (L.page ? ' · Страница: ' + esc(L.page) : '') + '</div>' +
+            '</div>' +
+            '<div class="actions">' +
+              '<select class="status s-' + esc(L.status) + '">' +
+                ['new','work','done'].map(function(s){
+                  return '<option value="' + s + '"' + (s === L.status ? ' selected' : '') + '>' + STATUS_LABELS[s] + '</option>';
+                }).join('') +
+              '</select>' +
+              '<button class="del">Удалить</button>' +
+            '</div>' +
+          '</div>';
+        }).join('');
+      })
+      .catch(function(){
+        list.innerHTML = '<div class="empty">Не получилось загрузить заявки. Обновите страницу.</div>';
+      });
+  }
+
+  document.querySelectorAll('.chip').forEach(function(ch){
+    ch.addEventListener('click', function(){
+      document.querySelectorAll('.chip').forEach(function(c){ c.classList.remove('on'); });
+      ch.classList.add('on');
+      status = ch.dataset.status; load();
+    });
+  });
+  qInput.addEventListener('input', function(){
+    clearTimeout(t);
+    t = setTimeout(function(){ q = qInput.value.trim(); load(); }, 300);
+  });
+
+  list.addEventListener('change', function(ev){
+    var sel = ev.target.closest('select.status'); if (!sel) return;
+    var id = sel.closest('.lead').dataset.id;
+    fetch('/admin/api/leads/' + id + '/status', {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({status: sel.value})
+    }).then(load);
+  });
+  list.addEventListener('click', function(ev){
+    var del = ev.target.closest('.del'); if (!del) return;
+    var id = del.closest('.lead').dataset.id;
+    if (!confirm('Удалить заявку №' + id + ' безвозвратно? Используется для исполнения запросов на удаление данных.')) return;
+    fetch('/admin/api/leads/' + id, { method: 'DELETE' }).then(load);
+  });
+
+  load();
+})();
+</script>
+</body>
+</html>

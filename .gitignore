@@ -1,0 +1,16 @@
+# зависимости и сборка
+node_modules/
+dist/
+.vite/
+*.tsbuildinfo
+
+# секреты — НИКОГДА не коммитим
+.env
+.env.local
+*.env
+!*.env.example
+
+# системное
+.DS_Store
+*.log
+npm-debug.log*
