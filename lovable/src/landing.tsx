@@ -643,7 +643,7 @@ function Principle() {
       <AmbientHalo className="-right-40 top-0" color="var(--red-glow)" size={620} opacity={0.28} />
       <AmbientHalo className="-left-32 bottom-0" color="oklch(0.85 0.02 260)" size={520} opacity={0.08} />
       <div className="pointer-events-none absolute inset-0">
-        <Sphere size={180} className="right-10 top-10" delay={0.2} duration={9} variant="red" />
+        <Sphere size={180} className="right-10 top-10 hidden md:block" delay={0.2} duration={9} variant="red" />
         <Sphere size={80} className="right-[220px] top-[160px] hidden md:block" delay={0.9} duration={7} variant="chrome" />
         <LiquidDrop size={64} className="left-[8%] top-[220px] hidden md:block" tone="chrome" delay={0.4} duration={11} />
         <LiquidDrop size={42} className="left-[22%] bottom-[80px] hidden md:block" tone="red" delay={1.2} duration={9} />
@@ -657,38 +657,38 @@ function Principle() {
         <RevealHeading as="blockquote" className="mt-8 max-w-5xl font-display text-2xl font-bold leading-tight sm:text-3xl md:text-5xl">
           «Если у продукта нет понятной бизнес-логики и спроектированного пути к
           результату — это{" "}
-          <span className="text-[color:var(--red)]">производство контента</span>,
+          <span className="text-[color:var(--red-bright)]">производство контента</span>,
           а не образовательный продукт».
         </RevealHeading>
 
 
         <div className="mt-16 grid gap-10 md:grid-cols-2">
           <div>
-            <div className="mb-4 text-sm font-semibold uppercase tracking-widest text-[color:var(--red)]">
+            <div className="mb-4 text-sm font-semibold uppercase tracking-widest text-[color:var(--red-bright)]">
               Для EdTech продуктов
             </div>
             <ul className="space-y-3 text-lg">
               <li className="flex gap-3">
-                <Check className="mt-1 h-5 w-5 shrink-0 text-[color:var(--red)]" />
+                <Check className="mt-1 h-5 w-5 shrink-0 text-[color:var(--red-bright)]" />
                 Понятная модель монетизации и целевая экономика
               </li>
               <li className="flex gap-3">
-                <Check className="mt-1 h-5 w-5 shrink-0 text-[color:var(--red)]" />
+                <Check className="mt-1 h-5 w-5 shrink-0 text-[color:var(--red-bright)]" />
                 Измеримый результат продукта и спроектированный путь к нему
               </li>
             </ul>
           </div>
           <div>
-            <div className="mb-4 text-sm font-semibold uppercase tracking-widest text-[color:var(--red)]">
+            <div className="mb-4 text-sm font-semibold uppercase tracking-widest text-[color:var(--red-bright)]">
               Для корпоративного обучения
             </div>
             <ul className="space-y-3 text-lg">
               <li className="flex gap-3">
-                <Check className="mt-1 h-5 w-5 shrink-0 text-[color:var(--red)]" />
+                <Check className="mt-1 h-5 w-5 shrink-0 text-[color:var(--red-bright)]" />
                 Программа связана с конкретной задачей бизнеса
               </li>
               <li className="flex gap-3">
-                <Check className="mt-1 h-5 w-5 shrink-0 text-[color:var(--red)]" />
+                <Check className="mt-1 h-5 w-5 shrink-0 text-[color:var(--red-bright)]" />
                 Знания и навыки применяются в реальной работе
               </li>
             </ul>
@@ -1130,7 +1130,7 @@ function Scenarios() {
               <div className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--red)]">
                 {d.tag}
               </div>
-              <h3 className="font-display text-3xl font-extrabold leading-tight md:text-4xl">
+              <h3 className="font-display text-[1.5rem] font-extrabold leading-tight [hyphens:auto] [overflow-wrap:break-word] sm:text-3xl md:text-4xl">
                 {d.title}
               </h3>
               <p className="mt-6 text-lg text-muted-foreground">{d.lead}</p>
@@ -1528,16 +1528,13 @@ function Guarantees() {
               До начала проекта в предложении, задании и договоре фиксируем всё
               — от границ работ до критериев приёмки.
             </p>
-            <div className="mt-10 flex items-baseline gap-6 border-t border-border pt-8">
-              <div className="font-display text-4xl sm:text-5xl md:text-6xl font-extrabold text-[color:var(--red)]">
-                1
-              </div>
-              <div className="text-lg font-semibold">
-                Один договор.
+            <div className="mt-10 border-t border-border pt-8">
+              <div className="font-display text-2xl font-extrabold leading-snug sm:text-3xl md:text-4xl">
+                <span className="text-[color:var(--red)]">Один</span> договор.
                 <br />
-                Одна команда.
+                <span className="text-[color:var(--red)]">Одна</span> команда.
                 <br />
-                Одна точка ответственности.
+                <span className="text-[color:var(--red)]">Одна</span> точка ответственности.
               </div>
             </div>
           </div>

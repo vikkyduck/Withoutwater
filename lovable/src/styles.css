@@ -43,6 +43,7 @@
   --red: oklch(0.42 0.13 25);
   --red-deep: oklch(0.32 0.11 25);
   --red-glow: oklch(0.52 0.15 25);
+  --red-bright: oklch(0.72 0.17 25); /* красный акцент на тёмном фоне (читаемый) */
   --background: var(--paper);
   --foreground: var(--ink);
   --card: oklch(1 0 0);
@@ -295,3 +296,8 @@ html[data-calm="true"] .glass-refract { display: none; }
 
 
 
+
+/* защита от переполнения длинных русских слов в заголовках (моб.) */
+h1, h2, h3, h4, blockquote {
+  overflow-wrap: break-word;
+}

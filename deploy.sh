@@ -7,7 +7,10 @@ set -euo pipefail
 
 SERVER="${SERVER_USER:-root}@${SERVER_HOST:-5.129.198.180}"
 
-echo "==> site-new/ → /opt/withoutwater/site  (дизайн Expert Compass / Lovable)"
+echo "==> сборка фронта (Vite + пререндер статического HTML для SEO)"
+( cd lovable && npm run build )
+
+echo "==> dist/ → /opt/withoutwater/site  (дизайн Expert Compass / Lovable)"
 rsync -az --delete lovable/dist/ "$SERVER:/opt/withoutwater/site/"
 
 echo "==> backend/ → /opt/withoutwater/backend (без .env, он в /opt/withoutwater/.env)"
