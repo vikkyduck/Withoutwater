@@ -80,6 +80,10 @@ function useCalm(): [boolean, (v: boolean) => void] {
 
 let pickScenario: (i: number) => void = () => {};
 
+/* Перенос контекста до заявки: форма (#contact) регистрирует сеттер, и при
+   выборе сценария (карточка Hero, таб, CTA в детали) нужный chip отмечается сам. */
+let noteScenarioForForm: (label: string) => void = () => {};
+
 
 /* ----------------------------- Small helpers ----------------------------- */
 
@@ -1090,9 +1094,12 @@ function Scenarios() {
     setOpenSub(null);
   }, [active]);
 
-  // связываем карточки сценариев в Hero с этими табами
+  // связываем карточки сценариев в Hero с этими табами (+ перенос выбора в форму)
   useEffect(() => {
-    pickScenario = setActive;
+    pickScenario = (i: number) => {
+      setActive(i);
+      noteScenarioForForm(SCENARIOS[i].short);
+    };
     return () => {
       pickScenario = () => {};
     };
@@ -1114,7 +1121,10 @@ function Scenarios() {
           {SCENARIOS.map((dir, i) => (
             <button
               key={i}
-              onClick={() => setActive(i)}
+              onClick={() => {
+                setActive(i);
+                noteScenarioForForm(SCENARIOS[i].short);
+              }}
               className={`relative -mb-px flex items-center gap-3 px-4 py-4 text-left text-sm font-semibold transition sm:px-5 ${
                 active === i
                   ? "text-foreground"
@@ -1254,6 +1264,7 @@ function Scenarios() {
             <div className="mt-10">
               <a
                 href={d.ctaHref}
+                onClick={() => noteScenarioForForm(d.short)}
                 className="group inline-flex items-center gap-3 rounded-full bg-foreground px-7 py-4 text-base font-semibold text-background transition hover:bg-[color:var(--red)]"
               >
                 {d.cta}
@@ -1678,6 +1689,25 @@ function Contact() {
   const toggleTask = (t: string) =>
     setTasks((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
 
+  // перенос выбранного сценария до заявки: авто-chip заменяется при смене
+  // сценария, но ручные отметки посетителя не трогаем
+  const autoTask = useRef<string | null>(null);
+  useEffect(() => {
+    noteScenarioForForm = (label: string) => {
+      setTasks((prev) => {
+        const cleaned =
+          autoTask.current && autoTask.current !== label
+            ? prev.filter((t) => t !== autoTask.current)
+            : prev;
+        autoTask.current = label;
+        return cleaned.includes(label) ? cleaned : [...cleaned, label];
+      });
+    };
+    return () => {
+      noteScenarioForForm = () => {};
+    };
+  }, []);
+
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setErr(null);
@@ -1705,7 +1735,7 @@ function Contact() {
           name,
           contact,
           company,
-          comment: [tasks.length ? `С чем работаем: ${tasks.join(", ")}` : "", about]
+          comment: [tasks.length ? `Сценарий: ${tasks.join(", ")}` : "", about]
             .filter(Boolean)
             .join("\n"),
           consent_pd: true,
@@ -1810,15 +1840,16 @@ function Contact() {
                 <Field label="Email или Telegram" name="contact" placeholder="вы@company.com / @username" dark />
                 <div>
                   <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-background/60">
-                    С чем работаем <span className="text-background/40 normal-case tracking-normal">(можно позже)</span>
+                    Какой сценарий ближе <span className="text-background/40 normal-case tracking-normal">(можно позже)</span>
                   </div>
-                  <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                    {[
-                      "Есть эксперт",
-                      "Нужна программа",
-                      "Экспертное сопровождение",
-                    ].map((t) => (
-                      <TaskChip key={t} label={t} on={tasks.includes(t)} onToggle={() => toggleTask(t)} />
+                  <div className="flex flex-wrap gap-2">
+                    {SCENARIOS.map((s) => (
+                      <TaskChip
+                        key={s.short}
+                        label={s.short}
+                        on={tasks.includes(s.short)}
+                        onToggle={() => toggleTask(s.short)}
+                      />
                     ))}
                   </div>
                 </div>
