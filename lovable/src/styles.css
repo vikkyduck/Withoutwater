@@ -38,12 +38,20 @@
 
 :root {
   --radius: 0.25rem;
-  --paper: oklch(0.985 0.003 90);
-  --ink: oklch(0.12 0.01 260);
-  --red: oklch(0.42 0.13 25);
-  --red-deep: oklch(0.32 0.11 25);
-  --red-glow: oklch(0.52 0.15 25);
-  --red-bright: oklch(0.72 0.17 25); /* красный акцент на тёмном фоне (читаемый) */
+  /* Палитра 2026-07 (80% Мудрец / 20% Бунтарь / примесь Творца):
+     молочный + чёрный + графит; ягодный ТОЛЬКО для CTA, номеров и маркеров;
+     лавандовый — сферы, слабые градиенты и поверхности «человечных» секций. */
+  --paper: #FBFAF8;           /* молочный фон */
+  --ink: #040609;             /* чёрный */
+  --graphite: #45494E;        /* графитовый текст */
+  --red: #89293F;             /* ягодно-бордовый: CTA, номера, активные состояния */
+  --red-deep: #5E1B2B;
+  --red-glow: #A84A60;        /* свечение на тёмных секциях */
+  --red-bright: #D08CA0;      /* ягодный акцент на тёмном фоне (читаемый) */
+  --lav: #9992A5;             /* лавандовый: шарики и мягкие градиенты */
+  --lav-light: #C9C4D2;
+  --lav-soft: #E6E3E9;        /* светлая лавандовая поверхность */
+  --lav-deep: #5C5568;
   --background: var(--paper);
   --foreground: var(--ink);
   --card: oklch(1 0 0);
@@ -52,16 +60,16 @@
   --popover-foreground: var(--ink);
   --primary: var(--ink);
   --primary-foreground: var(--paper);
-  --secondary: oklch(0.94 0.005 90);
+  --secondary: #F2F0ED;
   --secondary-foreground: var(--ink);
-  --muted: oklch(0.94 0.005 90);
-  --muted-foreground: oklch(0.45 0.01 260);
+  --muted: #F2F0ED;
+  --muted-foreground: var(--graphite);
   --accent: var(--red);
   --accent-foreground: oklch(1 0 0);
   --destructive: oklch(0.6 0.24 25);
   --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.88 0.005 260);
-  --input: oklch(0.88 0.005 260);
+  --border: #E3E1DD;
+  --input: #E3E1DD;
   --ring: var(--red);
 }
 
@@ -194,7 +202,7 @@
     transparent 0deg,
     color-mix(in oklab, white 70%, transparent) 40deg,
     transparent 90deg,
-    color-mix(in oklab, var(--red) 50%, transparent) 200deg,
+    color-mix(in oklab, var(--lav) 55%, transparent) 200deg,
     transparent 260deg,
     color-mix(in oklab, white 60%, transparent) 320deg,
     transparent 360deg

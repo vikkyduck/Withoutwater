@@ -198,11 +198,13 @@ function Sphere({
       <defs>
         <radialGradient id={gradId} cx="35%" cy="30%" r="75%">
           {variant === "red" ? (
+            /* палитра 2026-07: «красный» вариант сфер стал лавандовым —
+               бордовый бережём только для CTA и маркеров */
             <>
-              <stop offset="0%" stopColor="oklch(0.78 0.08 25)" />
-              <stop offset="35%" stopColor="var(--red-glow)" />
-              <stop offset="75%" stopColor="var(--red)" />
-              <stop offset="100%" stopColor="var(--red-deep)" />
+              <stop offset="0%" stopColor="var(--lav-soft)" />
+              <stop offset="35%" stopColor="var(--lav-light)" />
+              <stop offset="75%" stopColor="var(--lav)" />
+              <stop offset="100%" stopColor="var(--lav-deep)" />
             </>
           ) : (
             <>
@@ -361,7 +363,7 @@ function LiquidOrb({ size = 380, className = "" }: { size?: number; className?: 
           className="absolute inset-0 rounded-full blur-3xl"
           style={{
             background:
-              "radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--red) 55%, transparent), transparent 60%)",
+              "radial-gradient(circle at 50% 50%, color-mix(in oklab, var(--lav) 60%, transparent), transparent 60%)",
             transform: "translateZ(-40px) scale(1.15)",
           }}
         />
@@ -383,7 +385,7 @@ function LiquidOrb({ size = 380, className = "" }: { size?: number; className?: 
               left: "10%",
               top: "15%",
               background:
-                "radial-gradient(circle, var(--red-glow), var(--red) 55%, transparent 75%)",
+                "radial-gradient(circle, var(--lav-light), var(--lav) 55%, transparent 75%)",
               animation: "liquid-morph 9s ease-in-out infinite",
               mixBlendMode: "screen",
             }}
@@ -405,7 +407,7 @@ function LiquidOrb({ size = 380, className = "" }: { size?: number; className?: 
               right: "20%",
               top: "20%",
               background:
-                "radial-gradient(circle, var(--red-deep), transparent 70%)",
+                "radial-gradient(circle, var(--lav-deep), transparent 70%)",
               animation: "liquid-morph 7s ease-in-out infinite",
               mixBlendMode: "multiply",
             }}
@@ -415,7 +417,7 @@ function LiquidOrb({ size = 380, className = "" }: { size?: number; className?: 
             className="absolute inset-2 rounded-full opacity-70"
             style={{
               background:
-                "conic-gradient(from 0deg, transparent, color-mix(in oklab, white 70%, transparent), transparent 40%, color-mix(in oklab, var(--red) 60%, transparent), transparent 80%)",
+                "conic-gradient(from 0deg, transparent, color-mix(in oklab, white 70%, transparent), transparent 40%, color-mix(in oklab, var(--lav) 65%, transparent), transparent 80%)",
               mask: "radial-gradient(circle, transparent 62%, black 63%, black 78%, transparent 80%)",
               WebkitMask:
                 "radial-gradient(circle, transparent 62%, black 63%, black 78%, transparent 80%)",
@@ -479,11 +481,12 @@ function LiquidDrop({
 }) {
   const [calm] = useCalm();
   if (calm) return null;
+  /* палитра 2026-07: red/warm капли стали лавандовыми (бордовый — только CTA) */
   const bg =
     tone === "red"
-      ? "radial-gradient(circle at 32% 28%, oklch(1 0 0 / 0.9), var(--red-glow) 40%, var(--red) 70%, var(--red-deep))"
+      ? "radial-gradient(circle at 32% 28%, oklch(1 0 0 / 0.9), var(--lav-light) 40%, var(--lav) 70%, var(--lav-deep))"
       : tone === "warm"
-      ? "radial-gradient(circle at 32% 28%, oklch(1 0 0 / 0.95), oklch(0.85 0.06 60 / 0.55) 45%, oklch(0.35 0.08 30 / 0.6))"
+      ? "radial-gradient(circle at 32% 28%, oklch(1 0 0 / 0.95), var(--lav-soft) 45%, var(--lav) 80%)"
       : "radial-gradient(circle at 32% 28%, oklch(1 0 0 / 0.95), oklch(0.78 0.01 260 / 0.5) 45%, oklch(0.18 0.02 260 / 0.7))";
   return (
     <motion.div
@@ -569,7 +572,7 @@ function Hero() {
       <div className="grid-lines absolute inset-0 opacity-60" />
 
       {/* Breathing ambient halos */}
-      <AmbientHalo className="-right-40 -top-20" color="var(--red-glow)" size={680} opacity={0.22} />
+      <AmbientHalo className="-right-40 -top-20" color="var(--lav)" size={680} opacity={0.3} />
       <AmbientHalo className="-left-40 bottom-0" color="oklch(0.85 0.02 260)" size={560} opacity={0.14} />
       <AmbientHalo className="left-1/3 top-1/2" color="oklch(0.92 0.03 60)" size={420} opacity={0.1} />
 
@@ -737,8 +740,8 @@ function Principle() {
 
 function BookSection() {
   return (
-    <section id="book" className="relative overflow-hidden border-b border-border bg-secondary/20">
-      <AmbientHalo className="-right-40 top-0" color="var(--red)" size={560} opacity={0.1} />
+    <section id="book" className="relative overflow-hidden border-b border-border bg-[color:var(--lav-soft)]/45">
+      <AmbientHalo className="-right-40 top-0" color="var(--lav)" size={560} opacity={0.2} />
       <AmbientHalo className="-left-40 bottom-0" color="oklch(0.85 0.02 260)" size={480} opacity={0.12} />
       <LiquidDrop size={72} className="left-[6%] top-[120px] hidden md:block" tone="red" delay={0.4} duration={12} />
       <LiquidDrop size={44} className="right-[8%] bottom-[100px] hidden md:block" tone="chrome" delay={1.0} duration={10} />
@@ -749,7 +752,7 @@ function BookSection() {
           <GlassCard className="overflow-hidden p-0">
             <div className="grid items-stretch gap-0 md:grid-cols-[360px_1fr]">
               {/* Cover */}
-              <div className="relative flex items-center justify-center bg-[color:var(--red)]/5 p-8 md:p-10">
+              <div className="relative flex items-center justify-center bg-[color:var(--lav)]/10 p-8 md:p-10">
                 <motion.div
                   initial={{ opacity: 0, y: 20, rotateY: -8 }}
                   whileInView={{ opacity: 1, y: 0, rotateY: 0 }}
@@ -882,7 +885,7 @@ function Team() {
   ];
   return (
     <section id="team" className="relative overflow-hidden border-b border-border bg-secondary/40">
-      <AmbientHalo className="left-1/2 top-0 -translate-x-1/2" color="var(--red-glow)" size={640} opacity={0.1} />
+      <AmbientHalo className="left-1/2 top-0 -translate-x-1/2" color="var(--lav)" size={640} opacity={0.18} />
       <LiquidDrop size={90} className="left-[4%] top-[140px] hidden md:block" tone="red" delay={0.3} duration={13} />
       <LiquidDrop size={54} className="right-[6%] bottom-[100px] hidden md:block" tone="chrome" delay={0.9} duration={11} />
       <LiquidDrop size={36} className="right-[22%] top-[80px] hidden md:block" tone="warm" delay={1.6} duration={9} />
@@ -1128,7 +1131,7 @@ function Scenarios() {
 
   return (
     <section id="directions" className="relative overflow-hidden border-b border-border">
-      <AmbientHalo className="-right-40 top-20" color="var(--red)" size={560} opacity={0.1} />
+      <AmbientHalo className="-right-40 top-20" color="var(--lav)" size={560} opacity={0.18} />
       <AmbientHalo className="-left-32 bottom-20" color="oklch(0.78 0.02 260)" size={480} opacity={0.12} />
       <LiquidDrop size={78} className="right-[6%] top-[180px] hidden lg:block" tone="red" delay={0.4} duration={12} />
       <LiquidDrop size={46} className="left-[3%] top-[420px] hidden lg:block" tone="chrome" delay={1.0} duration={10} />
@@ -1287,7 +1290,7 @@ function Scenarios() {
               <a
                 href={d.ctaHref}
                 onClick={() => selectScenario(d.short)}
-                className="group inline-flex items-center gap-3 rounded-full bg-foreground px-7 py-4 text-base font-semibold text-background transition hover:bg-[color:var(--red)]"
+                className="group inline-flex items-center gap-3 rounded-full bg-[color:var(--red)] px-7 py-4 text-base font-semibold text-[color:var(--paper)] shadow-lg shadow-[color:var(--red)]/20 transition hover:bg-foreground"
               >
                 {d.cta}
                 <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
@@ -1521,7 +1524,7 @@ function Cases() {
   }, []);
   return (
     <section id="cases" className="relative overflow-hidden border-b border-border">
-      <AmbientHalo className="-right-40 top-10" color="var(--red)" size={600} opacity={0.1} />
+      <AmbientHalo className="-right-40 top-10" color="oklch(0.72 0.008 260)" size={600} opacity={0.14} />
       <AmbientHalo className="-left-40 bottom-10" color="oklch(0.82 0.02 260)" size={520} opacity={0.12} />
       <LiquidDrop size={76} className="left-[5%] top-[120px] hidden md:block" tone="chrome" delay={0.4} duration={13} />
       <LiquidDrop size={44} className="right-[8%] top-[260px] hidden md:block" tone="red" delay={1.0} duration={10} />
@@ -1775,7 +1778,7 @@ function Guarantees() {
   const [open, setOpen] = useState<number | null>(0);
   return (
     <section id="guarantees" className="relative overflow-hidden border-b border-border bg-secondary/40">
-      <AmbientHalo className="-left-40 top-10" color="var(--red-glow)" size={520} opacity={0.12} />
+      <AmbientHalo className="-left-40 top-10" color="oklch(0.72 0.008 260)" size={520} opacity={0.14} />
       <AmbientHalo className="-right-40 bottom-10" color="oklch(0.85 0.02 260)" size={480} opacity={0.14} />
       <LiquidDrop size={64} className="left-[6%] bottom-[120px] hidden md:block" tone="red" delay={0.5} duration={11} />
       <LiquidDrop size={38} className="left-[16%] top-[100px] hidden md:block" tone="chrome" delay={1.1} duration={9} />
@@ -1892,8 +1895,8 @@ const REVIEWS = [
 
 function Reviews() {
   return (
-    <section id="reviews" className="relative overflow-hidden border-b border-border">
-      <AmbientHalo className="-left-40 top-10" color="var(--red-glow)" size={560} opacity={0.12} />
+    <section id="reviews" className="relative overflow-hidden border-b border-border bg-[color:var(--lav-soft)]/45">
+      <AmbientHalo className="-left-40 top-10" color="var(--lav)" size={560} opacity={0.22} />
       <AmbientHalo className="-right-40 bottom-10" color="oklch(0.85 0.02 260)" size={480} opacity={0.12} />
       <LiquidDrop size={70} className="right-[6%] top-[140px] hidden md:block" tone="red" delay={0.4} duration={12} />
       <LiquidDrop size={42} className="left-[5%] bottom-[110px] hidden md:block" tone="chrome" delay={1.0} duration={10} />
