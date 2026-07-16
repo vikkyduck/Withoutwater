@@ -73,6 +73,12 @@ function useCalm(): [boolean, (v: boolean) => void] {
 }
 
 
+/* --------- Активный сценарий: карточки Hero ↔ табы секции Scenarios --------- */
+/* Секция Scenarios регистрирует свой setActive здесь при монтировании.        */
+/* Состояние остаётся локальным useState — это важно: с useSyncExternalStore    */
+/* AnimatePresence(mode="wait") зависал (старый блок не размонтировался).        */
+
+let pickScenario: (i: number) => void = () => {};
 
 
 /* ----------------------------- Small helpers ----------------------------- */
@@ -612,7 +618,11 @@ function Hero() {
               viewport={{ once: true }}
               transition={{ delay: i * 0.08 }}
             >
-              <a href="#directions" className="block h-full">
+              <a
+                href="#directions"
+                onClick={() => pickScenario(i)}
+                className="block h-full"
+              >
                 <GlassCard className="group relative h-full p-6 transition-transform duration-300 hover:-translate-y-1">
                   <div className="mb-3 flex items-center justify-between">
                     <div className="text-xs font-semibold uppercase tracking-widest text-[color:var(--red)]">
@@ -1080,6 +1090,14 @@ function Scenarios() {
     setOpenSub(null);
   }, [active]);
 
+  // связываем карточки сценариев в Hero с этими табами
+  useEffect(() => {
+    pickScenario = setActive;
+    return () => {
+      pickScenario = () => {};
+    };
+  }, []);
+
   return (
     <section id="directions" className="relative overflow-hidden border-b border-border">
       <AmbientHalo className="-right-40 top-20" color="var(--red)" size={560} opacity={0.1} />
@@ -1117,15 +1135,11 @@ function Scenarios() {
           ))}
         </div>
 
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={active}
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25 }}
-            className="mt-12"
-          >
+        {/* Контент таба всегда видим (opacity 1), без анимации входа — это гарантия,
+            что панель не «зависнет» пустой. Прежний AnimatePresence(mode="wait")
+            зависал из-за вложенного AnimatePresence (раскрывашки): при клике по табу
+            старый блок уходил в opacity:0, а новый не монтировался. */}
+          <div key={active} className="mt-12">
             <div className="max-w-4xl">
               <div className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--red)]">
                 {d.tag}
@@ -1246,8 +1260,7 @@ function Scenarios() {
                 <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
               </a>
             </div>
-          </motion.div>
-        </AnimatePresence>
+          </div>
 
         <p className="mx-auto mt-14 max-w-3xl text-center text-sm text-muted-foreground sm:text-base">
           В любом формате вы получаете не часы отдельных специалистов, а согласованный объём работ, сроки, критерии приёмки и принцип «единого окна» в работе с нашей командой.
