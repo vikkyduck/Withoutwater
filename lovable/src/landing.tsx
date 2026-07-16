@@ -88,6 +88,20 @@ let noteScenarioForForm: (label: string) => void = () => {};
    подходящие карточки в секции #cases (секция регистрирует сеттер). */
 let highlightCases: (scenario: number) => void = () => {};
 
+/* Микро-цели Яндекс Метрики. Имена целей (создать в интерфейсе Метрики как
+   «JavaScript-событие»): scenario_selected, form_started, chip_toggled, lead_sent. */
+function ymGoal(goal: string, params?: Record<string, unknown>) {
+  const w = window as unknown as { ym?: (...a: unknown[]) => void; YM_ID?: number };
+  if (w.ym && w.YM_ID) w.ym(w.YM_ID, "reachGoal", goal, params);
+}
+
+/* Единая точка выбора сценария: цель в Метрику + авто-chip в форме.
+   Вызывается из всех мест выбора: карточка Hero, таб, CTA детали, бейдж кейса. */
+function selectScenario(label: string) {
+  ymGoal("scenario_selected", { scenario: label });
+  noteScenarioForForm(label);
+}
+
 
 /* ----------------------------- Small helpers ----------------------------- */
 
@@ -754,6 +768,7 @@ function BookSection() {
                       src={bookCover.url}
                       alt="Обложка книги «Эксперт под ключ»"
                       loading="lazy"
+                      decoding="async"
                       width={1200}
                       height={1600}
                       className="h-full w-full object-cover"
@@ -897,6 +912,7 @@ function Team() {
                     src={m.photo}
                     alt={m.name}
                     loading="lazy"
+                    decoding="async"
                     className="h-full w-full object-cover grayscale transition duration-500 group-hover:grayscale-0"
                   />
                   <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-background/70 to-transparent" />
@@ -1102,7 +1118,7 @@ function Scenarios() {
   useEffect(() => {
     pickScenario = (i: number) => {
       setActive(i);
-      noteScenarioForForm(SCENARIOS[i].short);
+      selectScenario(SCENARIOS[i].short);
     };
     return () => {
       pickScenario = () => {};
@@ -1127,7 +1143,7 @@ function Scenarios() {
               key={i}
               onClick={() => {
                 setActive(i);
-                noteScenarioForForm(SCENARIOS[i].short);
+                selectScenario(SCENARIOS[i].short);
               }}
               className={`relative -mb-px flex items-center gap-3 px-4 py-4 text-left text-sm font-semibold transition sm:px-5 ${
                 active === i
@@ -1268,7 +1284,7 @@ function Scenarios() {
             <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
               <a
                 href={d.ctaHref}
-                onClick={() => noteScenarioForForm(d.short)}
+                onClick={() => selectScenario(d.short)}
                 className="group inline-flex items-center gap-3 rounded-full bg-foreground px-7 py-4 text-base font-semibold text-background transition hover:bg-[color:var(--red)]"
               >
                 {d.cta}
@@ -1736,14 +1752,34 @@ function Reviews() {
 
 function Contact() {
   const [sent, setSent] = useState(false);
+  const [sentName, setSentName] = useState(""); // для персонального «спасибо»
   const [sending, setSending] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [tasks, setTasks] = useState<string[]>([]);
   const [pd, setPd] = useState(false);
   const [ads, setAds] = useState(false);
 
-  const toggleTask = (t: string) =>
+  const toggleTask = (t: string) => {
+    ymGoal("chip_toggled", { chip: t });
     setTasks((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
+  };
+
+  // цель «начал заполнять форму» — один раз за сессию формы
+  const formStarted = useRef(false);
+  const onFormFocus = () => {
+    if (formStarted.current) return;
+    formStarted.current = true;
+    ymGoal("form_started");
+  };
+
+  // UTM-метки: сохраняем при заходе (переживают переход на юр. страницы и обратно)
+  useEffect(() => {
+    try {
+      if (/utm_|yclid|gclid/.test(window.location.search)) {
+        window.sessionStorage.setItem("bv-src", window.location.search);
+      }
+    } catch {}
+  }, []);
 
   // перенос выбранного сценария до заявки: авто-chip заменяется при смене
   // сценария, но ручные отметки посетителя не трогаем
@@ -1798,13 +1834,22 @@ function Contact() {
           consent_pd_version: "1.0-2026-07-14",
           consent_ads: ads,
           website: hp,
-          page: "/",
+          // источник трафика: путь + utm-метки (текущие или сохранённые при заходе)
+          page: (() => {
+            let src = window.location.search;
+            try {
+              if (!/utm_|yclid|gclid/.test(src)) {
+                src = window.sessionStorage.getItem("bv-src") || src;
+              }
+            } catch {}
+            return (window.location.pathname || "/") + src;
+          })(),
         }),
       });
       if (!r.ok) throw new Error(String(r.status));
+      setSentName(name);
       setSent(true);
-      const w = window as any;
-      if (w.ym && w.YM_ID) w.ym(w.YM_ID, "reachGoal", "lead_sent");
+      ymGoal("lead_sent");
     } catch {
       setErr("Заявка не отправилась. Попробуйте ещё раз или напишите в Telegram: @BV_Vikky_bot.");
     } finally {
@@ -1857,7 +1902,12 @@ function Contact() {
         </div>
 
         <GlassCard dark className="p-8 md:p-10">
-        <form onSubmit={onSubmit} className="text-background">
+        <form
+          onSubmit={onSubmit}
+          onFocusCapture={onFormFocus}
+          onPointerDownCapture={onFormFocus}
+          className="text-background"
+        >
 
           <AnimatePresence mode="wait">
             {sent ? (
@@ -1871,11 +1921,36 @@ function Contact() {
                   <Check className="h-6 w-6" />
                 </div>
                 <h3 className="mt-6 font-display text-3xl font-bold text-background">
-                  Заявка отправлена
+                  {sentName ? `Спасибо, ${sentName}!` : "Заявка отправлена"}
                 </h3>
                 <p className="mt-3 text-background/70">
-                  Свяжемся с вами в течение двух часов в рабочее время.
+                  Заявка отправлена. Свяжемся с вами в течение двух часов в рабочее время.
                 </p>
+                {tasks.length > 0 && (
+                  <p className="mt-3 text-background/70">
+                    На диагностике разберём ваш сценарий{" "}
+                    <span className="font-semibold text-background">
+                      «{tasks.join("» и «")}»
+                    </span>
+                    .
+                  </p>
+                )}
+                <ol className="mt-8 space-y-3 border-t border-background/15 pt-6">
+                  {[
+                    ["Диагностика", "30 минут онлайн, разбираем задачу"],
+                    ["Модель решения", "присылаем состав работ, сроки и стоимость"],
+                  ].map(([t, d], i) => (
+                    <li key={t} className="flex items-start gap-4">
+                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-background/25 font-display text-sm font-bold text-background/90">
+                        {i + 1}
+                      </span>
+                      <div>
+                        <div className="font-display text-base font-bold">{t}</div>
+                        <div className="text-sm text-background/60">{d}</div>
+                      </div>
+                    </li>
+                  ))}
+                </ol>
                 <button
                   type="button"
                   onClick={() => setSent(false)}

@@ -23,10 +23,24 @@ await build({
 const entry = readdirSync(SSR_DIR).find((f) => f.endsWith(".js") || f.endsWith(".mjs"));
 if (!entry) throw new Error("[prerender] SSR-бандл не найден в dist-ssr");
 const mod = await import(pathToFileURL(resolve(SSR_DIR, entry)).href);
-const appHtml = mod.render();
+let appHtml = mod.render();
 if (!appHtml || appHtml.length < 1000) {
   throw new Error(`[prerender] подозрительно мало HTML (${appHtml?.length ?? 0} симв.) — рендер сорвался`);
 }
+
+// 2б. LCP-фикс: framer вписывает стартовое состояние входных анимаций инлайном
+// (opacity:0 + blur + translateY) — до загрузки JS страница выглядела пустой.
+// Вычищаем скрытие у КОНТЕНТА (style начинается с opacity:0); декор-сферы
+// (opacity:0 в середине style) не трогаем. После гидрации анимации отработают.
+let unhidden = 0;
+appHtml = appHtml.replace(/style="opacity:0([^"]*)"/g, (_mm, rest) => {
+  unhidden++;
+  const cleaned = rest
+    .replace(/;?filter:blur\([^)]*\)/g, "")
+    .replace(/;?transform:translateY\([^)]*\)/g, "");
+  return `style="opacity:1${cleaned}"`;
+});
+console.log(`[prerender] показано в статике (LCP): ${unhidden} скрытых анимацией элементов`);
 
 // 3. вставка в dist/index.html
 let html = readFileSync(INDEX, "utf8");
