@@ -1165,11 +1165,12 @@ function Scenarios() {
           ))}
         </div>
 
-        {/* Контент таба всегда видим (opacity 1), без анимации входа — это гарантия,
-            что панель не «зависнет» пустой. Прежний AnimatePresence(mode="wait")
-            зависал из-за вложенного AnimatePresence (раскрывашки): при клике по табу
-            старый блок уходил в opacity:0, а новый не монтировался. */}
-          <div key={active} className="mt-12">
+        {/* Контент таба: keyed remount + CSS-фейд .tab-fade (скрытие только в
+            from-кадре keyframes, базовое состояние видимое — «залипнуть» пустым
+            невозможно). JS-анимации тут не используем: прежний
+            AnimatePresence(mode="wait") зависал из-за вложенного AnimatePresence
+            (раскрывашки) — старый блок уходил в opacity:0, новый не монтировался. */}
+          <div key={active} className="mt-12 tab-fade">
             <div className="max-w-4xl">
               <div className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--red)]">
                 {d.tag}
