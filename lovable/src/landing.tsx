@@ -84,6 +84,10 @@ let pickScenario: (i: number) => void = () => {};
    выборе сценария (карточка Hero, таб, CTA в детали) нужный chip отмечается сам. */
 let noteScenarioForForm: (label: string) => void = () => {};
 
+/* Кейсы ↔ сценарии: ссылка «Кейсы этого сценария» в детали сценария подсвечивает
+   подходящие карточки в секции #cases (секция регистрирует сеттер). */
+let highlightCases: (scenario: number) => void = () => {};
+
 
 /* ----------------------------- Small helpers ----------------------------- */
 
@@ -1261,7 +1265,7 @@ function Scenarios() {
               })}
             </div>
 
-            <div className="mt-10">
+            <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
               <a
                 href={d.ctaHref}
                 onClick={() => noteScenarioForForm(d.short)}
@@ -1269,6 +1273,14 @@ function Scenarios() {
               >
                 {d.cta}
                 <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
+              </a>
+              <a
+                href="#cases"
+                onClick={() => highlightCases(active)}
+                className="group inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition hover:text-[color:var(--red)]"
+              >
+                Кейсы этого сценария
+                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
               </a>
             </div>
           </div>
@@ -1286,6 +1298,7 @@ function Scenarios() {
 const CASES = [
   {
     category: "Запуски продуктов",
+    scenario: 0, // Абонентское сопровождение: годовая программа, 3 перезапуска
     title: "Курс «10 сфер жизни»",
     nda: true,
     client: "Предприниматель-блогер, 1 млн+ подписчиков",
@@ -1307,6 +1320,7 @@ const CASES = [
   },
   {
     category: "Запуски продуктов",
+    scenario: 1, // Продукт под задачу: запуск конкретного курса под запрос
     title: "Экокурс с нулевым бюджетом на маркетинг",
     nda: true,
     client: "Блогер-эксперт",
@@ -1328,6 +1342,7 @@ const CASES = [
   },
   {
     category: "Корпоративное обучение",
+    scenario: 1, // Продукт под задачу: конкретная ДПО-программа (MVP)
     title: "Цифровой Брокер",
     client: "Global Broker League",
     link: "https://globalbrokerleague.com/",
@@ -1349,6 +1364,7 @@ const CASES = [
   },
   {
     category: "Корпоративное обучение",
+    scenario: 2, // Практикум для L&D: передача подхода внутренним тренерам
     title: "Продуктовый подход в корпоративном обучении",
     client: "Корпоративный заказчик",
     role: "Разработка и проведение тренинга",
@@ -1368,7 +1384,15 @@ const CASES = [
   },
 ];
 
-function CaseCard({ item, index }: { item: (typeof CASES)[0]; index: number }) {
+function CaseCard({
+  item,
+  index,
+  highlighted = false,
+}: {
+  item: (typeof CASES)[0];
+  index: number;
+  highlighted?: boolean;
+}) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -1376,10 +1400,23 @@ function CaseCard({ item, index }: { item: (typeof CASES)[0]; index: number }) {
       viewport={{ once: true, margin: "-60px" }}
       transition={{ delay: index * 0.1, duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
     >
-      <GlassCard className="group flex h-full flex-col gap-5 p-6 transition-transform duration-300 hover:-translate-y-1 md:p-7">
+      <GlassCard
+        className={`group flex h-full flex-col gap-5 p-6 transition-transform duration-300 hover:-translate-y-1 md:p-7 ${
+          highlighted ? "ring-2 ring-[color:var(--red)]/60" : ""
+        }`}
+      >
         <div className="flex items-start justify-between gap-4">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--red)]">
-            {item.category}
+          <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+            <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--red)]">
+              {item.category}
+            </div>
+            <a
+              href="#directions"
+              onClick={() => pickScenario(item.scenario)}
+              className="rounded-full border border-border/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground transition hover:border-[color:var(--red)]/50 hover:text-[color:var(--red)]"
+            >
+              Сценарий 0{item.scenario + 1}
+            </a>
           </div>
           {item.nda && (
             <span className="shrink-0 rounded-full border border-border/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -1450,6 +1487,20 @@ function CaseCard({ item, index }: { item: (typeof CASES)[0]; index: number }) {
 }
 
 function Cases() {
+  // подсветка кейсов выбранного сценария (по ссылке из детали сценария)
+  const [hl, setHl] = useState<number | null>(null);
+  useEffect(() => {
+    let t: ReturnType<typeof setTimeout>;
+    highlightCases = (s: number) => {
+      setHl(s);
+      clearTimeout(t);
+      t = setTimeout(() => setHl(null), 4000);
+    };
+    return () => {
+      highlightCases = () => {};
+      clearTimeout(t);
+    };
+  }, []);
   return (
     <section id="cases" className="relative overflow-hidden border-b border-border">
       <AmbientHalo className="-right-40 top-10" color="var(--red)" size={600} opacity={0.1} />
@@ -1471,7 +1522,12 @@ function Cases() {
 
         <div className="mt-14 grid gap-6 md:grid-cols-2">
           {CASES.map((item, i) => (
-            <CaseCard key={item.title} item={item} index={i} />
+            <CaseCard
+              key={item.title}
+              item={item}
+              index={i}
+              highlighted={hl !== null && item.scenario === hl}
+            />
           ))}
         </div>
       </div>
@@ -1837,7 +1893,7 @@ function Contact() {
               >
                 <Field label="Имя" name="name" placeholder="Как к вам обращаться" dark />
                 <Field label="Компания" name="company" placeholder="Название компании" dark />
-                <Field label="Email или Telegram" name="contact" placeholder="вы@company.com / @username" dark />
+                <Field label="Телефон, Email или Telegram" name="contact" placeholder="+7 900 000-00-00 / @username / вы@company.com" dark />
                 <div>
                   <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-background/60">
                     Какой сценарий ближе <span className="text-background/40 normal-case tracking-normal">(можно позже)</span>
@@ -1907,9 +1963,18 @@ function Contact() {
                   <span className="relative">{sending ? "ОТПРАВЛЯЕМ…" : "ЗАПИСАТЬСЯ НА ДИАГНОСТИКУ"}</span>
                   <ArrowUpRight className="relative h-5 w-5 transition group-hover:rotate-45" />
                 </button>
-                <p className="text-xs text-background/50">
-                  Не рассылаем спам.
-                </p>
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <p className="text-xs text-background/50">Не рассылаем спам.</p>
+                  <a
+                    href="https://t.me/vikki_duck"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="group inline-flex items-center gap-1.5 text-sm font-semibold text-background/80 transition hover:text-background"
+                  >
+                    Спросить в Telegram
+                    <ArrowUpRight className="h-4 w-4 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+                  </a>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
