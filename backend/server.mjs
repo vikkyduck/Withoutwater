@@ -66,6 +66,15 @@ db.exec(`
     status TEXT DEFAULT 'new',
     legacy_fields TEXT DEFAULT ''
   );
+  -- прохождения визарда «Черновик модели решения»: только выборы, БЕЗ персональных данных
+  CREATE TABLE IF NOT EXISTS wizard_runs (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts TEXT NOT NULL,
+    scenario TEXT DEFAULT '',
+    have TEXT DEFAULT '',
+    goal TEXT DEFAULT '',
+    timing TEXT DEFAULT ''
+  );
 `);
 
 // одноразовая миграция: если таблица пуста, а jsonl есть — импортируем историю.
@@ -265,6 +274,29 @@ const server = http.createServer(async (req, res) => {
     return json(res, 200, { ok: true, id });
   }
 
+  /* ── визард «Черновик модели решения»: фиксация выборов (без ПД) ── */
+  if (req.method === 'POST' && path === '/api/wizard') {
+    cors(res, origin);
+    const ip = clientIp(req);
+    if (!rateOk(ip)) return json(res, 429, { ok: false, error: 'rate_limited' });
+    let p;
+    try { p = JSON.parse(await readBody(req) || '{}'); }
+    catch (e) { return json(res, e.message === 'too_large' ? 413 : 400, { ok: false, error: 'bad_body' }); }
+    const scenario = clean(p.scenario).slice(0, 80);
+    const have = (Array.isArray(p.have) ? p.have : []).map((h) => clean(h).slice(0, 80)).filter(Boolean).slice(0, 8).join(', ');
+    const goal = clean(p.goal).slice(0, 80);
+    const timing = clean(p.timing).slice(0, 80);
+    if (!scenario) return json(res, 400, { ok: false, error: 'no_scenario' });
+    try {
+      db.prepare('INSERT INTO wizard_runs (ts,scenario,have,goal,timing) VALUES (?,?,?,?,?)')
+        .run(new Date().toISOString(), scenario, have, goal, timing);
+    } catch (e) {
+      console.error('[wizard] insert не прошёл:', e.message);
+      return json(res, 500, { ok: false, error: 'store_failed' });
+    }
+    return json(res, 200, { ok: true });
+  }
+
   /* ── админка ── */
   if (path === '/admin' || path.startsWith('/admin/')) {
     if (!adminAuthed(req)) return require401(res);
@@ -307,6 +339,26 @@ const server = http.createServer(async (req, res) => {
       db.prepare('DELETE FROM leads WHERE id = ?').run(Number(mDel[1]));
       console.log(`[admin] заявка #${mDel[1]} удалена (запрос на удаление ПД или ручная очистка)`);
       return json(res, 200, { ok: true });
+    }
+
+    // дайджест визарда: что выбирают чаще всего + последние прохождения
+    if (req.method === 'GET' && path === '/admin/api/wizard/summary') {
+      const total = db.prepare('SELECT COUNT(*) AS c FROM wizard_runs').get().c;
+      const by = (col) => db.prepare(
+        `SELECT ${col} AS k, COUNT(*) AS c FROM wizard_runs WHERE ${col} != '' GROUP BY ${col} ORDER BY c DESC`
+      ).all();
+      // «что есть» — мультивыбор через запятую, раскладываем по значениям
+      const haveCounts = {};
+      for (const r of db.prepare("SELECT have FROM wizard_runs WHERE have != ''").all()) {
+        for (const h of r.have.split(', ')) haveCounts[h] = (haveCounts[h] || 0) + 1;
+      }
+      const recent = db.prepare('SELECT ts,scenario,have,goal,timing FROM wizard_runs ORDER BY id DESC LIMIT 20').all();
+      return json(res, 200, {
+        ok: true, total,
+        scenario: by('scenario'), goal: by('goal'), timing: by('timing'),
+        have: Object.entries(haveCounts).map(([k, c]) => ({ k, c })).sort((a, b) => b.c - a.c),
+        recent,
+      });
     }
 
     if (req.method === 'GET' && path === '/admin/api/export.csv') {

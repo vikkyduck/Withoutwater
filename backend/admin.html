@@ -55,6 +55,22 @@ select.status{padding:8px 10px;border-radius:var(--r);border:1px solid var(--lin
   background-size:400% 100%;animation:sk 1.2s infinite linear;margin-bottom:14px}
 @keyframes sk{to{background-position:-140% 0}}
 .counts{font-size:13.5px;color:var(--soft)}
+/* дайджест визарда */
+.wiz{border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;margin-bottom:24px}
+.wiz h2{font-size:16px;font-weight:800;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.wiz h2 span{font-size:13px;font-weight:600;color:var(--soft)}
+.wiz-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px 28px;margin-top:14px}
+.wiz-col h3{font-size:12px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);margin-bottom:8px}
+.wbar{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;font-size:13.5px;margin-bottom:6px}
+.wbar .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wbar .n{font-weight:800;font-variant-numeric:tabular-nums}
+.wbar .track{grid-column:1/-1;height:4px;border-radius:4px;background:var(--paper);overflow:hidden}
+.wbar .track i{display:block;height:100%;background:var(--ink);border-radius:4px}
+.wiz-recent{margin-top:14px;border-top:1px solid var(--line);padding-top:12px;font-size:13px;color:var(--soft)}
+.wiz-recent summary{cursor:pointer;font-weight:700;color:var(--ink)}
+.wiz-recent table{width:100%;border-collapse:collapse;margin-top:10px}
+.wiz-recent td{padding:6px 10px 6px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.wiz-empty{color:var(--soft);font-size:14px;margin-top:10px}
 footer{padding:32px 0;color:var(--soft);font-size:13px}
 @media(max-width:640px){
   .lead{grid-template-columns:1fr;gap:10px}
@@ -73,6 +89,15 @@ footer{padding:32px 0;color:var(--soft);font-size:13px}
   </div>
 </header>
 <div class="wrap">
+  <div class="wiz" id="wiz" hidden>
+    <h2>Визард «Черновик модели решения» <span id="wizTotal"></span></h2>
+    <div class="wiz-grid" id="wizGrid"></div>
+    <details class="wiz-recent" id="wizRecentBox" hidden>
+      <summary>Последние прохождения</summary>
+      <table id="wizRecent"></table>
+    </details>
+    <div class="wiz-empty" id="wizEmpty" hidden>Пока нет прохождений — дайджест наполнится, когда визард появится на сайте.</div>
+  </div>
   <div class="filters">
     <button class="chip on" data-status="">Все</button>
     <button class="chip" data-status="new">Новые</button>
@@ -181,6 +206,42 @@ footer{padding:32px 0;color:var(--soft);font-size:13px}
   });
 
   load();
+
+  /* ── дайджест визарда ── */
+  function wizBars(title, rows, total){
+    if (!rows.length) return '';
+    var max = rows[0].c || 1;
+    return '<div class="wiz-col"><h3>' + esc(title) + '</h3>' + rows.map(function(r){
+      var pct = total ? Math.round(r.c / total * 100) : 0;
+      return '<div class="wbar"><span class="lab">' + esc(r.k) + '</span>' +
+        '<span class="n">' + r.c + ' · ' + pct + '%</span>' +
+        '<span class="track"><i style="width:' + Math.round(r.c / max * 100) + '%"></i></span></div>';
+    }).join('') + '</div>';
+  }
+  fetch('/admin/api/wizard/summary')
+    .then(function(r){ return r.json(); })
+    .then(function(d){
+      if (!d.ok) return;
+      var box = document.getElementById('wiz');
+      box.hidden = false;
+      document.getElementById('wizTotal').textContent = d.total ? d.total + ' прохождений' : '';
+      if (!d.total){ document.getElementById('wizEmpty').hidden = false; return; }
+      document.getElementById('wizGrid').innerHTML =
+        wizBars('Сценарий', d.scenario, d.total) +
+        wizBars('Что уже есть', d.have, d.total) +
+        wizBars('Нужный результат', d.goal, d.total) +
+        wizBars('Сроки', d.timing, d.total);
+      var rb = document.getElementById('wizRecentBox');
+      rb.hidden = false;
+      document.getElementById('wizRecent').innerHTML = d.recent.map(function(r){
+        return '<tr><td style="white-space:nowrap">' + esc(fmtTs(r.ts)) + '</td>' +
+          '<td><b>' + esc(r.scenario) + '</b>' +
+          (r.have ? ' · есть: ' + esc(r.have) : '') +
+          (r.goal ? ' · результат: ' + esc(r.goal) : '') +
+          (r.timing ? ' · сроки: ' + esc(r.timing) : '') + '</td></tr>';
+      }).join('');
+    })
+    .catch(function(){ /* дайджест не критичен для работы с заявками */ });
 })();
 </script>
 </body>
