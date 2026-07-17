@@ -536,11 +536,19 @@ function AmbientHalo({
 }
 
 /* --------------------------- MeetingSpheres ---------------------------- */
-/* «От встреч рождается новая вселенная»: два лавандовых шарика дрейфуют,
-   раз в 40–70 секунд сходятся — в точке касания загорается искра и рождается
-   третий, серебристо-графитовый (второй тон сфер сайта). Живёт максимум два
-   новорождённых: старший тихо растворяется перед следующей встречей.
-   Canvas, деликатно, pointer-events: none; в калм-режиме не рендерится. */
+/* «От встреч рождается новая вселенная», v2 по фидбеку заказчицы:
+   — рождение происходит ОТ КАСАНИЯ: шарики физически не проходят друг сквозь
+     друга — каждый контакт либо рождает третий, либо мягко отталкивает
+     (пересечений «вхолостую» не бывает);
+   — цвет новорождённого — СМЕСЬ цветов двух столкнувшихся; стартовые родители
+     разных тонов палитры (лаванда + хром), так что дети — новые оттенки
+     внутри той же гаммы;
+   — плановые встречи: первая через ~9–14 с, дальше раз в 40–70 с шарики сами
+     тянутся друг к другу; случайные касания тоже рождают (с кулдауном);
+   — живёт не больше 6 шариков: старший новорождённый тихо растворяется.
+   Canvas, pointer-events: none; в калм-режиме не рендерится. */
+
+type SphereRGB = [number, number, number];
 
 function MeetingSpheres({ className = "" }: { className?: string }) {
   const [calm] = useCalm();
@@ -571,153 +579,235 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
     ro.observe(parent);
 
     const rand = (a: number, b: number) => a + Math.random() * (b - a);
-    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
     const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
-    const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
     const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+    const mixRGB = (a: SphereRGB, b: SphereRGB): SphereRGB => [
+      Math.round((a[0] + b[0]) / 2),
+      Math.round((a[1] + b[1]) / 2),
+      Math.round((a[2] + b[2]) / 2),
+    ];
+    const lighten = (c: SphereRGB, t: number): SphereRGB => [
+      Math.round(c[0] + (255 - c[0]) * t),
+      Math.round(c[1] + (255 - c[1]) * t),
+      Math.round(c[2] + (255 - c[2]) * t),
+    ];
+    const darken = (c: SphereRGB, t: number): SphereRGB => [
+      Math.round(c[0] * (1 - t)),
+      Math.round(c[1] * (1 - t)),
+      Math.round(c[2] * (1 - t)),
+    ];
+    const css = (c: SphereRGB, a = 1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+
+    const LAV: SphereRGB = [153, 146, 165];   // лаванда сайта #9992A5
+    const CHROME: SphereRGB = [167, 169, 174]; // хром/серебро
 
     type Orb = {
-      r: number; homeX: number; homeY: number;
-      ampX: number; ampY: number; freqX: number; freqY: number;
-      phaseX: number; phaseY: number; born: number;
-      x: number; y: number; opacity: number; tone: "lav" | "chrome";
-      dying?: boolean;
+      r: number; x: number; y: number; vx: number; vy: number;
+      homeX: number; homeY: number; ampX: number; ampY: number;
+      freqX: number; freqY: number; phaseX: number; phaseY: number;
+      born: number; opacity: number; color: SphereRGB;
+      growT?: number; growTarget?: number; dying?: boolean; isParent?: boolean;
     };
-    // дрейф — в правой части секции, где нет текста
+
     const zone = () => ({ x0: W * 0.5, x1: W * 0.96, y0: H * 0.08, y1: H * 0.9 });
-    const makeOrb = (tone: "lav" | "chrome", r: number, cx?: number, cy?: number): Orb => {
+    const makeOrb = (color: SphereRGB, r: number, cx?: number, cy?: number): Orb => {
       const z = zone();
+      const x = cx ?? rand(z.x0 + r, z.x1 - r);
+      const y = cy ?? rand(z.y0 + r, z.y1 - r);
       return {
-        r,
-        homeX: cx ?? rand(z.x0 + r, z.x1 - r),
-        homeY: cy ?? rand(z.y0 + r, z.y1 - r),
-        ampX: rand(W * 0.05, W * 0.12), ampY: rand(H * 0.08, H * 0.2),
+        r, x, y, vx: 0, vy: 0,
+        homeX: x, homeY: y,
+        ampX: rand(W * 0.05, W * 0.13), ampY: rand(H * 0.1, H * 0.24),
         freqX: rand(0.00014, 0.00024) * (Math.random() < 0.5 ? 1 : -1),
         freqY: rand(0.00012, 0.0002) * (Math.random() < 0.5 ? 1 : -1),
         phaseX: rand(0, Math.PI * 2), phaseY: rand(0, Math.PI * 2),
-        born: performance.now(),
-        x: 0, y: 0, opacity: 0, tone,
-      };
-    };
-    const ambient = (o: Orb, now: number) => {
-      const t = now - o.born;
-      return {
-        x: o.homeX + o.ampX * Math.sin(o.freqX * t + o.phaseX),
-        y: o.homeY + o.ampY * Math.cos(o.freqY * t + o.phaseY),
+        born: performance.now(), opacity: 0, color,
       };
     };
 
-    const parents: Orb[] = [makeOrb("lav", rand(30, 40)), makeOrb("lav", rand(42, 54))];
-    let newborns: Orb[] = [];
-    let meet: {
-      t0: number; ax0: number; ay0: number; bx0: number; by0: number;
-      mx: number; my: number; sparkR: number; newborn: Orb | null;
-    } | null = null;
+    let orbs: Orb[] = [
+      Object.assign(makeOrb(LAV, rand(38, 48)), { isParent: true }),
+      Object.assign(makeOrb(CHROME, rand(30, 40)), { isParent: true }),
+    ];
+    const MAX_ORBS = 6;
+    type Flash = { x: number; y: number; t0: number; color: SphereRGB };
+    let flashes: Flash[] = [];
+    const touching = new Set<string>();
+    let birthCooldownUntil = 0;
+    // плановая встреча: пара мягко тянется друг к другу до касания
+    let steer: [number, number] | null = null;
     let nextMeetAt = performance.now() + rand(9000, 14000);
-    const APPROACH = 1100;
-    const SPARK = 1000;
-    const TOTAL = APPROACH + SPARK;
 
-    const drawOrb = (x: number, y: number, r: number, opacity: number, tone: "lav" | "chrome") => {
-      if (opacity <= 0.01 || r <= 0.5) return;
+    const birth = (a: Orb, b: Orb, now: number) => {
+      const nx = (a.x * b.r + b.x * a.r) / (a.r + b.r);
+      const ny = (a.y * b.r + b.y * a.r) / (a.r + b.r);
+      const color = mixRGB(a.color, b.color);
+      flashes.push({ x: nx, y: ny, t0: now, color });
+      const nb = makeOrb(color, rand(16, 24), nx, ny);
+      nb.growT = now;
+      nb.growTarget = nb.r;
+      nb.r = 2;
+      nb.vx = rand(-0.6, 0.6);
+      nb.vy = rand(-0.6, 0.6);
+      orbs.push(nb);
+      // не больше MAX_ORBS: старший не-родитель растворяется
+      const alive = orbs.filter((o) => !o.isParent && !o.dying);
+      if (alive.length > MAX_ORBS - 2) alive[0].dying = true;
+      birthCooldownUntil = now + rand(25000, 40000);
+    };
+
+    const drawOrb = (o: Orb) => {
+      if (o.opacity <= 0.01 || o.r <= 0.5) return;
       ctx.save();
-      ctx.globalAlpha = opacity;
-      const g = ctx.createRadialGradient(x - r * 0.32, y - r * 0.34, r * 0.05, x, y, r);
-      if (tone === "chrome") {
-        g.addColorStop(0, "#FAFAFA"); g.addColorStop(0.45, "#B4B6BC");
-        g.addColorStop(0.85, "#45494E"); g.addColorStop(1, "#1D1F23");
-      } else {
-        g.addColorStop(0, "#F4F2F6"); g.addColorStop(0.34, "#C9C4D2");
-        g.addColorStop(0.72, "#9992A5"); g.addColorStop(1, "#5C5568");
-      }
+      ctx.globalAlpha = o.opacity;
+      const g = ctx.createRadialGradient(
+        o.x - o.r * 0.32, o.y - o.r * 0.34, o.r * 0.05, o.x, o.y, o.r
+      );
+      g.addColorStop(0, css(lighten(o.color, 0.78)));
+      g.addColorStop(0.34, css(lighten(o.color, 0.3)));
+      g.addColorStop(0.74, css(o.color));
+      g.addColorStop(1, css(darken(o.color, 0.42)));
       ctx.fillStyle = g;
-      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
-      ctx.globalAlpha = opacity * 0.4;
+      ctx.beginPath();
+      ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.globalAlpha = o.opacity * 0.4;
       ctx.fillStyle = "#FFFFFF";
       ctx.beginPath();
-      ctx.ellipse(x - r * 0.32, y - r * 0.36, r * 0.32, r * 0.18, -0.5, 0, Math.PI * 2);
+      ctx.ellipse(o.x - o.r * 0.32, o.y - o.r * 0.36, o.r * 0.32, o.r * 0.18, -0.5, 0, Math.PI * 2);
       ctx.fill();
       ctx.restore();
     };
 
+    let last = performance.now();
     let raf = 0;
     const frame = (now: number) => {
+      const dt = Math.min(40, now - last);
+      last = now;
       ctx.clearRect(0, 0, W, H);
+      const z = zone();
 
-      if (!meet && now >= nextMeetAt && W > 480) {
-        const pa = ambient(parents[0], now);
-        const pb = ambient(parents[1], now);
-        meet = {
-          t0: now, ax0: pa.x, ay0: pa.y, bx0: pb.x, by0: pb.y,
-          mx: (pa.x + pb.x) / 2, my: (pa.y + pb.y) / 2,
-          sparkR: 0, newborn: null,
-        };
-        // не больше двух новорождённых: старший начинает растворяться
-        if (newborns.length >= 2) newborns[0].dying = true;
-      }
-
-      parents.forEach((o) => {
-        const p = ambient(o, now);
-        o.x = p.x; o.y = p.y;
-        o.opacity = Math.min(1, o.opacity + 0.02);
-      });
-
-      if (meet) {
-        const el = now - meet.t0;
-        if (el < APPROACH) {
-          const u = easeInOut(clamp01(el / APPROACH));
-          parents[0].x = lerp(meet.ax0, meet.mx, u * 0.44);
-          parents[0].y = lerp(meet.ay0, meet.my, u * 0.44);
-          parents[1].x = lerp(meet.bx0, meet.mx, u * 0.44);
-          parents[1].y = lerp(meet.by0, meet.my, u * 0.44);
-        } else if (el < TOTAL) {
-          const u = clamp01((el - APPROACH) / SPARK);
-          // родители мягко возвращаются к своему дрейфу (движущаяся цель — без скачка)
-          const ta = ambient(parents[0], now);
-          const tb = ambient(parents[1], now);
-          parents[0].x = lerp(lerp(meet.ax0, meet.mx, 0.44), ta.x, easeOut(u));
-          parents[0].y = lerp(lerp(meet.ay0, meet.my, 0.44), ta.y, easeOut(u));
-          parents[1].x = lerp(lerp(meet.bx0, meet.mx, 0.44), tb.x, easeOut(u));
-          parents[1].y = lerp(lerp(meet.by0, meet.my, 0.44), tb.y, easeOut(u));
-          // искра → хромовый новорождённый
-          meet.sparkR = lerp(2, rand(16, 20), easeOut(u));
-          if (u < 0.3) {
-            const f = 1 - u / 0.3;
-            ctx.save();
-            ctx.globalAlpha = f * 0.9;
-            const fg = ctx.createRadialGradient(meet.mx, meet.my, 0, meet.mx, meet.my, 60);
-            fg.addColorStop(0, "rgba(255,255,255,0.95)");
-            fg.addColorStop(0.4, "rgba(230,227,233,0.5)");
-            fg.addColorStop(1, "rgba(230,227,233,0)");
-            ctx.fillStyle = fg;
-            ctx.beginPath(); ctx.arc(meet.mx, meet.my, 60, 0, Math.PI * 2); ctx.fill();
-            ctx.restore();
+      // плановая встреча: выбираем ближайшую пару и тянем друг к другу
+      if (!steer && now >= nextMeetAt && orbs.length >= 2 && W > 480) {
+        let bi = 0, bj = 1, bd = Infinity;
+        for (let i = 0; i < orbs.length; i++)
+          for (let j = i + 1; j < orbs.length; j++) {
+            if (orbs[i].dying || orbs[j].dying) continue;
+            const d = Math.hypot(orbs[i].x - orbs[j].x, orbs[i].y - orbs[j].y);
+            if (d < bd) { bd = d; bi = i; bj = j; }
           }
-          drawOrb(meet.mx, meet.my, meet.sparkR, Math.min(1, u * 1.6), "chrome");
+        steer = [bi, bj];
+      }
+
+      orbs.forEach((o, idx) => {
+        // рост новорождённого
+        if (o.growT != null && o.growTarget != null) {
+          const u = clamp01((now - o.growT) / 900);
+          o.r = 2 + (o.growTarget - 2) * easeOut(u);
+          if (u >= 1) { o.growT = undefined; }
+        }
+        // блуждающая «домашняя» точка + пружина к ней;
+        // в плановую встречу цель пары — их общая середина (пружина сама сводит)
+        const t = now - o.born;
+        let tx = o.homeX + o.ampX * Math.sin(o.freqX * t + o.phaseX);
+        let ty = o.homeY + o.ampY * Math.cos(o.freqY * t + o.phaseY);
+        let k = 0.00035;
+        if (steer && (idx === steer[0] || idx === steer[1])) {
+          const other = orbs[idx === steer[0] ? steer[1] : steer[0]];
+          if (other) {
+            tx = (o.x + other.x) / 2;
+            ty = (o.y + other.y) / 2;
+            k = 0.0007;
+          }
+        }
+        o.vx += (tx - o.x) * k * dt;
+        o.vy += (ty - o.y) * k * dt;
+        // мягкие границы зоны
+        if (o.x < z.x0 + o.r) o.vx += (z.x0 + o.r - o.x) * 0.0004 * dt;
+        if (o.x > z.x1 - o.r) o.vx -= (o.x - (z.x1 - o.r)) * 0.0004 * dt;
+        if (o.y < z.y0 + o.r) o.vy += (z.y0 + o.r - o.y) * 0.0004 * dt;
+        if (o.y > z.y1 - o.r) o.vy -= (o.y - (z.y1 - o.r)) * 0.0004 * dt;
+        const damp = Math.pow(0.92, dt / 16);
+        o.vx *= damp; o.vy *= damp;
+        o.x += o.vx * (dt / 16);
+        o.y += o.vy * (dt / 16);
+        if (o.dying) {
+          o.opacity = Math.max(0, o.opacity - 0.006 * (dt / 16));
         } else {
-          const nb = makeOrb("chrome", meet.sparkR || 18, meet.mx, meet.my);
-          nb.opacity = 1;
-          newborns.push(nb);
-          meet = null;
-          nextMeetAt = now + rand(40000, 70000);
+          o.opacity = Math.min(1, o.opacity + 0.02 * (dt / 16));
+        }
+      });
+      orbs = orbs.filter((o) => !(o.dying && o.opacity <= 0));
+
+      // столкновения: касание = рождение (или мягкий отскок в кулдаун)
+      for (let i = 0; i < orbs.length; i++) {
+        for (let j = i + 1; j < orbs.length; j++) {
+          const a = orbs[i], b = orbs[j];
+          const dx = b.x - a.x, dy = b.y - a.y;
+          const dist = Math.hypot(dx, dy) || 0.001;
+          const minD = a.r + b.r + 4;
+          const key = i + "-" + j;
+          if (dist < minD) {
+            // позиционное разведение + мягкий импульс (сквозь не проходят)
+            const nx = dx / dist, ny = dy / dist;
+            const overlap = minD - dist;
+            const wa = b.r / (a.r + b.r), wb = a.r / (a.r + b.r);
+            a.x -= nx * overlap * 0.5 * wa; a.y -= ny * overlap * 0.5 * wa;
+            b.x += nx * overlap * 0.5 * wb; b.y += ny * overlap * 0.5 * wb;
+            const imp = overlap * 0.012 * dt;
+            a.vx -= nx * imp * wa; a.vy -= ny * imp * wa;
+            b.vx += nx * imp * wb; b.vy += ny * imp * wb;
+            if (!touching.has(key)) {
+              touching.add(key);
+              const growing = a.growT != null || b.growT != null;
+              const planned = steer && ((steer[0] === i && steer[1] === j) || (steer[0] === j && steer[1] === i));
+              const chanceAllowed = now >= birthCooldownUntil && orbs.length < MAX_ORBS;
+              if (!growing && !a.dying && !b.dying && (planned || chanceAllowed)) {
+                birth(a, b, now);
+                if (planned) {
+                  steer = null;
+                  nextMeetAt = now + rand(40000, 70000);
+                  // разлёт: дома́ разводим вдоль нормали, дрейф стартует из своей точки
+                  const D = (a.r + b.r) * 1.6;
+                  const home = (o: Orb, sgn: number) => {
+                    o.born = now;
+                    const px = o.x + sgn * nx * D * 0.5;
+                    const py = o.y + sgn * ny * D * 0.5;
+                    o.homeX = px - o.ampX * Math.sin(o.phaseX);
+                    o.homeY = py - o.ampY * Math.cos(o.phaseY);
+                  };
+                  home(a, -1);
+                  home(b, 1);
+                  a.vx -= nx * 1.1; a.vy -= ny * 1.1;
+                  b.vx += nx * 1.1; b.vy += ny * 1.1;
+                }
+              }
+            }
+          } else {
+            touching.delete(key);
+          }
         }
       }
 
-      newborns = newborns.filter((o) => {
-        if (o.dying) {
-          o.opacity -= 0.008;
-          if (o.opacity <= 0) return false;
-        } else {
-          o.opacity = Math.min(1, o.opacity + 0.02);
-        }
-        const p = ambient(o, now);
-        o.x = p.x; o.y = p.y;
+      // вспышки рождения
+      flashes = flashes.filter((f) => {
+        const u = (now - f.t0) / 500;
+        if (u >= 1) return false;
+        ctx.save();
+        ctx.globalAlpha = (1 - u) * 0.85;
+        const fg = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, 64);
+        fg.addColorStop(0, "rgba(255,255,255,0.95)");
+        fg.addColorStop(0.4, css(lighten(f.color, 0.5), 0.5));
+        fg.addColorStop(1, css(lighten(f.color, 0.5), 0));
+        ctx.fillStyle = fg;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, 64, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
         return true;
       });
 
-      parents.forEach((o) => drawOrb(o.x, o.y, o.r, o.opacity, o.tone));
-      newborns.forEach((o) => drawOrb(o.x, o.y, o.r, o.opacity, o.tone));
-
+      orbs.forEach(drawOrb);
       raf = requestAnimationFrame(frame);
     };
     raf = requestAnimationFrame(frame);
