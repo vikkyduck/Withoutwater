@@ -598,23 +598,27 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
     ];
     const css = (c: SphereRGB, a = 1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 
-    const LAV: SphereRGB = [153, 146, 165];   // лаванда сайта #9992A5
-    const CHROME: SphereRGB = [167, 169, 174]; // хром/серебро
+    const LAV: SphereRGB = [153, 146, 165];      // лаванда сайта #9992A5
+    const CHROME: SphereRGB = [167, 169, 174];   // хром/серебро
+    const LAV_LIGHT: SphereRGB = [201, 196, 210]; // светлая лаванда #C9C4D2
 
     type Orb = {
+      id: number;
       r: number; x: number; y: number; vx: number; vy: number;
       homeX: number; homeY: number; ampX: number; ampY: number;
       freqX: number; freqY: number; phaseX: number; phaseY: number;
       born: number; opacity: number; color: SphereRGB;
       growT?: number; growTarget?: number; dying?: boolean; isParent?: boolean;
     };
+    let orbSeq = 0;
 
-    const zone = () => ({ x0: W * 0.5, x1: W * 0.96, y0: H * 0.08, y1: H * 0.9 });
+    const zone = () => ({ x0: W * 0.44, x1: W * 0.78, y0: H * 0.12, y1: H * 0.86 });
     const makeOrb = (color: SphereRGB, r: number, cx?: number, cy?: number): Orb => {
       const z = zone();
       const x = cx ?? rand(z.x0 + r, z.x1 - r);
       const y = cy ?? rand(z.y0 + r, z.y1 - r);
       return {
+        id: ++orbSeq,
         r, x, y, vx: 0, vy: 0,
         homeX: x, homeY: y,
         ampX: rand(W * 0.05, W * 0.13), ampY: rand(H * 0.1, H * 0.24),
@@ -625,18 +629,27 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
       };
     };
 
-    let orbs: Orb[] = [
-      Object.assign(makeOrb(LAV, rand(38, 48)), { isParent: true }),
-      Object.assign(makeOrb(CHROME, rand(30, 40)), { isParent: true }),
-    ];
+    const makeSpaced = (color: SphereRGB, r: number, others: Orb[]): Orb => {
+      for (let tries = 0; tries < 24; tries++) {
+        const o = makeOrb(color, r);
+        if (others.every((p) => Math.hypot(p.x - o.x, p.y - o.y) > p.r + o.r + 50)) return o;
+      }
+      return makeOrb(color, r);
+    };
+    const orbsInit: Orb[] = [];
+    orbsInit.push(Object.assign(makeSpaced(LAV, rand(38, 48), orbsInit), { isParent: true }));
+    orbsInit.push(Object.assign(makeSpaced(CHROME, rand(30, 40), orbsInit), { isParent: true }));
+    orbsInit.push(Object.assign(makeSpaced(LAV_LIGHT, rand(20, 26), orbsInit), { isParent: true }));
+    let orbs: Orb[] = orbsInit;
     const MAX_ORBS = 6;
     type Flash = { x: number; y: number; t0: number; color: SphereRGB };
     let flashes: Flash[] = [];
     const touching = new Set<string>();
     let birthCooldownUntil = 0;
     // плановая встреча: пара мягко тянется друг к другу до касания
-    let steer: [number, number] | null = null;
-    let nextMeetAt = performance.now() + rand(9000, 14000);
+    let steer: [Orb, Orb] | null = null;
+    let steerSince = 0;
+    let nextMeetAt = performance.now() + rand(4000, 7000);
 
     const birth = (a: Orb, b: Orb, now: number) => {
       const nx = (a.x * b.r + b.x * a.r) / (a.r + b.r);
@@ -650,9 +663,12 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
       nb.vx = rand(-0.6, 0.6);
       nb.vy = rand(-0.6, 0.6);
       orbs.push(nb);
-      // не больше MAX_ORBS: старший не-родитель растворяется
-      const alive = orbs.filter((o) => !o.isParent && !o.dying);
-      if (alive.length > MAX_ORBS - 2) alive[0].dying = true;
+      // держим популяцию: всё сверх MAX_ORBS — старшие дети растворяются
+      let excess = orbs.filter((o) => !o.dying).length - MAX_ORBS;
+      for (const kid of orbs) {
+        if (excess <= 0) break;
+        if (!kid.isParent && !kid.dying) { kid.dying = true; excess--; }
+      }
       birthCooldownUntil = now + rand(25000, 40000);
     };
 
@@ -689,17 +705,24 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
 
       // плановая встреча: выбираем ближайшую пару и тянем друг к другу
       if (!steer && now >= nextMeetAt && orbs.length >= 2 && W > 480) {
-        let bi = 0, bj = 1, bd = Infinity;
+        let pick: [Orb, Orb] | null = null;
+        let bd = Infinity;
         for (let i = 0; i < orbs.length; i++)
           for (let j = i + 1; j < orbs.length; j++) {
             if (orbs[i].dying || orbs[j].dying) continue;
             const d = Math.hypot(orbs[i].x - orbs[j].x, orbs[i].y - orbs[j].y);
-            if (d < bd) { bd = d; bi = i; bj = j; }
+            if (d < bd) { bd = d; pick = [orbs[i], orbs[j]]; }
           }
-        steer = [bi, bj];
+        steer = pick;
+        steerSince = now;
+      }
+      // страховка: если сведение зависло — пересобрать план
+      if (steer && now - steerSince > 10000) {
+        steer = null;
+        nextMeetAt = now + 1500;
       }
 
-      orbs.forEach((o, idx) => {
+      orbs.forEach((o) => {
         // рост новорождённого
         if (o.growT != null && o.growTarget != null) {
           const u = clamp01((now - o.growT) / 900);
@@ -712,13 +735,11 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
         let tx = o.homeX + o.ampX * Math.sin(o.freqX * t + o.phaseX);
         let ty = o.homeY + o.ampY * Math.cos(o.freqY * t + o.phaseY);
         let k = 0.00035;
-        if (steer && (idx === steer[0] || idx === steer[1])) {
-          const other = orbs[idx === steer[0] ? steer[1] : steer[0]];
-          if (other) {
-            tx = (o.x + other.x) / 2;
-            ty = (o.y + other.y) / 2;
-            k = 0.0007;
-          }
+        if (steer && (o === steer[0] || o === steer[1])) {
+          const other = o === steer[0] ? steer[1] : steer[0];
+          tx = (o.x + other.x) / 2;
+          ty = (o.y + other.y) / 2;
+          k = 0.0013;
         }
         o.vx += (tx - o.x) * k * dt;
         o.vy += (ty - o.y) * k * dt;
@@ -732,7 +753,7 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
         o.x += o.vx * (dt / 16);
         o.y += o.vy * (dt / 16);
         if (o.dying) {
-          o.opacity = Math.max(0, o.opacity - 0.006 * (dt / 16));
+          o.opacity = Math.max(0, o.opacity - 0.012 * (dt / 16));
         } else {
           o.opacity = Math.min(1, o.opacity + 0.02 * (dt / 16));
         }
@@ -746,7 +767,7 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
           const dx = b.x - a.x, dy = b.y - a.y;
           const dist = Math.hypot(dx, dy) || 0.001;
           const minD = a.r + b.r + 4;
-          const key = i + "-" + j;
+          const key = a.id + "-" + b.id;
           if (dist < minD) {
             // позиционное разведение + мягкий импульс (сквозь не проходят)
             const nx = dx / dist, ny = dy / dist;
@@ -757,16 +778,17 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
             const imp = overlap * 0.012 * dt;
             a.vx -= nx * imp * wa; a.vy -= ny * imp * wa;
             b.vx += nx * imp * wb; b.vy += ny * imp * wb;
-            if (!touching.has(key)) {
-              touching.add(key);
+            const firstTouch = !touching.has(key);
+            touching.add(key);
+            {
               const growing = a.growT != null || b.growT != null;
-              const planned = steer && ((steer[0] === i && steer[1] === j) || (steer[0] === j && steer[1] === i));
-              const chanceAllowed = now >= birthCooldownUntil && orbs.length < MAX_ORBS;
+              const planned = steer && ((steer[0] === a && steer[1] === b) || (steer[0] === b && steer[1] === a));
+              const chanceAllowed = firstTouch && now >= birthCooldownUntil && orbs.length < MAX_ORBS;
               if (!growing && !a.dying && !b.dying && (planned || chanceAllowed)) {
                 birth(a, b, now);
                 if (planned) {
                   steer = null;
-                  nextMeetAt = now + rand(40000, 70000);
+                  nextMeetAt = now + rand(35000, 60000);
                   // разлёт: дома́ разводим вдоль нормали, дрейф стартует из своей точки
                   const D = (a.r + b.r) * 1.6;
                   const home = (o: Orb, sgn: number) => {
@@ -874,12 +896,11 @@ function Hero() {
       <div className="pointer-events-none absolute inset-x-0 bottom-40 mx-auto h-px max-w-7xl bg-border" />
       <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px bg-border/60" />
 
-      {/* Floating liquid orb + drifting drops */}
+      {/* Floating liquid orb + физика встреч. Все малые шарики hero живут в
+          MeetingSpheres: касание = рождение (цвет-смесь) или отскок; CSS-капли
+          убраны — они плавали сквозь остальных без событий. */}
       <LiquidOrb size={440} className="right-[-80px] top-8 hidden md:block" />
-      {/* встречи шариков: рождение третьего (хромового) — заменяет пару статичных капель */}
       <MeetingSpheres className="hidden md:block" />
-      <LiquidDrop size={90} className="left-[6%] top-[180px] hidden md:block" tone="chrome" delay={0.3} duration={12} />
-      <LiquidDrop size={64} className="right-[8%] bottom-[80px] hidden md:block" tone="chrome" delay={0.7} duration={13} />
 
       <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-10 md:px-6 md:pb-24 md:pt-20">
         <SectionLabel n="01">Проектная команда</SectionLabel>
