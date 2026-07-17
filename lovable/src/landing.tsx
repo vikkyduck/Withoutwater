@@ -535,6 +535,209 @@ function AmbientHalo({
   );
 }
 
+/* --------------------------- MeetingSpheres ---------------------------- */
+/* «От встреч рождается новая вселенная»: два лавандовых шарика дрейфуют,
+   раз в 40–70 секунд сходятся — в точке касания загорается искра и рождается
+   третий, серебристо-графитовый (второй тон сфер сайта). Живёт максимум два
+   новорождённых: старший тихо растворяется перед следующей встречей.
+   Canvas, деликатно, pointer-events: none; в калм-режиме не рендерится. */
+
+function MeetingSpheres({ className = "" }: { className?: string }) {
+  const [calm] = useCalm();
+  const ref = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    if (calm) return;
+    const cv = ref.current;
+    if (!cv) return;
+    const ctx = cv.getContext("2d");
+    if (!ctx) return;
+    const parent = cv.parentElement;
+    if (!parent) return;
+
+    let W = 0;
+    let H = 0;
+    const DPR = Math.min(2, window.devicePixelRatio || 1);
+    const resize = () => {
+      const r = parent.getBoundingClientRect();
+      W = r.width;
+      H = r.height;
+      cv.width = Math.round(W * DPR);
+      cv.height = Math.round(H * DPR);
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    };
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(parent);
+
+    const rand = (a: number, b: number) => a + Math.random() * (b - a);
+    const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
+    const clamp01 = (t: number) => Math.max(0, Math.min(1, t));
+    const easeInOut = (t: number) => (t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2);
+    const easeOut = (t: number) => 1 - Math.pow(1 - t, 3);
+
+    type Orb = {
+      r: number; homeX: number; homeY: number;
+      ampX: number; ampY: number; freqX: number; freqY: number;
+      phaseX: number; phaseY: number; born: number;
+      x: number; y: number; opacity: number; tone: "lav" | "chrome";
+      dying?: boolean;
+    };
+    // дрейф — в правой части секции, где нет текста
+    const zone = () => ({ x0: W * 0.5, x1: W * 0.96, y0: H * 0.08, y1: H * 0.9 });
+    const makeOrb = (tone: "lav" | "chrome", r: number, cx?: number, cy?: number): Orb => {
+      const z = zone();
+      return {
+        r,
+        homeX: cx ?? rand(z.x0 + r, z.x1 - r),
+        homeY: cy ?? rand(z.y0 + r, z.y1 - r),
+        ampX: rand(W * 0.05, W * 0.12), ampY: rand(H * 0.08, H * 0.2),
+        freqX: rand(0.00014, 0.00024) * (Math.random() < 0.5 ? 1 : -1),
+        freqY: rand(0.00012, 0.0002) * (Math.random() < 0.5 ? 1 : -1),
+        phaseX: rand(0, Math.PI * 2), phaseY: rand(0, Math.PI * 2),
+        born: performance.now(),
+        x: 0, y: 0, opacity: 0, tone,
+      };
+    };
+    const ambient = (o: Orb, now: number) => {
+      const t = now - o.born;
+      return {
+        x: o.homeX + o.ampX * Math.sin(o.freqX * t + o.phaseX),
+        y: o.homeY + o.ampY * Math.cos(o.freqY * t + o.phaseY),
+      };
+    };
+
+    const parents: Orb[] = [makeOrb("lav", rand(30, 40)), makeOrb("lav", rand(42, 54))];
+    let newborns: Orb[] = [];
+    let meet: {
+      t0: number; ax0: number; ay0: number; bx0: number; by0: number;
+      mx: number; my: number; sparkR: number; newborn: Orb | null;
+    } | null = null;
+    let nextMeetAt = performance.now() + rand(9000, 14000);
+    const APPROACH = 1100;
+    const SPARK = 1000;
+    const TOTAL = APPROACH + SPARK;
+
+    const drawOrb = (x: number, y: number, r: number, opacity: number, tone: "lav" | "chrome") => {
+      if (opacity <= 0.01 || r <= 0.5) return;
+      ctx.save();
+      ctx.globalAlpha = opacity;
+      const g = ctx.createRadialGradient(x - r * 0.32, y - r * 0.34, r * 0.05, x, y, r);
+      if (tone === "chrome") {
+        g.addColorStop(0, "#FAFAFA"); g.addColorStop(0.45, "#B4B6BC");
+        g.addColorStop(0.85, "#45494E"); g.addColorStop(1, "#1D1F23");
+      } else {
+        g.addColorStop(0, "#F4F2F6"); g.addColorStop(0.34, "#C9C4D2");
+        g.addColorStop(0.72, "#9992A5"); g.addColorStop(1, "#5C5568");
+      }
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+      ctx.globalAlpha = opacity * 0.4;
+      ctx.fillStyle = "#FFFFFF";
+      ctx.beginPath();
+      ctx.ellipse(x - r * 0.32, y - r * 0.36, r * 0.32, r * 0.18, -0.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.restore();
+    };
+
+    let raf = 0;
+    const frame = (now: number) => {
+      ctx.clearRect(0, 0, W, H);
+
+      if (!meet && now >= nextMeetAt && W > 480) {
+        const pa = ambient(parents[0], now);
+        const pb = ambient(parents[1], now);
+        meet = {
+          t0: now, ax0: pa.x, ay0: pa.y, bx0: pb.x, by0: pb.y,
+          mx: (pa.x + pb.x) / 2, my: (pa.y + pb.y) / 2,
+          sparkR: 0, newborn: null,
+        };
+        // не больше двух новорождённых: старший начинает растворяться
+        if (newborns.length >= 2) newborns[0].dying = true;
+      }
+
+      parents.forEach((o) => {
+        const p = ambient(o, now);
+        o.x = p.x; o.y = p.y;
+        o.opacity = Math.min(1, o.opacity + 0.02);
+      });
+
+      if (meet) {
+        const el = now - meet.t0;
+        if (el < APPROACH) {
+          const u = easeInOut(clamp01(el / APPROACH));
+          parents[0].x = lerp(meet.ax0, meet.mx, u * 0.44);
+          parents[0].y = lerp(meet.ay0, meet.my, u * 0.44);
+          parents[1].x = lerp(meet.bx0, meet.mx, u * 0.44);
+          parents[1].y = lerp(meet.by0, meet.my, u * 0.44);
+        } else if (el < TOTAL) {
+          const u = clamp01((el - APPROACH) / SPARK);
+          // родители мягко возвращаются к своему дрейфу (движущаяся цель — без скачка)
+          const ta = ambient(parents[0], now);
+          const tb = ambient(parents[1], now);
+          parents[0].x = lerp(lerp(meet.ax0, meet.mx, 0.44), ta.x, easeOut(u));
+          parents[0].y = lerp(lerp(meet.ay0, meet.my, 0.44), ta.y, easeOut(u));
+          parents[1].x = lerp(lerp(meet.bx0, meet.mx, 0.44), tb.x, easeOut(u));
+          parents[1].y = lerp(lerp(meet.by0, meet.my, 0.44), tb.y, easeOut(u));
+          // искра → хромовый новорождённый
+          meet.sparkR = lerp(2, rand(16, 20), easeOut(u));
+          if (u < 0.3) {
+            const f = 1 - u / 0.3;
+            ctx.save();
+            ctx.globalAlpha = f * 0.9;
+            const fg = ctx.createRadialGradient(meet.mx, meet.my, 0, meet.mx, meet.my, 60);
+            fg.addColorStop(0, "rgba(255,255,255,0.95)");
+            fg.addColorStop(0.4, "rgba(230,227,233,0.5)");
+            fg.addColorStop(1, "rgba(230,227,233,0)");
+            ctx.fillStyle = fg;
+            ctx.beginPath(); ctx.arc(meet.mx, meet.my, 60, 0, Math.PI * 2); ctx.fill();
+            ctx.restore();
+          }
+          drawOrb(meet.mx, meet.my, meet.sparkR, Math.min(1, u * 1.6), "chrome");
+        } else {
+          const nb = makeOrb("chrome", meet.sparkR || 18, meet.mx, meet.my);
+          nb.opacity = 1;
+          newborns.push(nb);
+          meet = null;
+          nextMeetAt = now + rand(40000, 70000);
+        }
+      }
+
+      newborns = newborns.filter((o) => {
+        if (o.dying) {
+          o.opacity -= 0.008;
+          if (o.opacity <= 0) return false;
+        } else {
+          o.opacity = Math.min(1, o.opacity + 0.02);
+        }
+        const p = ambient(o, now);
+        o.x = p.x; o.y = p.y;
+        return true;
+      });
+
+      parents.forEach((o) => drawOrb(o.x, o.y, o.r, o.opacity, o.tone));
+      newborns.forEach((o) => drawOrb(o.x, o.y, o.r, o.opacity, o.tone));
+
+      raf = requestAnimationFrame(frame);
+    };
+    raf = requestAnimationFrame(frame);
+
+    return () => {
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+    };
+  }, [calm]);
+
+  if (calm) return null;
+  return (
+    <canvas
+      ref={ref}
+      aria-hidden
+      className={`pointer-events-none absolute inset-0 h-full w-full ${className}`}
+    />
+  );
+}
+
 
 function RevealHeading({
   children,
@@ -583,9 +786,9 @@ function Hero() {
 
       {/* Floating liquid orb + drifting drops */}
       <LiquidOrb size={440} className="right-[-80px] top-8 hidden md:block" />
+      {/* встречи шариков: рождение третьего (хромового) — заменяет пару статичных капель */}
+      <MeetingSpheres className="hidden md:block" />
       <LiquidDrop size={90} className="left-[6%] top-[180px] hidden md:block" tone="chrome" delay={0.3} duration={12} />
-      <LiquidDrop size={54} className="left-[18%] bottom-[160px] hidden md:block" tone="red" delay={1.0} duration={10} />
-      <LiquidDrop size={38} className="right-[42%] top-[120px] hidden md:block" tone="warm" delay={1.6} duration={9} />
       <LiquidDrop size={64} className="right-[8%] bottom-[80px] hidden md:block" tone="chrome" delay={0.7} duration={13} />
 
       <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-10 md:px-6 md:pb-24 md:pt-20">
@@ -2040,7 +2243,7 @@ function Contact() {
       setSent(true);
       ymGoal("lead_sent");
     } catch {
-      setErr("Заявка не отправилась. Попробуйте ещё раз или напишите в Telegram: @BV_Vikky_bot.");
+      setErr("Заявка не отправилась. Попробуйте ещё раз или напишите в Telegram: @vikki_duck.");
     } finally {
       setSending(false);
     }
@@ -2354,7 +2557,7 @@ function Footer() {
             </div>
             <ul className="mt-4 space-y-1.5 text-sm">
               <li><a href="tel:+79645842225" className="text-foreground/75 transition hover:text-[color:var(--red)]">+7 964 584 22 25</a></li>
-              <li><a href="https://t.me/BV_Vikky_bot" target="_blank" rel="noreferrer" className="text-foreground/75 transition hover:text-[color:var(--red)]">Telegram: @BV_Vikky_bot</a></li>
+              <li><a href="https://t.me/vikki_duck" target="_blank" rel="noreferrer" className="text-foreground/75 transition hover:text-[color:var(--red)]">Telegram: @vikki_duck</a></li>
               <li><a href="mailto:vikavika.utkina@yandex.ru" className="text-foreground/75 transition hover:text-[color:var(--red)]">vikavika.utkina@yandex.ru</a></li>
             </ul>
           </div>

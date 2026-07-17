@@ -180,9 +180,9 @@
     },
     {
       key: "birth", name: "Рождение", n: "02",
-      short: "в точке касания рождается новый, третий",
-      title: "Рождение — встреча создаёт новый шарик",
-      text: "Два шарика лишь соприкасаются и расходятся почти как были — но именно в точке касания загорается искра. Она отделяется и растёт в самостоятельный, третий шарик со своим путём.",
+      short: "рождается третий — другого цвета",
+      title: "Рождение — встреча создаёт новый шарик другого цвета",
+      text: "Два лавандовых шарика соприкасаются и расходятся почти как были — но в точке касания загорается искра. Она растёт в самостоятельный, третий шарик — серебристо-графитовый, как второй вариант сфер сайта: та же палитра, но сразу видно, что он новорождённый.",
     },
     {
       key: "burst", name: "Вспышка", n: "03",
@@ -279,6 +279,7 @@
       targetOpacity: 1,
       born: performance.now(),
       state: "ambient",
+      tone: opts.tone || "lav",
     };
   }
 
@@ -298,16 +299,25 @@
 
   /* ---------------------------- drawing helpers ---------------------------- */
 
-  function drawOrb(x, y, r, opacity, blurPx) {
+  /* tone: "lav" — лавандовый (как шарики сайта), "chrome" — серебристо-графитовый
+     (второй вариант сфер сайта). Рождённый в «Рождении» — хромовый. */
+  function drawOrb(x, y, r, opacity, blurPx, tone) {
     if (opacity <= 0.01 || r <= 0.5) return;
     ctx.save();
     ctx.globalAlpha = opacity;
     if (blurPx) ctx.filter = "blur(" + blurPx + "px)";
     var g = ctx.createRadialGradient(x - r * 0.32, y - r * 0.34, r * 0.05, x, y, r);
-    g.addColorStop(0, "#F4F2F6");
-    g.addColorStop(0.34, "var(--lav-light)".includes("var") ? "#C9C4D2" : "#C9C4D2");
-    g.addColorStop(0.72, "#9992A5");
-    g.addColorStop(1, "#5C5568");
+    if (tone === "chrome") {
+      g.addColorStop(0, "#FAFAFA");
+      g.addColorStop(0.45, "#B4B6BC");
+      g.addColorStop(0.85, "#45494E");
+      g.addColorStop(1, "#1D1F23");
+    } else {
+      g.addColorStop(0, "#F4F2F6");
+      g.addColorStop(0.34, "#C9C4D2");
+      g.addColorStop(0.72, "#9992A5");
+      g.addColorStop(1, "#5C5568");
+    }
     ctx.fillStyle = g;
     ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
     ctx.filter = "none";
@@ -402,7 +412,7 @@
       b.phaseX += rand(1.2, 2.4); b.phaseY += rand(1.2, 2.4);
       a.born = now; b.born = now;
       if (orbs.length < 7) {
-        orbs.push(spawnOrb({ cx: e.mx, cy: e.my, r: rand(16, 24), opacity: 0 }));
+        orbs.push(spawnOrb({ cx: e.mx, cy: e.my, r: rand(16, 24), opacity: 0, tone: "chrome" }));
       }
     } else if (e.variant === "burst") {
       orbs = orbs.filter(function (o) { return o !== a && o !== b; });
@@ -502,7 +512,7 @@
     if (e.variant === "merge" && e.flash) drawFlash(e.mx, e.my, e.a.r * 1.4, e.flash * 0.9);
     if (e.variant === "birth" && e.spark) {
       if (e.spark.flash) drawFlash(e.spark.x, e.spark.y, e.spark.r * 3, e.spark.flash);
-      drawOrb(e.spark.x, e.spark.y, e.spark.r, e.spark.opacity, 0);
+      drawOrb(e.spark.x, e.spark.y, e.spark.r, e.spark.opacity, 0, "chrome");
     }
     if (e.variant === "burst" && e.condenseR) {
       drawOrb(e.mx, e.my, e.condenseR, e.condenseOpacity, e.condenseBlur);
@@ -567,7 +577,7 @@
       drawTether(e.a.x, e.a.y, e.b.x, e.b.y, e.variant === "satellite" ? 0 : strength * (1 - clamp01((ts - e.t0 - e.phase1) / 400)));
     }
 
-    orbs.forEach(function (o) { drawOrb(o.x, o.y, o.r, o.opacity, 0); });
+    orbs.forEach(function (o) { drawOrb(o.x, o.y, o.r, o.opacity, 0, o.tone); });
     drawParticles(ts);
     if (activeEvent) drawEventExtras(activeEvent, ts);
 
