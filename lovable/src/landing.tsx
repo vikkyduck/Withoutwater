@@ -78,14 +78,6 @@ function useCalm(): [boolean, (v: boolean) => void] {
 /* Состояние остаётся локальным useState — это важно: с useSyncExternalStore    */
 /* AnimatePresence(mode="wait") зависал (старый блок не размонтировался).        */
 
-/* Перенос контекста до заявки: форма (#contact) регистрирует сеттер, и при
-   выборе сценария (карточка Hero, таб, CTA в детали) нужный chip отмечается сам. */
-let noteScenarioForForm: (label: string) => void = () => {};
-
-/* Кейсы ↔ сценарии: ссылка «Кейсы этого сценария» в детали сценария подсвечивает
-   подходящие карточки в секции #cases (секция регистрирует сеттер). */
-let highlightCases: (scenario: number) => void = () => {};
-
 /* Микро-цели Яндекс Метрики. Имена целей (создать в интерфейсе Метрики как
    «JavaScript-событие»): scenario_selected, form_started, chip_toggled, lead_sent. */
 function ymGoal(goal: string, params?: Record<string, unknown>) {
@@ -93,12 +85,6 @@ function ymGoal(goal: string, params?: Record<string, unknown>) {
   if (w.ym && w.YM_ID) w.ym(w.YM_ID, "reachGoal", goal, params);
 }
 
-/* Единая точка выбора сценария: цель в Метрику + авто-chip в форме.
-   Вызывается из всех мест выбора: карточка Hero, таб, CTA детали, бейдж кейса. */
-function selectScenario(label: string) {
-  ymGoal("scenario_selected", { scenario: label });
-  noteScenarioForForm(label);
-}
 
 
 /* ----------------------------- Small helpers ----------------------------- */
@@ -132,12 +118,12 @@ function SectionLabel({ n, children }: { n: string; children: React.ReactNode })
 
 function Nav() {
   const links = [
-    ["Продукты", "#directions"],
+    ["Когда мы нужны", "#when"],
+    ["Подход", "#approach"],
     ["Кейсы", "#cases"],
     ["Отзывы", "#reviews"],
-    ["Наш подход", "#guarantees"],
-    ["Команда", "#team"],
     ["Книга", "#book"],
+    ["FAQ", "#faq"],
   ];
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/75 backdrop-blur-xl">
@@ -161,8 +147,8 @@ function Nav() {
           href="#contact"
           className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-[color:var(--red)] px-4 py-2.5 text-xs font-semibold text-background shadow-sm shadow-[color:var(--red)]/20 transition hover:bg-foreground md:px-5 md:text-sm"
         >
-          <span className="hidden sm:inline">Обсудить задачу</span>
-          <span className="sm:hidden">Обсудить</span>
+          <span className="hidden sm:inline">Контакты</span>
+          <span className="sm:hidden">Контакты</span>
           <ArrowUpRight className="h-4 w-4 transition group-hover:rotate-45" />
         </a>
       </div>
@@ -887,70 +873,57 @@ function Hero() {
   return (
     <section id="top" className="relative overflow-hidden border-b border-border">
       <div className="grid-lines absolute inset-0 opacity-60" />
-
-      {/* Breathing ambient halos */}
       <AmbientHalo className="-right-40 -top-20" color="var(--lav)" size={680} opacity={0.3} />
       <AmbientHalo className="-left-40 bottom-0" color="oklch(0.85 0.02 260)" size={560} opacity={0.14} />
-      <AmbientHalo className="left-1/3 top-1/2" color="oklch(0.92 0.03 60)" size={420} opacity={0.1} />
-
-      {/* Minimalist hairlines */}
       <div className="pointer-events-none absolute inset-x-0 top-24 mx-auto h-px max-w-7xl bg-border" />
-      <div className="pointer-events-none absolute inset-x-0 bottom-40 mx-auto h-px max-w-7xl bg-border" />
       <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px bg-border/60" />
-
-      {/* Floating liquid orb + физика встреч (MeetingSpheres): касание = рождение
-          (цвет-смесь) или отскок; статичных CSS-капель в hero нет. */}
       <LiquidOrb size={440} className="right-[-80px] top-8 hidden md:block" />
       <MeetingSpheres className="hidden md:block" />
 
-      <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-10 md:px-6 md:pb-24 md:pt-20">
-        <SectionLabel n="01">Проектная команда для корпоративных программ и продуктов обучения</SectionLabel>
-        <RevealHeading as="h1" className="mt-6 max-w-5xl font-display text-[clamp(1.75rem,7vw,2.5rem)] font-extrabold leading-[1.05] tracking-tight sm:text-5xl md:mt-8 md:text-7xl md:leading-[1.02]">
-          Превращаем{" "}
+      <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-12 md:px-6 md:pb-24 md:pt-24">
+        <RevealHeading as="h1" className="max-w-5xl font-display text-[clamp(1.6rem,6vw,2.2rem)] font-extrabold leading-[1.08] tracking-tight sm:text-4xl md:text-6xl md:leading-[1.05]">
+          Сохраняем{" "}
           <span className="relative inline-block">
-            <span className="relative z-10">знания ваших экспертов</span>
+            <span className="relative z-10">опыт ключевых сотрудников</span>
             <span className="absolute inset-x-0 bottom-1 -z-0 h-4 bg-[color:var(--red)]/25" />
           </span>{" "}
-          в программы, по которым учится вся компания
+          и усиливаем команду внешними экспертами без расширения штата
         </RevealHeading>
 
         <p className="mt-6 max-w-2xl text-base md:text-lg text-muted-foreground">
-          Внешняя команда методологов и продактов. Извлекаем опыт ваших ключевых
-          людей, при необходимости приводим практиков с рынка — и собираем
-          готовую к запуску программу.
+          Переводим подходы сильных экспертов в алгоритмы, стандарты и материалы,
+          которыми может пользоваться вся команда
         </p>
 
-        <ul className="mt-7 flex max-w-2xl flex-col gap-3">
-          {[
-            "Эксперт по обучению приступает к вашему проекту через 72 часа после согласования",
-            "Можно прийти без ТЗ — заберем разрозненные вводные и вернем дорожную карту продукта",
-            "Программы строим на опыте действующих практиков, а не на пересказе теории",
-          ].map((b) => (
-            <li key={b} className="flex items-start gap-3 text-sm leading-relaxed text-foreground/85 md:text-base">
-              <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--red)]" />
-              <span>{b}</span>
-            </li>
-          ))}
-        </ul>
+        <div className="mt-8 max-w-2xl">
+          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--red)]">
+            Почему с нами удобно
+          </div>
+          <ul className="mt-4 flex flex-col gap-3">
+            {[
+              "Можно прийти без готового ТЗ: принимаем вводные в любом виде и собираем из них архитектуру решения и план работ",
+              "В течение 24 часов после согласования назначаем команду и проводим стартовую встречу",
+            ].map((b) => (
+              <li key={b} className="flex items-start gap-3 text-sm leading-relaxed text-foreground/85 md:text-base">
+                <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--red)]" />
+                <span>{b}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
 
         <div className="mt-8 flex flex-col gap-4 md:mt-10">
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
+          <div>
             <a
               href="#contact"
               className="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-[color:var(--red)] px-6 py-3.5 text-sm font-semibold text-background shadow-lg shadow-[color:var(--red)]/20 transition hover:bg-foreground sm:w-auto sm:px-7 sm:py-4 sm:text-base"
             >
-              Обсудить задачу
+              Назначить разбор
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1 sm:h-5 sm:w-5" />
-            </a>
-            <a
-              href="#cases"
-              className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-border bg-background/70 px-6 py-3.5 text-sm font-semibold text-foreground backdrop-blur transition hover:border-[color:var(--red)]/50 hover:text-[color:var(--red)] sm:w-auto sm:px-7 sm:py-4 sm:text-base"
-            >
-              Посмотреть кейсы
             </a>
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground sm:text-sm">
-            <span className="inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[color:var(--red)]" />30 минут онлайн. Сверим задачу и предложим следующий шаг</span>
+            <span className="inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[color:var(--red)]" />30 минут онлайн. Сверимся по задаче и определим следующий шаг</span>
           </div>
         </div>
       </div>
@@ -958,31 +931,129 @@ function Hero() {
   );
 }
 
+/* --------------------------- Stats (цифры) ------------------------------ */
 
-/* --------------------- WhyItWorks (Почему подход работает) --------------------- */
-/* Блок 5 структуры v2: три опоры + принцип-цитата (переехала из старого
-   «Наш принцип»). Тёмная секция — зона Мудреца: чёрный фон, молочный текст,
-   ягодные маркеры, лавандовые сферы. */
+function Stats() {
+  const items = [
+    ["260+", "практиков с подтверждённым опытом в профессиональной сети команды"],
+    ["460+", "разработанных продуктов в портфеле команды"],
+    ["30+", "компаний-клиентов"],
+  ];
+  return (
+    <section className="relative overflow-hidden border-b border-border">
+      <div className="relative mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
+        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          Наш опыт в цифрах
+        </div>
+        <div className="mt-8 grid gap-8 sm:grid-cols-3">
+          {items.map(([n, d]) => (
+            <div key={n} className="border-t-2 border-[color:var(--red)]/60 pt-4">
+              <div className="font-display text-4xl font-extrabold tabular-nums md:text-5xl">{n}</div>
+              <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">{d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-function WhyItWorks() {
+/* --------------------- Flow (схема взаимодействия) ---------------------- */
+
+function Flow() {
+  return (
+    <section className="relative overflow-hidden border-b border-border bg-secondary/30">
+      <div className="relative mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
+        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+          Схема взаимодействия
+        </div>
+        <div className="mt-8 grid gap-4 md:grid-cols-2">
+          {[
+            ["2 рабочих часа", "отвечаем на заявку"],
+            ["30 минут", "проводим первичный разбор"],
+          ].map(([t, d], i) => (
+            <div key={t} className="flex items-start gap-4 rounded-2xl border border-border bg-background/70 p-5 md:p-6">
+              <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full border border-[color:var(--red)]/50 bg-[color:var(--red)]/10 font-display text-sm font-bold text-[color:var(--red)]">
+                {i + 1}
+              </span>
+              <div>
+                <div className="font-display text-lg font-extrabold">{t}</div>
+                <div className="mt-1 text-sm text-muted-foreground">{d}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+        {/* развилка */}
+        <div className="mx-auto mt-4 h-6 w-px bg-border md:mt-6" />
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="rounded-2xl border border-border bg-background/70 p-5 md:p-6">
+            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              Для методологического проекта
+            </div>
+            <div className="mt-3 font-display text-lg font-extrabold">24 часа</div>
+            <div className="mt-1 text-sm text-muted-foreground">назначаем команду и проводим стартовую встречу</div>
+          </div>
+          <div className="rounded-2xl border border-border bg-background/70 p-5 md:p-6">
+            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+              Если нужен внешний эксперт
+            </div>
+            <div className="mt-3 font-display text-lg font-extrabold">72 часа</div>
+            <div className="mt-1 text-sm text-muted-foreground">представляем первые релевантные профили</div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* -------- Capital / Approach / FirstStage (по финальному списку) -------- */
+
+function Capital() {
+  const items = [
+    "сотрудники принимают решения по единым принципам",
+    "практика сильных руководителей передаётся другим командам",
+    "новые сотрудники быстрее осваивают рабочий подход",
+    "руководители меньше времени тратят на повторение одних и тех же объяснений",
+  ];
+  return (
+    <section id="capital" className="relative overflow-hidden border-b border-border bg-[color:var(--lav-soft)]/45">
+      <AmbientHalo className="-right-40 top-10" color="var(--lav)" size={520} opacity={0.2} />
+      <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
+        <SectionLabel n="03">Интеллектуальный капитал</SectionLabel>
+        <RevealHeading className="mt-6 max-w-4xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
+          С нами экспертный опыт становится интеллектуальным капиталом компании
+        </RevealHeading>
+        <ul className="mt-10 grid max-w-4xl gap-4 sm:grid-cols-2">
+          {items.map((t) => (
+            <li key={t} className="flex items-start gap-3 rounded-2xl border border-border bg-background/70 p-5 text-sm leading-relaxed text-foreground/85 md:text-[15px]">
+              <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--red)]" />
+              <span>{t}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function Approach() {
   const pillars = [
     {
-      t: "Тиражирование лучших практик",
-      d: "Извлекаем знания ваших ключевых сотрудников и переводим их в структурированные алгоритмы, которые легко передать остальной команде.",
+      t: "Доступ к нужной практике",
+      d: "В профессиональной сети команды — более 260 руководителей и отраслевых специалистов. Подключаем к проекту практиков, которые уже решали сопоставимые задачи",
     },
     {
-      t: "Доступ к рыночному опыту",
-      d: "Если нужной компетенции внутри нет — наш нетворк позволяет привести действующих топов и узких hard-специалистов и встроить их практику в ваш контекст.",
+      t: "Перевод опыта в рабочие инструменты",
+      d: "Методологи превращают решения экспертов в алгоритмы, стандарты, кейсы и материалы, адаптированные под задачи и язык вашей компании.",
     },
     {
-      t: "Скорость без потери качества",
-      d: "Пул проверенных методологов: эксперт приступает через 72 часа, полный цикл проектирования — на нашей стороне.",
+      t: "Один договор вместо отдельных договоров с практиками",
+      d: "Подключаем практиков, оформляем договорённости, координируем их работу и переводим опыт в согласованный результат. Вы работаете с одной проектной командой и одним договором.",
     },
   ];
   return (
-    <section id="why" className="relative overflow-hidden border-b border-border bg-foreground text-background">
+    <section id="approach" className="relative overflow-hidden border-b border-border bg-foreground text-background">
       <AmbientHalo className="-right-40 top-0" color="var(--red-glow)" size={620} opacity={0.28} />
-      <AmbientHalo className="-left-32 bottom-0" color="oklch(0.85 0.02 260)" size={520} opacity={0.08} />
       <div className="pointer-events-none absolute inset-0">
         <Sphere size={180} className="right-10 top-10 hidden md:block" delay={0.2} duration={9} variant="red" />
         <Sphere size={80} className="right-[220px] top-[160px] hidden md:block" delay={0.9} duration={7} variant="chrome" />
@@ -990,12 +1061,11 @@ function WhyItWorks() {
       </div>
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
         <div className="text-xs font-semibold uppercase tracking-[0.2em] text-background/50">
-          Почему наш подход работает
+          Наш подход
         </div>
         <RevealHeading className="mt-6 max-w-4xl font-display text-2xl font-extrabold leading-tight sm:text-3xl md:text-5xl">
-          Мы не пересказываем теорию, а соединяем бизнес с реальным рыночным опытом
+          Почему нам доверяют работу с экспертным опытом
         </RevealHeading>
-
         <div className="mt-12 grid gap-8 md:grid-cols-3 md:gap-10">
           {pillars.map((p, i) => (
             <motion.div
@@ -1006,27 +1076,47 @@ function WhyItWorks() {
               transition={{ delay: i * 0.08 }}
               className="border-t border-background/15 pt-6"
             >
-              <div className="font-display text-lg font-bold text-background md:text-xl">
-                {p.t}
-              </div>
-              <p className="mt-3 text-sm leading-relaxed text-background/65 md:text-[15px]">
-                {p.d}
-              </p>
+              <div className="font-display text-lg font-bold text-background md:text-xl">{p.t}</div>
+              <p className="mt-3 text-sm leading-relaxed text-background/65 md:text-[15px]">{p.d}</p>
             </motion.div>
           ))}
         </div>
-
-        <blockquote className="mt-14 max-w-4xl border-l-2 border-[color:var(--red-bright)] pl-6 font-display text-xl font-bold leading-snug sm:text-2xl md:mt-20 md:text-3xl">
-          «Если у продукта нет понятной бизнес-логики и спроектированного пути к
-          результату — это{" "}
-          <span className="text-[color:var(--red-bright)]">производство контента</span>,
-          а не образовательный продукт».
-        </blockquote>
       </div>
     </section>
   );
 }
 
+function FirstStage() {
+  const bullets = [
+    "Один договор. Одна команда. Одна точка ответственности",
+    "До старта согласуем объем работ, этапы, сроки и критерии приемки",
+    "Профильных экспертов подключаем под конкретную задачу",
+    "Если результат этапа не соответствует критериям, согласованным до старта, дорабатываем его без дополнительной оплаты",
+  ];
+  return (
+    <section id="firststage" className="relative overflow-hidden border-b border-border">
+      <LiquidDrop size={56} className="right-[6%] top-[120px] hidden md:block" tone="red" delay={0.5} duration={11} />
+      <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
+        <SectionLabel n="05">Как начинаем</SectionLabel>
+        <RevealHeading className="mt-6 max-w-4xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
+          Сначала — отдельный этап с самостоятельным результатом
+        </RevealHeading>
+        <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
+          Вы получаете модель решения и дорожную карту. После этого можете
+          продолжить проект с нами или использовать результат самостоятельно.
+        </p>
+        <ul className="mt-10 max-w-3xl divide-y divide-border border-y border-border">
+          {bullets.map((t) => (
+            <li key={t} className="flex items-start gap-4 py-4 text-[15px] leading-relaxed text-foreground/85">
+              <Check className="mt-1 h-4 w-4 flex-none text-[color:var(--red)]" />
+              <span>{t}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
 
 /* ------------------------------- Book ---------------------------------- */
 
@@ -1126,234 +1216,6 @@ function BookSection() {
   );
 }
 
-/* --------------------------------- Team --------------------------------- */
-
-function PhotoPlaceholder({ label }: { label: string }) {
-  return (
-    <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-muted">
-      <div className="absolute inset-0 bg-gradient-to-br from-[color:var(--red)]/10 via-transparent to-[color:var(--red)]/5" />
-      <div className="absolute inset-0 backdrop-blur-[1px]" />
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-muted-foreground/60">
-        <div className="flex h-10 w-10 items-center justify-center rounded-full border border-border/80 bg-background/60">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
-            <circle cx="12" cy="13" r="4" />
-          </svg>
-        </div>
-        <span className="text-[10px] font-medium uppercase tracking-widest">{label}</span>
-      </div>
-      <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-background/80 to-transparent" />
-    </div>
-  );
-}
-
-function Team() {
-  const members = [
-    {
-      photo: "/img/team/utkina.jpg",
-      name: "Виктория Уткина",
-      role: "Владелица агентства, методолог-продюсер, автор книги «Эксперт под ключ»",
-    },
-    {
-      photo: "/img/team/syrtsov.jpg",
-      name: "Юрий Сырцов",
-      role: "Бизнес-тренер международной квалификации, ведущий стратегических и фасилитационных сессий",
-    },
-    {
-      photo: "/img/team/tarakanov.jpg",
-      name: "Тимур Тараканов",
-      role: "Ex-топ-менеджер Auchan и X5 Retail Group, 20 лет управленческой работы",
-    },
-    {
-      photo: "/img/team/nikolaeva.jpg",
-      name: "Мария Николаева",
-      role: "Эксперт по гостеприимству и внедрению стандартов качества, опыт с 2010 года",
-    },
-    {
-      photo: "/img/team/ratochka.jpg",
-      name: "Катерина Раточка",
-      role: "Эксперт по стратегическому маркетингу, маркетолог №1 в нише авто",
-    },
-  ];
-  return (
-    <section id="team" className="relative overflow-hidden border-b border-border bg-secondary/40">
-      <AmbientHalo className="left-1/2 top-0 -translate-x-1/2" color="var(--lav)" size={640} opacity={0.18} />
-      <LiquidDrop size={90} className="left-[4%] top-[140px] hidden md:block" tone="red" delay={0.3} duration={13} />
-      <LiquidDrop size={54} className="right-[6%] bottom-[100px] hidden md:block" tone="chrome" delay={0.9} duration={11} />
-      <LiquidDrop size={36} className="right-[22%] top-[80px] hidden md:block" tone="warm" delay={1.6} duration={9} />
-      <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="07">Команда</SectionLabel>
-        <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <RevealHeading className="max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
-            Познакомьтесь с командой
-          </RevealHeading>
-          <p className="max-w-md text-muted-foreground">
-            Реальные эксперты, которые стоят за результатом.
-          </p>
-        </div>
-
-        <div className="mt-14 grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
-          {members.map((m, i) => (
-            <motion.div
-              key={m.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-              className="group"
-            >
-              <GlassCard className="h-full overflow-hidden p-0 transition-transform duration-300 hover:-translate-y-1">
-                <div className="relative aspect-[4/5] w-full overflow-hidden rounded-t-2xl bg-muted">
-                  <img
-                    src={m.photo}
-                    alt={m.name}
-                    loading="lazy"
-                    decoding="async"
-                    className="h-full w-full object-cover grayscale transition duration-500 group-hover:grayscale-0"
-                  />
-                  <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-background/70 to-transparent" />
-                </div>
-                <div className="p-5">
-                  <div className="font-display text-lg font-bold leading-tight">{m.name}</div>
-                  <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-                    {m.role}
-                  </p>
-                </div>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-/* -------------------- Scenarios («Что можно поручить») ------------------- */
-/* Блок 4 структуры v2. Подпродукт 1.3 (EdTech) на корп-лендинг не ставим.
-   short-названия сценариев используются chips формы и бейджами кейсов. */
-
-const SCENARIOS = [
-  {
-    n: "01",
-    short: "Абонентское сопровождение",
-    lead: "Внешний методологический отдел по подписке: фиксированный объем работ на цикл, еженедельные рабочие созвоны, продление помесячно. Новую задачу берем в работу за 72 часа — без нового тендера и поиска подрядчика.",
-    subs: [
-      {
-        code: "1.1",
-        title: "Методолог по подписке",
-        text: "Выделенный методолог ведет ваши задачи обучения: от разбора запроса до готовых материалов.",
-      },
-      {
-        code: "1.2",
-        title: "Фабрика курсов для корпоративной LMS",
-        text: "Типовой курс — 24 рабочих часа производства: от передачи материалов до загрузки в вашу LMS. Ведем до 10–12 курсов параллельно.",
-        note: "Типовой курс — 20–30 минут прохождения, до 50 экранов и тест, собирается на основе ваших материалов. Курсы с извлечением знаний у экспертов оцениваем отдельно.",
-      },
-      {
-        code: "1.4",
-        title: "Проектный офис образовательной инициативы",
-        text: "Берем управление инициативой целиком: план, команда, эксперты, сроки, отчетность — у вас одна точка ответственности.",
-      },
-    ],
-  },
-  {
-    n: "02",
-    short: "Продукт под задачу",
-    lead: "Курс, программа, тренинг или методическое решение под ключ. После первой встречи — дорожная карта: как будет выглядеть продукт, чья экспертиза потребуется и сколько займет запуск. Эксперт приступает через 72 часа.",
-  },
-  {
-    n: "03",
-    short: "Практикум для L&D",
-    lead: "Передаем вашей команде единый подход к проектированию программ и сопровождаем его применение на текущих проектах — от разбора задачи до архитектуры и критериев результата. Каждый следующий продукт команда собирает сама, без ручного контроля руководителя.",
-  },
-];
-
-function Scenarios() {
-  return (
-    <section id="directions" className="relative overflow-hidden border-b border-border">
-      <AmbientHalo className="-right-40 top-20" color="var(--lav)" size={560} opacity={0.18} />
-      <AmbientHalo className="-left-32 bottom-20" color="oklch(0.78 0.02 260)" size={480} opacity={0.12} />
-      <LiquidDrop size={78} className="right-[6%] top-[180px] hidden lg:block" tone="red" delay={0.4} duration={12} />
-      <LiquidDrop size={46} className="left-[3%] top-[420px] hidden lg:block" tone="chrome" delay={1.0} duration={10} />
-      <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="03">Что можно поручить</SectionLabel>
-        <RevealHeading className="mt-6 max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
-          Что можно поручить команде «Без Воды»
-        </RevealHeading>
-        <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-          Подключаемся там, где нужен не просто продакшн, а цельное решение
-        </p>
-
-        {/* Сценарий 01 с подпродуктами */}
-        <div className="mt-12 rounded-3xl border border-border bg-background/60 p-6 backdrop-blur-sm md:p-10">
-          <div className="max-w-4xl">
-            <div className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--red)]">
-              Сценарий 01
-            </div>
-            <h3 className="font-display text-2xl font-extrabold leading-tight sm:text-3xl">
-              Абонентское сопровождение
-            </h3>
-            <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
-              {SCENARIOS[0].lead}
-            </p>
-          </div>
-          <div className="mt-8 grid gap-4 md:grid-cols-3">
-            {SCENARIOS[0].subs!.map((sub) => (
-              <div
-                key={sub.code}
-                className="rounded-2xl border border-border bg-background/70 p-5 md:p-6"
-              >
-                <div className="flex items-start gap-3">
-                  <span className="font-display text-xl font-bold tabular-nums text-[color:var(--red)]">
-                    {sub.code}
-                  </span>
-                  <h4 className="font-display text-base font-extrabold leading-tight md:text-lg">
-                    {sub.title}
-                  </h4>
-                </div>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                  {sub.text}
-                </p>
-                {"note" in sub && sub.note && (
-                  <p className="mt-3 border-t border-border pt-3 text-xs leading-relaxed text-muted-foreground/80">
-                    {sub.note}
-                  </p>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Сценарии 02 и 03 */}
-        <div className="mt-6 grid gap-6 md:grid-cols-2">
-          {[SCENARIOS[1], SCENARIOS[2]].map((s) => (
-            <div
-              key={s.n}
-              className="rounded-3xl border border-border bg-background/60 p-6 backdrop-blur-sm md:p-10"
-            >
-              <div className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--red)]">
-                Сценарий {s.n}
-              </div>
-              <h3 className="font-display text-2xl font-extrabold leading-tight sm:text-3xl">
-                {s.short}
-              </h3>
-              <p className="mt-4 text-base leading-relaxed text-muted-foreground">
-                {s.lead}
-              </p>
-            </div>
-          ))}
-        </div>
-
-        <p className="mx-auto mt-14 max-w-3xl text-center text-sm text-muted-foreground sm:text-base">
-          В любом формате вы получаете не часы отдельных специалистов, а
-          согласованный объем работ, сроки, критерии приемки и принцип «единого окна».
-        </p>
-      </div>
-    </section>
-  );
-}
-
-
 /* ------------------------------- Cases ---------------------------------- */
 
 const CASES = [
@@ -1445,15 +1307,7 @@ const CASES = [
   },
 ];
 
-function CaseCard({
-  item,
-  index,
-  highlighted = false,
-}: {
-  item: (typeof CASES)[0];
-  index: number;
-  highlighted?: boolean;
-}) {
+function CaseCard({ item, index }: { item: (typeof CASES)[0]; index: number }) {
   return (
     <motion.div
       initial={{ opacity: 0, y: 24 }}
@@ -1461,23 +1315,12 @@ function CaseCard({
       viewport={{ once: true, margin: "-60px" }}
       transition={{ delay: index * 0.1, duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
     >
-      <GlassCard
-        className={`group flex h-full flex-col gap-5 p-6 transition-transform duration-300 hover:-translate-y-1 md:p-7 ${
-          highlighted ? "ring-2 ring-[color:var(--red)]/60" : ""
-        }`}
-      >
+      <GlassCard className="group flex h-full flex-col gap-5 p-6 transition-transform duration-300 hover:-translate-y-1 md:p-7">
         <div className="flex items-start justify-between gap-4">
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
             <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[color:var(--red)]">
               {item.category}
             </div>
-            <a
-              href="#directions"
-              onClick={() => selectScenario(SCENARIOS[item.scenario].short)}
-              className="rounded-full border border-border/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground transition hover:border-[color:var(--red)]/50 hover:text-[color:var(--red)]"
-            >
-              Сценарий 0{item.scenario + 1}
-            </a>
           </div>
           {item.nda && (
             <span className="shrink-0 rounded-full border border-border/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
@@ -1548,20 +1391,6 @@ function CaseCard({
 }
 
 function Cases() {
-  // подсветка кейсов выбранного сценария (по ссылке из детали сценария)
-  const [hl, setHl] = useState<number | null>(null);
-  useEffect(() => {
-    let t: ReturnType<typeof setTimeout>;
-    highlightCases = (s: number) => {
-      setHl(s);
-      clearTimeout(t);
-      t = setTimeout(() => setHl(null), 4000);
-    };
-    return () => {
-      highlightCases = () => {};
-      clearTimeout(t);
-    };
-  }, []);
   return (
     <section id="cases" className="relative overflow-hidden border-b border-border">
       <AmbientHalo className="-right-40 top-10" color="oklch(0.72 0.008 260)" size={600} opacity={0.14} />
@@ -1583,24 +1412,10 @@ function Cases() {
 
         <div className="mt-14 grid gap-6 md:grid-cols-2">
           {CASES.map((item, i) => (
-            <CaseCard
-              key={item.title}
-              item={item}
-              index={i}
-              highlighted={hl !== null && item.scenario === hl}
-            />
+            <CaseCard key={item.title} item={item} index={i} />
           ))}
         </div>
 
-        <div className="mt-12 text-center">
-          <a
-            href="#contact"
-            className="group inline-flex items-center gap-3 rounded-full bg-[color:var(--red)] px-7 py-4 text-base font-semibold text-[color:var(--paper)] shadow-lg shadow-[color:var(--red)]/20 transition hover:bg-foreground"
-          >
-            Запросить похожий кейс
-            <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
-          </a>
-        </div>
       </div>
     </section>
   );
@@ -1653,20 +1468,16 @@ function TrustStrip() {
 function WhenNeeded() {
   const items = [
     {
-      t: "Есть бизнес-задача, но нет ТЗ на обучение",
-      d: "Приходите с идеями и вводными в любом виде. Мы соберем смыслы, разложим их в логику и вернемся с архитектурой продукта и дорожной картой.",
+      t: "Знания распределены между несколькими сильными экспертами, внутренними материалами и сложившимися практиками. Их нужно быстро собрать в единый продукт",
+      d: "С нами опыт экспертов становится активом вашей компании. Опытом можно пользоваться независимо от занятости его носителей, а подразделения работают по единым принципам",
     },
     {
-      t: "Знания и опыт распределены между сильными экспертами и материалами",
-      d: "Соберем их в единый структурированный продукт, адаптированный к вашему контексту, — экспертиза станет активом компании, а не отдельных людей.",
+      t: "Пиковые нагрузки на L&D-отдел",
+      d: "Усиливаем вашу команду, когда инициатив стало кратно больше. Подключаем методологическую команду к параллельным проектам и берём на себя согласованный объём разработки",
     },
     {
-      t: "Бизнес идет в новую нишу, готовых решений по обучению нет",
-      d: "Найдем на рынке практика, который уже прошел этот путь, договоримся с ним и встроим его опыт в программу под ваши цели.",
-    },
-    {
-      t: "Инициатив стало кратно больше, чем рук у L&D",
-      d: "Подключим команду на параллельные запуски: эксперт приступает через 72 часа, штат расширять не нужно.",
+      t: "Бизнес входит в новые ниши — нужны подходы, которых пока нет внутри",
+      d: "Подключаем к проекту практика с релевантным опытом и переводим его решения в алгоритмы и кейсы, адаптированные под контекст компании. Результат: команда быстрее получает рабочий подход и не тратит время на самостоятельный поиск решений",
     },
   ];
   return (
@@ -1679,9 +1490,9 @@ function WhenNeeded() {
           Когда нужна команда «Без Воды»
         </RevealHeading>
         <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-          Четыре ситуации, в которых наш подход дает максимальный эффект
+          3 ситуации, в которых наш подход дает максимальный эффект
         </p>
-        <div className="mt-12 grid gap-5 md:grid-cols-2">
+        <div className="mt-12 grid gap-5 md:grid-cols-3">
           {items.map((c, i) => (
             <motion.div
               key={c.t}
@@ -1694,7 +1505,7 @@ function WhenNeeded() {
                 <div className="font-display text-sm font-bold tabular-nums text-[color:var(--red)]">
                   0{i + 1}
                 </div>
-                <h3 className="mt-3 font-display text-lg font-extrabold leading-snug md:text-xl">
+                <h3 className="mt-3 font-display text-base font-extrabold leading-snug md:text-lg">
                   {c.t}
                 </h3>
                 <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-[15px]">
@@ -1703,282 +1514,6 @@ function WhenNeeded() {
               </GlassCard>
             </motion.div>
           ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-
-/* ----------------------------- Guarantees ------------------------------ */
-
-type GBlock = { p: string } | { h: string } | { ul: string[] };
-
-const GUARANTEE_ITEMS: { t: string; blocks: GBlock[] }[] = [
-  {
-    t: "Состав и границы работ",
-    blocks: [
-      { p: "В коммерческом предложении, задании и договоре фиксируем:" },
-      { ul: [
-        "какие задачи решает «Без Воды»",
-        "какие исследования и рабочие встречи проводим",
-        "какой продукт, программу или экспертное решение разрабатываем",
-        "какие материалы создаем",
-        "какие этапы запуска или реализации сопровождаем",
-        "какой объём результатов входит в каждый проект или цикл подписки",
-        "что не входит в согласованный объём работ",
-      ]},
-      { p: "Дополнительные задачи оцениваем и согласовываем отдельно до начала их выполнения" },
-    ],
-  },
-  {
-    t: "Результаты каждого этапа",
-    blocks: [
-      { p: "Каждый этап заканчивается результатом, который вы можете посмотреть, проверить и принять. В зависимости от проекта это могут быть:" },
-      { ul: [
-        "выводы исследования и уточнённая постановка задачи",
-        "профиль и предварительный список экспертов",
-        "карта распакованного экспертного опыта",
-        "продуктовое обещание и модель продукта",
-        "расчёт целевой экономики",
-        "архитектура программы и путь участника",
-        "сценарии занятий и учебных материалов",
-        "практические задания и инструменты оценки",
-        "экспертное заключение, рекомендации или дорожная карта",
-        "план запуска, внедрения или следующего рабочего цикла",
-      ]},
-      { p: "Точный перечень результатов каждого этапа фиксируем до начала проекта" },
-    ],
-  },
-  {
-    t: "Форматы передаваемых материалов",
-    blocks: [
-      { p: "Передаём результаты в форматах, пригодных для дальнейшей работы команды заказчика:" },
-      { ul: [
-        "текстовые документы и методические руководства",
-        "презентации",
-        "таблицы, расчёты и модели экономики",
-        "карты опыта и архитектуры программ",
-        "сценарии курсов, занятий и вебинаров",
-        "практические задания, кейсы и тренажёры",
-        "шаблоны, чек-листы и рабочие инструкции",
-        "инструменты диагностики и оценки",
-        "дорожные карты и производственные планы",
-        "материалы для размещения в LMS",
-        "SCORM-пакеты и интерактивные материалы, если они включены в проект",
-      ]},
-      { p: "До старта определяем, какие материалы передаются в редактируемом формате, какие — в финальном, а также закрепляем условия их дальнейшего использования" },
-    ],
-  },
-  {
-    t: "Сроки",
-    blocks: [
-      { p: "До начала работы составляем календарный план с контрольными датами:" },
-      { ul: [
-        "передачи исходных данных",
-        "проведения исследований и распаковок",
-        "завершения каждого этапа",
-        "проверки материалов заказчиком",
-        "внесения согласованных корректировок",
-        "передачи итогового результата",
-      ]},
-      { p: "Срок зависит от объема разработки, доступности экспертов и скорости согласований, поэтому для каждого проекта рассчитывается отдельно." },
-      { p: "На первичную заявку отвечаем в течение двух часов в рабочее время. Если требуется внешний эксперт, первые релевантные профили представляем в течение трёх рабочих дней после согласования полного брифа." },
-      { p: "Если исходные данные, доступы или согласования со стороны заказчика задерживаются, календарный план актуализируется." },
-    ],
-  },
-  {
-    t: "Критерии приёмки",
-    blocks: [
-      { p: "Результат принимается по критериям, согласованным до начала работы:" },
-      { ul: [
-        "соответствие заданию и цели этапа",
-        "наличие всех предусмотренных материалов",
-        "методическая и продуктовая целостность",
-        "предметная достоверность",
-        "соответствие аудитории и продуктовому обещанию",
-        "связь практики с рабочими действиями",
-        "наличие предусмотренных инструментов оценки",
-        "соответствие установленным техническим форматам",
-        "внесение согласованных корректировок",
-      ]},
-      { p: "Изменение первоначальной задачи, аудитории или объема после утверждения этапа согласуется как дополнительная работа" },
-    ],
-  },
-  {
-    t: "Целевые показатели",
-    blocks: [
-      { p: "До разработки определяем исходную точку, целевые показатели, способ измерения и период оценки. В зависимости от проекта это могут быть:" },
-      { ul: [
-        "целевая экономика продукта",
-        "условия возврата вложений",
-        "объём и сроки выпуска материалов",
-        "активация и доходимость участников",
-        "вовлечённость и выполнение практических заданий",
-        "освоение знаний и навыков",
-        "применение инструментов в работе",
-        "конверсия между этапами продукта",
-        "качество или скорость выполнения рабочих действий",
-        "другой показатель, связанный с задачей заказчика",
-      ]},
-      { p: "Мы разделяем результат проекта и целевой бизнес-эффект." },
-      { p: "«Без Воды» отвечает за методологию, продуктовую модель, согласованные материалы и систему измерения. Показатели, на которые также влияют маркетинг, продажи, спрос, цена, действия заказчика и активность участников, фиксируются как целевые ориентиры и проверяемые гипотезы." },
-    ],
-  },
-  {
-    t: "Действия со стороны заказчика",
-    blocks: [
-      { p: "Для работы в согласованные сроки заказчик:" },
-      { ul: [
-        "назначает одного руководителя или владельца проекта",
-        "предоставляет необходимые данные, исследования и внутренние документы",
-        "организует доступ к внутренним экспертам",
-        "предоставляет доступ к LMS и другим системам, если это требуется",
-        "согласовывает аудиторию, задачу и ожидаемый результат",
-        "передаёт консолидированную обратную связь",
-        "принимает решения по контрольным точкам",
-        "обеспечивает участие сотрудников в исследованиях и тестировании",
-        "отвечает за маркетинг, продажи и внедрение продукта, если они не включены в проект",
-        "обеспечивает участие лицензированной образовательной организации, если проект относится к ДПО или другому лицензируемому формату",
-      ]},
-      { p: "Конкретные действия и сроки их выполнения включаем в план проекта." },
-    ],
-  },
-  {
-    t: "Зоны ответственности",
-    blocks: [
-      { h: "«Без Воды» отвечает за:" },
-      { ul: [
-        "формирование и управление проектной командой",
-        "качество методологии и продуктовых решений",
-        "поиск и первичную проверку предметных экспертов",
-        "соблюдение согласованных этапов и сроков",
-        "комплектность передаваемых материалов",
-        "соответствие результатов заданию и критериям приёмки",
-      ]},
-      { h: "Предметный эксперт отвечает за:" },
-      { ul: [
-        "достоверность профессионального содержания",
-        "применимость предлагаемых решений",
-        "корректность передаваемых алгоритмов и кейсов",
-        "соблюдение конфиденциальности",
-        "правомерность использования передаваемой информации",
-      ]},
-      { h: "Заказчик отвечает за:" },
-      { ul: [
-        "полноту и достоверность исходных данных",
-        "своевременное предоставление доступов",
-        "принятие решений и согласование результатов",
-        "маркетинг, продажи и внедрение, если они не входят в проект",
-        "действия сотрудников и участников после передачи материалов",
-        "в случае разработки программы ДПО — выдачу документов через лицензированную организацию",
-      ]},
-      { h: "Совместно определяем:" },
-      { ul: [
-        "задачу проекта",
-        "продуктовые гипотезы",
-        "целевые показатели",
-        "способ измерения",
-        "решения о дальнейшем развитии продукта",
-      ]},
-      { p: "Для вас «Без Воды» остается единой точкой контакта: мы самостоятельно собираем проектную команду и управляем её работой, а вы согласуете задачу и принимаете результаты" },
-    ],
-  },
-];
-
-function Guarantees() {
-  const items = GUARANTEE_ITEMS;
-  const [open, setOpen] = useState<number | null>(0);
-  return (
-    <section id="guarantees" className="relative overflow-hidden border-b border-border bg-secondary/40">
-      <AmbientHalo className="-left-40 top-10" color="oklch(0.72 0.008 260)" size={520} opacity={0.14} />
-      <AmbientHalo className="-right-40 bottom-10" color="oklch(0.85 0.02 260)" size={480} opacity={0.14} />
-      <LiquidDrop size={64} className="left-[6%] bottom-[120px] hidden md:block" tone="red" delay={0.5} duration={11} />
-      <LiquidDrop size={38} className="left-[16%] top-[100px] hidden md:block" tone="chrome" delay={1.1} duration={9} />
-      <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <div className="grid gap-16 lg:grid-cols-[1fr_1.2fr]">
-          <div>
-            <SectionLabel n="06">Наш подход</SectionLabel>
-            <RevealHeading className="mt-6 font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
-              Результат фиксируем до старта
-            </RevealHeading>
-
-            <p className="mt-6 text-lg text-muted-foreground">
-              До начала проекта в предложении, задании и договоре фиксируем всё
-              — от границ работ до критериев приёмки.
-            </p>
-            <div className="mt-10 border-t border-border pt-8">
-              <div className="font-display text-2xl font-extrabold leading-snug sm:text-3xl md:text-4xl">
-                <span className="text-[color:var(--red)]">Один</span> договор.
-                <br />
-                <span className="text-[color:var(--red)]">Одна</span> команда.
-                <br />
-                <span className="text-[color:var(--red)]">Одна</span> точка ответственности.
-              </div>
-            </div>
-          </div>
-
-          <div className="divide-y divide-border border-y border-border">
-            {items.map((item, i) => {
-              const isOpen = open === i;
-              return (
-                <button
-                  key={item.t}
-                  onClick={() => setOpen(isOpen ? null : i)}
-                  className={`group flex w-full items-start gap-5 px-2 py-5 text-left transition hover:bg-background/70 ${isOpen ? "bg-background/60" : ""}`}
-                >
-                  <span className={`mt-1 font-display text-sm font-bold tabular-nums transition ${isOpen ? "text-[color:var(--red)]" : "text-muted-foreground group-hover:text-foreground"}`}>
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-                  <div className="flex-1">
-                    <div className={`font-display text-lg font-bold transition ${isOpen ? "text-foreground" : "text-foreground/85 group-hover:text-foreground"}`}>{item.t}</div>
-                    <AnimatePresence initial={false}>
-                      {isOpen && (
-                        <motion.div
-                          initial={{ height: 0, opacity: 0 }}
-                          animate={{ height: "auto", opacity: 1 }}
-                          exit={{ height: 0, opacity: 0 }}
-                          transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
-                          className="overflow-hidden"
-                        >
-                          {item.blocks.map((b, k) =>
-                            "p" in b ? (
-                              <p key={k} className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                                {b.p}
-                              </p>
-                            ) : "h" in b ? (
-                              <div key={k} className="mt-4 text-sm font-bold text-foreground">
-                                {b.h}
-                              </div>
-                            ) : (
-                              <ul key={k} className="mt-2 space-y-1.5">
-                                {b.ul.map((li) => (
-                                  <li key={li} className="flex gap-2.5 text-sm leading-relaxed text-muted-foreground">
-                                    <span className="flex-none text-[color:var(--red)]">—</span>
-                                    <span>{li}</span>
-                                  </li>
-                                ))}
-                              </ul>
-                            )
-                          )}
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </div>
-                  <span
-                    className={`mt-1 grid h-8 w-8 shrink-0 place-items-center rounded-full border transition ${
-                      isOpen
-                        ? "rotate-45 border-[color:var(--red)] bg-[color:var(--red)] text-background"
-                        : "border-border text-foreground/60 group-hover:border-foreground/40 group-hover:text-foreground"
-                    }`}
-                  >
-                    <Plus className="h-4 w-4" />
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-
         </div>
       </div>
     </section>
@@ -2050,27 +1585,22 @@ function Reviews() {
   );
 }
 
-/* ---------------------- NotFit (Кому не подходит) ---------------------- */
-/* Блок 9 структуры v2: честные границы — рационально, без лаванды. */
+/* ------------- NotFit («Когда нужен другой подрядчик») + FAQ ------------- */
 
 function NotFit() {
   const items = [
-    "Не подбираем специалистов в штат и не работаем по модели аутстаффинга",
-    "Не внедряем и не поддерживаем LMS-системы",
-    "Не продаем готовые типовые программы и не работаем как каталог тренеров",
-    "Не берем на себя event-продакшн",
-    "Не выстраиваем лидогенерацию и не работаем как внешний отдел продаж",
+    "если требуется подбор сотрудника в штат или аутстаффинг",
+    "если нужно внедрение или техническая поддержка LMS",
+    "если требуется внедрение организационных изменений за пределами образовательного проекта",
+    "если нужна организация и логистика мероприятия",
   ];
   return (
     <section id="notfit" className="relative overflow-hidden border-b border-border bg-secondary/40">
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="09">Кому не подходит</SectionLabel>
+        <SectionLabel n="09">Границы</SectionLabel>
         <RevealHeading className="mt-6 max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
-          Что остается за рамками наших проектов
+          Когда нужен другой подрядчик
         </RevealHeading>
-        <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
-          Мы делаем образовательные продукты — и не беремся за смежные задачи
-        </p>
         <ul className="mt-10 max-w-3xl divide-y divide-border border-y border-border">
           {items.map((t) => (
             <li key={t} className="flex items-start gap-4 py-4 text-[15px] leading-relaxed text-foreground/85">
@@ -2084,24 +1614,86 @@ function NotFit() {
   );
 }
 
+const FAQ_ITEMS = [
+  {
+    q: "Что происходит в первые 24 часа?",
+    a: "После согласования проекта назначаем команду, проводим стартовую встречу и фиксируем план первого этапа.",
+  },
+  {
+    q: "У меня нет готового ТЗ.",
+    a: "Достаточно описать желаемое изменение, срок и то, что уже есть: материалы, идеи или доступ к внутренним экспертам. Рамку первого этапа формируем сами",
+  },
+  {
+    q: "Как быстро вы представите внешних экспертов?",
+    a: "Сначала фиксируем, какой опыт нужен и какие вопросы специалист должен закрыть. Первые релевантные профили представляем в течение 72 часов после согласования требований.",
+  },
+  {
+    q: "Что потребуется от команды клиента?",
+    a: "Один владелец задачи со стороны компании, доступ к носителям практики, существующие материалы и обратная связь по контрольным точкам.",
+  },
+];
+
+function FAQ() {
+  const [open, setOpen] = useState<number | null>(0);
+  return (
+    <section id="faq" className="relative overflow-hidden border-b border-border">
+      <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
+        <SectionLabel n="10">FAQ</SectionLabel>
+        <RevealHeading className="mt-6 max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
+          Частые вопросы
+        </RevealHeading>
+        <div className="mt-10 max-w-3xl divide-y divide-border border-y border-border">
+          {FAQ_ITEMS.map((item, i) => {
+            const isOpen = open === i;
+            return (
+              <button
+                key={item.q}
+                onClick={() => setOpen(isOpen ? null : i)}
+                className={`group flex w-full items-start gap-5 px-2 py-5 text-left transition hover:bg-background/70 ${isOpen ? "bg-background/60" : ""}`}
+              >
+                <span className={`mt-1 font-display text-sm font-bold tabular-nums transition ${isOpen ? "text-[color:var(--red)]" : "text-muted-foreground group-hover:text-foreground"}`}>
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <div className="flex-1">
+                  <div className={`font-display text-lg font-bold transition ${isOpen ? "text-foreground" : "text-foreground/85 group-hover:text-foreground"}`}>
+                    {item.q}
+                  </div>
+                  <AnimatePresence initial={false}>
+                    {isOpen && (
+                      <motion.p
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: "auto", opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
+                        className="mt-2 overflow-hidden text-sm leading-relaxed text-muted-foreground md:text-[15px]"
+                      >
+                        {item.a}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
+                </div>
+                <motion.div animate={{ rotate: isOpen ? 45 : 0 }} transition={{ duration: 0.2 }} className="mt-1">
+                  <Plus className="h-4 w-4 text-muted-foreground" />
+                </motion.div>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  );
+}
 
 /* -------------------------------- Contact ------------------------------- */
 
 function Contact() {
   const [sent, setSent] = useState(false);
-  const [sentName, setSentName] = useState(""); // для персонального «спасибо»
+  const [sentName, setSentName] = useState("");
   const [sending, setSending] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  const [tasks, setTasks] = useState<string[]>([]);
   const [pd, setPd] = useState(false);
   const [ads, setAds] = useState(false);
 
-  const toggleTask = (t: string) => {
-    ymGoal("chip_toggled", { chip: t });
-    setTasks((prev) => (prev.includes(t) ? prev.filter((x) => x !== t) : [...prev, t]));
-  };
-
-  // цель «начал заполнять форму» — один раз за сессию формы
   const formStarted = useRef(false);
   const onFormFocus = () => {
     if (formStarted.current) return;
@@ -2109,32 +1701,12 @@ function Contact() {
     ymGoal("form_started");
   };
 
-  // UTM-метки: сохраняем при заходе (переживают переход на юр. страницы и обратно)
   useEffect(() => {
     try {
       if (/utm_|yclid|gclid/.test(window.location.search)) {
         window.sessionStorage.setItem("bv-src", window.location.search);
       }
     } catch {}
-  }, []);
-
-  // перенос выбранного сценария до заявки: авто-chip заменяется при смене
-  // сценария, но ручные отметки посетителя не трогаем
-  const autoTask = useRef<string | null>(null);
-  useEffect(() => {
-    noteScenarioForForm = (label: string) => {
-      setTasks((prev) => {
-        const cleaned =
-          autoTask.current && autoTask.current !== label
-            ? prev.filter((t) => t !== autoTask.current)
-            : prev;
-        autoTask.current = label;
-        return cleaned.includes(label) ? cleaned : [...cleaned, label];
-      });
-    };
-    return () => {
-      noteScenarioForForm = () => {};
-    };
   }, []);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -2164,22 +1736,19 @@ function Contact() {
           name,
           contact,
           company,
-          comment: [tasks.length ? `Сценарий: ${tasks.join(", ")}` : "", about]
-            .filter(Boolean)
-            .join("\n"),
+          comment: about,
           consent_pd: true,
           consent_pd_version: "1.0-2026-07-14",
           consent_ads: ads,
           website: hp,
-          // источник трафика: путь + utm-метки (текущие или сохранённые при заходе)
           page: (() => {
-            let src = window.location.search;
+            let srcQ = window.location.search;
             try {
-              if (!/utm_|yclid|gclid/.test(src)) {
-                src = window.sessionStorage.getItem("bv-src") || src;
+              if (!/utm_|yclid|gclid/.test(srcQ)) {
+                srcQ = window.sessionStorage.getItem("bv-src") || srcQ;
               }
             } catch {}
-            return (window.location.pathname || "/") + src;
+            return (window.location.pathname || "/") + srcQ;
           })(),
         }),
       });
@@ -2193,52 +1762,29 @@ function Contact() {
       setSending(false);
     }
   };
+
   return (
     <section id="contact" className="relative overflow-hidden bg-foreground text-background">
-      {/* breathing ambient halos + drifting drops */}
       <AmbientHalo className="-left-40 top-0" color="var(--red)" size={560} opacity={0.28} />
-      <AmbientHalo className="-right-32 bottom-0" color="oklch(0.85 0.02 260)" size={520} opacity={0.14} />
       <AmbientHalo className="right-1/4 top-1/3" color="var(--red-glow)" size={360} opacity={0.22} />
       <LiquidDrop size={96} className="right-[8%] top-[140px] hidden md:block" tone="red" delay={0.3} duration={13} />
       <LiquidDrop size={58} className="right-[28%] bottom-[120px] hidden md:block" tone="chrome" delay={1.1} duration={11} />
-      <LiquidDrop size={40} className="left-[46%] top-[80px] hidden md:block" tone="warm" delay={0.7} duration={9} />
-      <LiquidDrop size={72} className="right-[4%] bottom-[40px] hidden lg:block" tone="chrome" delay={1.6} duration={12} />
       <div className="relative mx-auto grid max-w-7xl gap-16 px-4 py-14 md:px-6 md:py-24 lg:grid-cols-[1fr_1fr]">
         <div>
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-background/50">
-            10 — Разбор задачи
+            11 — Контакты
           </div>
           <RevealHeading as="h2" className="mt-6 font-display text-3xl font-extrabold leading-[1.05] sm:text-4xl md:text-6xl">
-            Обсудим задачу и предложим следующий шаг
+            С чего начинается наше сотрудничество
           </RevealHeading>
           <p className="mt-8 max-w-md text-lg text-background/70">
-            С готовым брифом или с задачей, которую еще нужно уточнить.
+            Расскажите, что должно измениться в работе компании и к какому
+            сроку. Готовить презентацию и подробное ТЗ не нужно.
           </p>
-
-          <div className="mt-10 text-sm font-semibold uppercase tracking-[0.14em] text-background/60">
-            Начинаем со структурирования вашей задачи
-          </div>
-          <p className="mt-2 max-w-md text-sm text-background/60">
-            Не нужно готовить ТЗ — достаточно прийти с идеей
+          <p className="mt-4 max-w-md text-base text-background/60">
+            30 минут онлайн: сверим задачу, доступные источники опыта и
+            возможный результат первого этапа.
           </p>
-
-          <ol className="mt-10 space-y-5">
-            {[
-              ["Разбор", "за 30 минут собираем ваши ожидания, гипотезы и разрозненные вводные"],
-              ["Логика", "раскладываем фактуру и переводим запрос в образовательную механику"],
-              ["Дорожная карта", "как выглядит продукт, чья экспертиза нужна, сколько займет запуск"],
-            ].map(([t, d], i) => (
-              <li key={t} className="flex items-start gap-5">
-                <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-background/25 font-display text-lg font-bold text-background/90">
-                  {i + 1}
-                </span>
-                <div>
-                  <div className="font-display text-lg font-bold">{t}</div>
-                  <div className="text-sm text-background/60">{d}</div>
-                </div>
-              </li>
-            ))}
-          </ol>
 
           <div className="mt-12">
             <StencilLogo className="text-[18px] text-background" />
@@ -2268,33 +1814,8 @@ function Contact() {
                   {sentName ? `Спасибо, ${sentName}!` : "Заявка отправлена"}
                 </h3>
                 <p className="mt-3 text-background/70">
-                  Заявка отправлена. Свяжемся с вами в течение двух часов в рабочее время.
+                  Заявка отправлена. Ответим в течение двух рабочих часов.
                 </p>
-                {tasks.length > 0 && (
-                  <p className="mt-3 text-background/70">
-                    На разборе задачи обсудим ваш сценарий{" "}
-                    <span className="font-semibold text-background">
-                      «{tasks.join("» и «")}»
-                    </span>
-                    .
-                  </p>
-                )}
-                <ol className="mt-8 space-y-3 border-t border-background/15 pt-6">
-                  {[
-                    ["Разбор задачи", "30 минут онлайн, собираем вводные"],
-                    ["Дорожная карта", "как выглядит продукт и сколько займет запуск"],
-                  ].map(([t, d], i) => (
-                    <li key={t} className="flex items-start gap-4">
-                      <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-background/25 font-display text-sm font-bold text-background/90">
-                        {i + 1}
-                      </span>
-                      <div>
-                        <div className="font-display text-base font-bold">{t}</div>
-                        <div className="text-sm text-background/60">{d}</div>
-                      </div>
-                    </li>
-                  ))}
-                </ol>
                 <button
                   type="button"
                   onClick={() => setSent(false)}
@@ -2310,32 +1831,17 @@ function Contact() {
                 animate={{ opacity: 1 }}
                 className="flex flex-col gap-5"
               >
-                <Field label="Имя" name="name" placeholder="Как к вам обращаться" dark />
-                <Field label="Компания" name="company" placeholder="Название компании" dark />
-                <Field label="Телефон, Email или Telegram" name="contact" placeholder="+7 900 000-00-00 / @username / вы@company.com" dark />
-                <div>
-                  <div className="mb-2 text-xs font-semibold uppercase tracking-widest text-background/60">
-                    Какой сценарий ближе <span className="text-background/40 normal-case tracking-normal">(можно позже)</span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {SCENARIOS.map((s) => (
-                      <TaskChip
-                        key={s.short}
-                        label={s.short}
-                        on={tasks.includes(s.short)}
-                        onToggle={() => toggleTask(s.short)}
-                      />
-                    ))}
-                  </div>
-                </div>
+                <Field label="Ваше имя" name="name" placeholder="Ирина" dark />
+                <Field label="Компания и роль" name="company" placeholder="Avito, HRD / L&D" dark />
+                <Field label="Email / Telegram / телефон" name="contact" placeholder="name@company.ru" dark />
                 <div>
                   <label className="mb-2 block text-xs font-semibold uppercase tracking-widest text-background/60">
-                    Коротко о задаче <span className="text-background/40 normal-case tracking-normal">(необязательно)</span>
+                    Запрос на разбор <span className="text-background/40 normal-case tracking-normal">(не обязательно)</span>
                   </label>
                   <textarea
                     rows={3}
                     name="about"
-                    placeholder="Что нужно сделать, какие сроки, есть ли материалы"
+                    placeholder="Не обязательно"
                     className="w-full resize-none rounded-xl border border-background/15 bg-background/5 px-4 py-3 text-base text-background outline-none backdrop-blur transition placeholder:text-background/35 focus:border-background/40 focus:bg-background/10"
                   />
                 </div>
@@ -2353,7 +1859,7 @@ function Contact() {
                     className="mt-0.5 h-4 w-4 shrink-0 accent-[color:var(--red)]"
                   />
                   <span>
-                    Согласен(а) на обработку персональных данных —{" "}
+                    Нажимая кнопку, вы соглашаетесь на обработку персональных данных —{" "}
                     <a href="/consent_pd" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-background">условия</a>{" "}
                     и{" "}
                     <a href="/politics_pd" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-background">политика конфиденциальности</a>
@@ -2379,11 +1885,11 @@ function Contact() {
                   className="group relative mt-4 inline-flex items-center justify-center gap-3 overflow-hidden rounded-full border border-background/25 bg-background/10 px-7 py-4 text-base font-semibold text-background backdrop-blur-xl transition hover:border-background/50 hover:bg-background/20 disabled:cursor-default disabled:opacity-60"
                 >
                   <span className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/15 to-transparent opacity-60" />
-                  <span className="relative">{sending ? "Отправляем…" : "Назначить 30-минутный разбор задачи"}</span>
+                  <span className="relative">{sending ? "Отправляем…" : "Назначить разбор"}</span>
                   <ArrowUpRight className="relative h-5 w-5 transition group-hover:rotate-45" />
                 </button>
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <p className="text-xs text-background/50">Не рассылаем спам.</p>
+                  <p className="text-xs text-background/50">Ответим в течение двух рабочих часов.</p>
                   <a
                     href="https://t.me/vikki_duck"
                     target="_blank"
@@ -2400,22 +1906,6 @@ function Contact() {
         </form>
         </GlassCard>
 
-      </div>
-      <div className="relative border-t border-background/15">
-        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-3 gap-y-2 px-4 py-5 text-center text-xs text-background/60 md:px-6">
-          {[
-            "Договор и NDA",
-            "смета и сроки до старта",
-            "закрывающие документы, работаем с закупками",
-            "УСН, без НДС",
-            "ответ в течение 2 часов в рабочее время",
-          ].map((t, i) => (
-            <span key={t} className="inline-flex items-center gap-3">
-              {i > 0 && <span className="text-background/30">·</span>}
-              <span>{t}</span>
-            </span>
-          ))}
-        </div>
       </div>
     </section>
   );
@@ -2456,33 +1946,17 @@ function Field({
   );
 }
 
-function TaskChip({ label, on, onToggle }: { label: string; on: boolean; onToggle: () => void }) {
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      className={`rounded-full border px-4 py-2 text-sm font-medium backdrop-blur transition ${
-        on
-          ? "border-background/60 bg-background/20 text-background"
-          : "border-background/20 bg-background/5 text-background/80 hover:border-background/40 hover:text-background"
-      }`}
-    >
-      {label}
-    </button>
-  );
-}
-
 /* --------------------------------- Footer -------------------------------- */
 
 function Footer() {
   const links = [
-    ["Книга", "#book"],
-    ["Команда", "#team"],
-    ["Продукты", "#directions"],
+    ["Когда мы нужны", "#when"],
+    ["Подход", "#approach"],
     ["Кейсы", "#cases"],
-    ["Наш подход", "#guarantees"],
     ["Отзывы", "#reviews"],
-    ["Разбор задачи", "#contact"],
+    ["Книга", "#book"],
+    ["FAQ", "#faq"],
+    ["Контакты", "#contact"],
   ];
   return (
     <footer className="border-t border-border bg-background">
@@ -2606,16 +2080,18 @@ export default function Landing() {
         <Nav />
         <main className="pb-20 md:pb-0">
           <Hero />
+          <Stats />
+          <Flow />
           <TrustStrip />
           <WhenNeeded />
-          <Scenarios />
-          <WhyItWorks />
+          <Capital />
+          <Approach />
+          <FirstStage />
           <Cases />
           <Reviews />
-          <Guarantees />
-          <Team />
           <BookSection />
           <NotFit />
+          <FAQ />
           <Contact />
         </main>
         <Footer />
@@ -2629,7 +2105,7 @@ export default function Landing() {
             href="#contact"
             className="flex w-full items-center justify-center gap-2 rounded-full bg-[color:var(--red)] px-5 py-3 text-sm font-semibold text-background shadow-lg shadow-[color:var(--red)]/25 transition active:scale-[0.98]"
           >
-            Обсудить задачу
+            Назначить разбор
             <ArrowRight className="h-4 w-4" />
           </a>
         </div>
