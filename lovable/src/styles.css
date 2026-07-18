@@ -317,3 +317,8 @@ html[data-calm="true"] .glass-refract { display: none; }
 h1, h2, h3, h4, blockquote {
   overflow-wrap: break-word;
 }
+
+/* бегущая строка логотипов (TrustStrip); при калм-режиме анимация не задаётся */
+@keyframes trust-ticker {
+  to { transform: translateX(-50%); }
+}

@@ -78,8 +78,6 @@ function useCalm(): [boolean, (v: boolean) => void] {
 /* Состояние остаётся локальным useState — это важно: с useSyncExternalStore    */
 /* AnimatePresence(mode="wait") зависал (старый блок не размонтировался).        */
 
-let pickScenario: (i: number) => void = () => {};
-
 /* Перенос контекста до заявки: форма (#contact) регистрирует сеттер, и при
    выборе сценария (карточка Hero, таб, CTA в детали) нужный chip отмечается сам. */
 let noteScenarioForForm: (label: string) => void = () => {};
@@ -106,10 +104,14 @@ function selectScenario(label: string) {
 /* ----------------------------- Small helpers ----------------------------- */
 
 function StencilLogo({ className = "" }: { className?: string }) {
+  /* по референсу лого: белой линией «зачёркнуто» только слово ВОДЫ;
+     «БЕЗ» и «withoutwater» — сплошные */
   return (
     <div className={`inline-flex flex-col leading-none ${className}`}>
-      <span className="stencil text-[1.6em] tracking-tight">БЕЗ ВОДЫ</span>
-      <span className="stencil text-[0.55em] tracking-tight mt-1">
+      <span className="font-display text-[1.6em] font-extrabold tracking-tight">
+        БЕЗ <span className="stencil">ВОДЫ</span>
+      </span>
+      <span className="font-display text-[0.55em] font-extrabold tracking-tight mt-1">
         withoutwater
       </span>
     </div>
@@ -130,12 +132,12 @@ function SectionLabel({ n, children }: { n: string; children: React.ReactNode })
 
 function Nav() {
   const links = [
-    ["Книга", "#book"],
-    ["Команда", "#team"],
     ["Продукты", "#directions"],
     ["Кейсы", "#cases"],
-    ["Наш подход", "#guarantees"],
     ["Отзывы", "#reviews"],
+    ["Наш подход", "#guarantees"],
+    ["Команда", "#team"],
+    ["Книга", "#book"],
   ];
   return (
     <header className="sticky top-0 z-50 border-b border-border/60 bg-background/75 backdrop-blur-xl">
@@ -159,8 +161,8 @@ function Nav() {
           href="#contact"
           className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-[color:var(--red)] px-4 py-2.5 text-xs font-semibold text-background shadow-sm shadow-[color:var(--red)]/20 transition hover:bg-foreground md:px-5 md:text-sm"
         >
-          <span className="hidden sm:inline">Бесплатная диагностика</span>
-          <span className="sm:hidden">Диагностика</span>
+          <span className="hidden sm:inline">Обсудить задачу</span>
+          <span className="sm:hidden">Обсудить</span>
           <ArrowUpRight className="h-4 w-4 transition group-hover:rotate-45" />
         </a>
       </div>
@@ -896,28 +898,40 @@ function Hero() {
       <div className="pointer-events-none absolute inset-x-0 bottom-40 mx-auto h-px max-w-7xl bg-border" />
       <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px bg-border/60" />
 
-      {/* Floating liquid orb + физика встреч. Все малые шарики hero живут в
-          MeetingSpheres: касание = рождение (цвет-смесь) или отскок; CSS-капли
-          убраны — они плавали сквозь остальных без событий. */}
+      {/* Floating liquid orb + физика встреч (MeetingSpheres): касание = рождение
+          (цвет-смесь) или отскок; статичных CSS-капель в hero нет. */}
       <LiquidOrb size={440} className="right-[-80px] top-8 hidden md:block" />
       <MeetingSpheres className="hidden md:block" />
 
       <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-10 md:px-6 md:pb-24 md:pt-20">
-        <SectionLabel n="01">Проектная команда</SectionLabel>
+        <SectionLabel n="01">Проектная команда для корпоративных программ и продуктов обучения</SectionLabel>
         <RevealHeading as="h1" className="mt-6 max-w-5xl font-display text-[clamp(1.75rem,7vw,2.5rem)] font-extrabold leading-[1.05] tracking-tight sm:text-5xl md:mt-8 md:text-7xl md:leading-[1.02]">
-          Превращаем экспертный опыт в{" "}
+          Превращаем{" "}
           <span className="relative inline-block">
-            <span className="relative z-10">коммерчески обоснованные</span>
+            <span className="relative z-10">знания ваших экспертов</span>
             <span className="absolute inset-x-0 bottom-1 -z-0 h-4 bg-[color:var(--red)]/25" />
           </span>{" "}
-          продукты для бизнеса
+          в программы, по которым учится вся компания
         </RevealHeading>
 
         <p className="mt-6 max-w-2xl text-base md:text-lg text-muted-foreground">
-          Команда методологов, образовательных продактов и проджект-менеджеров.
-          Собираем специалистов под задачу заказчика и доводим экспертизу до
-          применимого результата.
+          Внешняя команда методологов и продактов. Извлекаем опыт ваших ключевых
+          людей, при необходимости приводим практиков с рынка — и собираем
+          готовую к запуску программу.
         </p>
+
+        <ul className="mt-7 flex max-w-2xl flex-col gap-3">
+          {[
+            "Эксперт по обучению приступает к вашему проекту через 72 часа после согласования",
+            "Можно прийти без ТЗ — заберем разрозненные вводные и вернем дорожную карту продукта",
+            "Программы строим на опыте действующих практиков, а не на пересказе теории",
+          ].map((b) => (
+            <li key={b} className="flex items-start gap-3 text-sm leading-relaxed text-foreground/85 md:text-base">
+              <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--red)]" />
+              <span>{b}</span>
+            </li>
+          ))}
+        </ul>
 
         <div className="mt-8 flex flex-col gap-4 md:mt-10">
           <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-4">
@@ -925,125 +939,89 @@ function Hero() {
               href="#contact"
               className="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-[color:var(--red)] px-6 py-3.5 text-sm font-semibold text-background shadow-lg shadow-[color:var(--red)]/20 transition hover:bg-foreground sm:w-auto sm:px-7 sm:py-4 sm:text-base"
             >
-              ЗАПИСАТЬСЯ НА ДИАГНОСТИКУ
+              Обсудить задачу
               <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1 sm:h-5 sm:w-5" />
+            </a>
+            <a
+              href="#cases"
+              className="group inline-flex w-full items-center justify-center gap-2 rounded-full border border-border bg-background/70 px-6 py-3.5 text-sm font-semibold text-foreground backdrop-blur transition hover:border-[color:var(--red)]/50 hover:text-[color:var(--red)] sm:w-auto sm:px-7 sm:py-4 sm:text-base"
+            >
+              Посмотреть кейсы
             </a>
           </div>
           <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground sm:text-sm">
-            <span className="inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[color:var(--red)]" />30 минут онлайн</span>
-            <span className="inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[color:var(--red)]" />Без обязательств</span>
-            <span className="inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[color:var(--red)]" />Ответ в течение 2 часов</span>
+            <span className="inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[color:var(--red)]" />30 минут онлайн. Сверим задачу и предложим следующий шаг</span>
           </div>
         </div>
-
-        <div className="mt-12 grid gap-4 border-t border-border pt-8 sm:gap-6 md:mt-20 md:grid-cols-3 md:pt-10">
-          {[
-            {
-              t: "Абонентское сопровождение",
-              d: "Если образовательные задачи возникают регулярно, берём их в сопровождение и отвечаем за результат.",
-            },
-            {
-              t: "Продукт под задачу",
-              d: "Если нужен конкретный продукт или экспертное решение, собираем проектную команду под запрос.",
-            },
-            {
-              t: "Практикум для L&D",
-              d: "Если подход нужно передать внутренней команде, проводим практикум и закрепляем инструменты.",
-            },
-          ].map((c, i) => (
-            <motion.div
-              key={c.t}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.08 }}
-            >
-              <a
-                href="#directions"
-                onClick={() => pickScenario(i)}
-                className="block h-full"
-              >
-                <GlassCard className="group relative h-full p-6 transition-transform duration-300 hover:-translate-y-1">
-                  <div className="mb-3 flex items-center justify-between">
-                    <div className="text-xs font-semibold uppercase tracking-widest text-[color:var(--red)]">
-                      Сценарий 0{i + 1}
-                    </div>
-                    <ArrowUpRight className="h-4 w-4 text-foreground/40 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-[color:var(--red)]" />
-                  </div>
-                  <div className="mb-2 font-display text-lg font-bold leading-snug">{c.t}</div>
-                  <div className="text-sm leading-relaxed text-muted-foreground">{c.d}</div>
-                </GlassCard>
-              </a>
-            </motion.div>
-          ))}
-
-        </div>
-
       </div>
     </section>
   );
 }
 
 
-/* ------------------------------ Principle ------------------------------ */
+/* --------------------- WhyItWorks (Почему подход работает) --------------------- */
+/* Блок 5 структуры v2: три опоры + принцип-цитата (переехала из старого
+   «Наш принцип»). Тёмная секция — зона Мудреца: чёрный фон, молочный текст,
+   ягодные маркеры, лавандовые сферы. */
 
-function Principle() {
+function WhyItWorks() {
+  const pillars = [
+    {
+      t: "Тиражирование лучших практик",
+      d: "Извлекаем знания ваших ключевых сотрудников и переводим их в структурированные алгоритмы, которые легко передать остальной команде.",
+    },
+    {
+      t: "Доступ к рыночному опыту",
+      d: "Если нужной компетенции внутри нет — наш нетворк позволяет привести действующих топов и узких hard-специалистов и встроить их практику в ваш контекст.",
+    },
+    {
+      t: "Скорость без потери качества",
+      d: "Пул проверенных методологов: эксперт приступает через 72 часа, полный цикл проектирования — на нашей стороне.",
+    },
+  ];
   return (
-    <section className="relative overflow-hidden border-b border-border bg-foreground text-background">
+    <section id="why" className="relative overflow-hidden border-b border-border bg-foreground text-background">
       <AmbientHalo className="-right-40 top-0" color="var(--red-glow)" size={620} opacity={0.28} />
       <AmbientHalo className="-left-32 bottom-0" color="oklch(0.85 0.02 260)" size={520} opacity={0.08} />
       <div className="pointer-events-none absolute inset-0">
         <Sphere size={180} className="right-10 top-10 hidden md:block" delay={0.2} duration={9} variant="red" />
         <Sphere size={80} className="right-[220px] top-[160px] hidden md:block" delay={0.9} duration={7} variant="chrome" />
         <LiquidDrop size={64} className="left-[8%] top-[220px] hidden md:block" tone="chrome" delay={0.4} duration={11} />
-        <LiquidDrop size={42} className="left-[22%] bottom-[80px] hidden md:block" tone="red" delay={1.2} duration={9} />
       </div>
-      <div className="pointer-events-none absolute left-0 right-0 top-1/2 h-px bg-background/10" />
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
         <div className="text-xs font-semibold uppercase tracking-[0.2em] text-background/50">
-          Наш принцип
+          Почему наш подход работает
+        </div>
+        <RevealHeading className="mt-6 max-w-4xl font-display text-2xl font-extrabold leading-tight sm:text-3xl md:text-5xl">
+          Мы не пересказываем теорию, а соединяем бизнес с реальным рыночным опытом
+        </RevealHeading>
+
+        <div className="mt-12 grid gap-8 md:grid-cols-3 md:gap-10">
+          {pillars.map((p, i) => (
+            <motion.div
+              key={p.t}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.08 }}
+              className="border-t border-background/15 pt-6"
+            >
+              <div className="font-display text-lg font-bold text-background md:text-xl">
+                {p.t}
+              </div>
+              <p className="mt-3 text-sm leading-relaxed text-background/65 md:text-[15px]">
+                {p.d}
+              </p>
+            </motion.div>
+          ))}
         </div>
 
-        <RevealHeading as="blockquote" className="mt-8 max-w-5xl font-display text-2xl font-bold leading-tight sm:text-3xl md:text-5xl">
+        <blockquote className="mt-14 max-w-4xl border-l-2 border-[color:var(--red-bright)] pl-6 font-display text-xl font-bold leading-snug sm:text-2xl md:mt-20 md:text-3xl">
           «Если у продукта нет понятной бизнес-логики и спроектированного пути к
           результату — это{" "}
           <span className="text-[color:var(--red-bright)]">производство контента</span>,
           а не образовательный продукт».
-        </RevealHeading>
-
-
-        <div className="mt-16 grid gap-10 md:grid-cols-2">
-          <div>
-            <div className="mb-4 text-sm font-semibold uppercase tracking-widest text-[color:var(--red-bright)]">
-              Для EdTech продуктов
-            </div>
-            <ul className="space-y-3 text-lg">
-              <li className="flex gap-3">
-                <Check className="mt-1 h-5 w-5 shrink-0 text-[color:var(--red-bright)]" />
-                Понятная модель монетизации и целевая экономика
-              </li>
-              <li className="flex gap-3">
-                <Check className="mt-1 h-5 w-5 shrink-0 text-[color:var(--red-bright)]" />
-                Измеримый результат продукта и спроектированный путь к нему
-              </li>
-            </ul>
-          </div>
-          <div>
-            <div className="mb-4 text-sm font-semibold uppercase tracking-widest text-[color:var(--red-bright)]">
-              Для корпоративного обучения
-            </div>
-            <ul className="space-y-3 text-lg">
-              <li className="flex gap-3">
-                <Check className="mt-1 h-5 w-5 shrink-0 text-[color:var(--red-bright)]" />
-                Программа связана с конкретной задачей бизнеса
-              </li>
-              <li className="flex gap-3">
-                <Check className="mt-1 h-5 w-5 shrink-0 text-[color:var(--red-bright)]" />
-                Знания и навыки применяются в реальной работе
-              </li>
-            </ul>
-          </div>
-        </div>
+        </blockquote>
       </div>
     </section>
   );
@@ -1061,7 +1039,7 @@ function BookSection() {
       <LiquidDrop size={44} className="right-[8%] bottom-[100px] hidden md:block" tone="chrome" delay={1.0} duration={10} />
 
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="02">Методология издана</SectionLabel>
+        <SectionLabel n="08">Методология издана</SectionLabel>
         <div className="mt-14">
           <GlassCard className="overflow-hidden p-0">
             <div className="grid items-stretch gap-0 md:grid-cols-[360px_1fr]">
@@ -1116,8 +1094,8 @@ function BookSection() {
                   Книга «Эксперт под ключ»
                 </motion.h2>
                 <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground">
-                  Как мы распаковываем опыт экспертов-практиков и превращаем его в
-                  образовательный продукт с измеримым результатом — методология
+                  Как мы извлекаем знания экспертов-практиков и собираем из них
+                  образовательные продукты с измеримым результатом — методология
                   команды, изданная книгой. Литрес, 2025.
                 </p>
                 <a
@@ -1130,7 +1108,7 @@ function BookSection() {
                   <ExternalLink className="h-4 w-4 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
                 </a>
                 <div className="mt-10 flex flex-wrap gap-3">
-                  {["Продуктовая методология", "Распаковка экспертности", "Измеримый результат"].map((tag) => (
+                  {["Продуктовая методология", "Извлечение знаний", "Измеримый результат"].map((tag) => (
                     <span
                       key={tag}
                       className="inline-flex items-center rounded-full border border-border/70 bg-background/60 px-3 py-1.5 text-xs font-medium text-foreground/80 backdrop-blur-sm"
@@ -1204,7 +1182,7 @@ function Team() {
       <LiquidDrop size={54} className="right-[6%] bottom-[100px] hidden md:block" tone="chrome" delay={0.9} duration={11} />
       <LiquidDrop size={36} className="right-[22%] top-[80px] hidden md:block" tone="warm" delay={1.6} duration={9} />
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="03">Команда</SectionLabel>
+        <SectionLabel n="07">Команда</SectionLabel>
         <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <RevealHeading className="max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
             Познакомьтесь с командой
@@ -1250,199 +1228,47 @@ function Team() {
   );
 }
 
-/* ------------------------------ Scenarios ------------------------------- */
+/* -------------------- Scenarios («Что можно поручить») ------------------- */
+/* Блок 4 структуры v2. Подпродукт 1.3 (EdTech) на корп-лендинг не ставим.
+   short-названия сценариев используются chips формы и бейджами кейсов. */
 
-type ScenarioSub = {
-  code: string;
-  title: string;
-  intro?: string;
-  listTitle?: string;
-  bullets?: string[];
-  note?: string;
-  result?: string;
-  subCta?: string;
-};
-type Scenario = {
-  tag: string;
-  short: string;
-  title: string;
-  lead: string;
-  cta: string;
-  ctaHref: string;
-  subs: ScenarioSub[];
-};
-const SCENARIOS: Scenario[] = [
+const SCENARIOS = [
   {
-    tag: "Сценарий 01",
+    n: "01",
     short: "Абонентское сопровождение",
-    title: "Если образовательные задачи возникают регулярно: берём их в абонентское сопровождение",
-    lead: "Работаем как внешний методологический отдел: планируем объём и сроки на цикл, сами формируем проектную команду и отвечаем за результат.",
-    cta: "ЗАПИСАТЬСЯ НА ДИАГНОСТИКУ",
-    ctaHref: "#contact",
+    lead: "Внешний методологический отдел по подписке: фиксированный объем работ на цикл, еженедельные рабочие созвоны, продление помесячно. Новую задачу берем в работу за 72 часа — без нового тендера и поиска подрядчика.",
     subs: [
       {
         code: "1.1",
-        title: "Эксперт по подписке",
-        bullets: [
-          "Согласованный объём образовательных результатов в каждом рабочем цикле",
-          "Подписка строится не вокруг занятости конкретного специалиста, а вокруг регулярного результата",
-          "В начале каждого цикла согласуем приоритеты, задачи, передаваемые материалы, сроки и критерии приёмки. «Без Воды» самостоятельно формирует проектную команду, распределяет работу и отвечает за качество результата",
-        ],
+        title: "Методолог по подписке",
+        text: "Выделенный методолог ведет ваши задачи обучения: от разбора запроса до готовых материалов.",
       },
       {
         code: "1.2",
         title: "Фабрика курсов для корпоративной LMS",
-        intro: "Превращаем очередь запросов и опыт внутренних экспертов в регулярный поток программ и материалов, подготовленных для корпоративной LMS.",
-        listTitle: "Берём на себя",
-        bullets: [
-          "распаковку внутренних экспертов",
-          "проектирование архитектуры программ",
-          "разработку сценариев курсов и занятий",
-          "создание практических заданий",
-          "разработку инструментов оценки",
-          "подготовку материалов для участников и преподавателей",
-          "методическую редактуру и контроль качества",
-          "управление производственным планом и сроками",
-        ],
-      },
-      {
-        code: "1.3",
-        title: "Продуктовая методология для EdTech",
-        intro: "Регулярно улучшаем образовательный продукт на основе пути участника, обратной связи и продуктовых показателей. Анализируем и исправляем, где продукт теряет участника, какие элементы мешают применению знаний и какие гипотезы стоит проверить в первую очередь.",
-        listTitle: "Берём на себя",
-        bullets: [
-          "аудит продукта и пути участника",
-          "анализ обратной связи и поведения пользователей",
-          "поиск точек потери вовлечённости и доходимости",
-          "проверку продуктового обещания",
-          "проектирование продуктовых гипотез",
-          "переработку архитектуры, практики и сопровождения",
-          "разработку и редактуру материалов",
-          "формирование системы образовательных и продуктовых показателей и их обеспечение",
-        ],
+        text: "Типовой курс — 24 рабочих часа производства: от передачи материалов до загрузки в вашу LMS. Ведем до 10–12 курсов параллельно.",
+        note: "Типовой курс — 20–30 минут прохождения, до 50 экранов и тест, собирается на основе ваших материалов. Курсы с извлечением знаний у экспертов оцениваем отдельно.",
       },
       {
         code: "1.4",
         title: "Проектный офис образовательной инициативы",
-        intro: "Собираем и координируем команду для сложного образовательного проекта — от постановки задачи до принятого заказчиком этапа. Подходит, если в проекте одновременно участвуют внутренние эксперты, методологи, образовательные продакты, редакторы, разработчики и представители бизнеса.",
-        listTitle: "Берём на себя",
-        bullets: [
-          "декомпозицию задачи",
-          "формирование проектной команды",
-          "разработку дорожной карты",
-          "управление бэклогом и производственным планом",
-          "распределение зон ответственности",
-          "координацию внутренних и привлечённых специалистов",
-          "управление этапами и сроками",
-          "контроль качества",
-          "подготовку результатов к приёмке",
-        ],
-        note: "Заказчик определяет приоритеты, требования и критерии приёмки. Работой специалистов управляет руководитель проекта «Без Воды».",
+        text: "Берем управление инициативой целиком: план, команда, эксперты, сроки, отчетность — у вас одна точка ответственности.",
       },
     ],
   },
   {
-    tag: "Сценарий 02",
+    n: "02",
     short: "Продукт под задачу",
-    title: "Если нужен конкретный продукт или экспертное решение: собираем продукт под задачу",
-    lead: "Собираем решение вокруг ваших задач с помощью предметной экспертности, методологии, продуктового подхода и проектного управления. До старта фиксируем, что должно быть разработано и передано заказчику, какие результаты войдут в проект и по каким критериям пройдёт приёмка.",
-    cta: "ЗАПИСАТЬСЯ НА ДИАГНОСТИКУ",
-    ctaHref: "#contact",
-    subs: [
-      {
-        code: "2.1",
-        title: "Из экспертности — в образовательный продукт",
-        intro: "Превращаем опыт в продукт с обоснованным обещанием, рассчитанной экономикой и измеримым результатом для участника.",
-        listTitle: "Берём на себя",
-        bullets: [
-          "исследование аудитории",
-          "распаковку опыта эксперта",
-          "формулирование продуктовой гипотезы",
-          "разработку продуктового обещания",
-          "расчёт целевой экономики",
-          "проектирование пути участника",
-          "разработку архитектуры программы",
-          "создание практики и системы оценки",
-          "подготовку сценариев занятий и материалов",
-          "разработку модели запуска и развития продукта",
-        ],
-        result: "Продуктовый пакет, подготовленный к запуску и проверке бизнес-гипотез, и организация ведения программы.",
-      },
-      {
-        code: "2.2",
-        title: "Hard skills из первых рук",
-        intro: "Находим практика в узкой нише и превращаем его опыт в программу под реальные задачи вашей команды. Находим специалиста, который уже решал задачи нужного вам уровня и может подтвердить их кейсами.",
-        listTitle: "Берём на себя",
-        bullets: [
-          "формирование профиля эксперта",
-          "поиск и проверку практиков",
-          "предварительное знакомство или демо",
-          "распаковку профессионального опыта",
-          "выделение рабочих алгоритмов",
-          "сбор кейсов и типичных ошибок",
-          "проектирование программы на задачах заказчика",
-          "разработку практики и материалов",
-          "создание инструментов оценки",
-          "методологическое и проектное сопровождение эксперта",
-        ],
-        result: "Вебинар, курс, тренинг, выступление или серия консультаций — под конкретную задачу вашей команды.",
-      },
-      {
-        code: "2.3",
-        title: "Как работаем с ДПО",
-        intro: "В проектах ДПО «Без Воды» выступает методологическим, продуктовым и проектным партнёром.",
-        note: "Программу утверждает и реализует лицензированная образовательная организация заказчика: она зачисляет слушателей, проводит итоговую аттестацию и выдаёт документы о квалификации.",
-      },
-    ],
+    lead: "Курс, программа, тренинг или методическое решение под ключ. После первой встречи — дорожная карта: как будет выглядеть продукт, чья экспертиза потребуется и сколько займет запуск. Эксперт приступает через 72 часа.",
   },
   {
-    tag: "Сценарий 03",
+    n: "03",
     short: "Практикум для L&D",
-    title: "Если подход нужно передать внутренней команде: проводим практикум для L&D",
-    lead: "Передаём внутренней команде тренеров и методологов продуктовый подход, который сразу внедряется в их проекты.",
-    cta: "ЗАПИСАТЬСЯ НА ДИАГНОСТИКУ",
-    ctaHref: "#contact",
-    subs: [
-      {
-        code: "3.1",
-        title: "Что определяет команда на практикуме",
-        listTitle: "На практикуме команда определяет",
-        bullets: [
-          "какую задачу бизнеса должна поддерживать программа",
-          "для какой аудитории она создаётся",
-          "какое продуктовое обещание можно обосновать",
-          "какое изменение требуется от участника",
-          "какие действия должны привести к этому изменению",
-          "как связать содержание, практику и среду",
-          "какими показателями оценивать продукт",
-          "какие гипотезы нужно проверить до масштабирования",
-        ],
-        result: "Для участника: освоение новых форматов и применение продуктового подхода к проектированию обучения.",
-      },
-    ],
+    lead: "Передаем вашей команде единый подход к проектированию программ и сопровождаем его применение на текущих проектах — от разбора задачи до архитектуры и критериев результата. Каждый следующий продукт команда собирает сама, без ручного контроля руководителя.",
   },
 ];
 
 function Scenarios() {
-  const [active, setActive] = useState(0);
-  const [openSub, setOpenSub] = useState<string | null>(null);
-  const d = SCENARIOS[active];
-
-  useEffect(() => {
-    setOpenSub(null);
-  }, [active]);
-
-  // связываем карточки сценариев в Hero с этими табами (+ перенос выбора в форму)
-  useEffect(() => {
-    pickScenario = (i: number) => {
-      setActive(i);
-      selectScenario(SCENARIOS[i].short);
-    };
-    return () => {
-      pickScenario = () => {};
-    };
-  }, []);
-
   return (
     <section id="directions" className="relative overflow-hidden border-b border-border">
       <AmbientHalo className="-right-40 top-20" color="var(--lav)" size={560} opacity={0.18} />
@@ -1450,183 +1276,83 @@ function Scenarios() {
       <LiquidDrop size={78} className="right-[6%] top-[180px] hidden lg:block" tone="red" delay={0.4} duration={12} />
       <LiquidDrop size={46} className="left-[3%] top-[420px] hidden lg:block" tone="chrome" delay={1.0} duration={10} />
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="04">Три сценария</SectionLabel>
+        <SectionLabel n="03">Что можно поручить</SectionLabel>
         <RevealHeading className="mt-6 max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
-          Выберите сценарий под вашу задачу
+          Что можно поручить команде «Без Воды»
         </RevealHeading>
+        <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
+          Подключаемся там, где нужен не просто продакшн, а цельное решение
+        </p>
 
-        <div className="mt-12 grid grid-cols-1 gap-1 border-b border-border sm:flex sm:flex-wrap sm:gap-2">
-          {SCENARIOS.map((dir, i) => (
-            <button
-              key={i}
-              onClick={() => {
-                setActive(i);
-                selectScenario(SCENARIOS[i].short);
-              }}
-              className={`relative -mb-px flex items-center gap-3 px-4 py-4 text-left text-sm font-semibold transition sm:px-5 ${
-                active === i
-                  ? "text-foreground"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+        {/* Сценарий 01 с подпродуктами */}
+        <div className="mt-12 rounded-3xl border border-border bg-background/60 p-6 backdrop-blur-sm md:p-10">
+          <div className="max-w-4xl">
+            <div className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--red)]">
+              Сценарий 01
+            </div>
+            <h3 className="font-display text-2xl font-extrabold leading-tight sm:text-3xl">
+              Абонентское сопровождение
+            </h3>
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground md:text-lg">
+              {SCENARIOS[0].lead}
+            </p>
+          </div>
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
+            {SCENARIOS[0].subs!.map((sub) => (
+              <div
+                key={sub.code}
+                className="rounded-2xl border border-border bg-background/70 p-5 md:p-6"
+              >
+                <div className="flex items-start gap-3">
+                  <span className="font-display text-xl font-bold tabular-nums text-[color:var(--red)]">
+                    {sub.code}
+                  </span>
+                  <h4 className="font-display text-base font-extrabold leading-tight md:text-lg">
+                    {sub.title}
+                  </h4>
+                </div>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
+                  {sub.text}
+                </p>
+                {"note" in sub && sub.note && (
+                  <p className="mt-3 border-t border-border pt-3 text-xs leading-relaxed text-muted-foreground/80">
+                    {sub.note}
+                  </p>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Сценарии 02 и 03 */}
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          {[SCENARIOS[1], SCENARIOS[2]].map((s) => (
+            <div
+              key={s.n}
+              className="rounded-3xl border border-border bg-background/60 p-6 backdrop-blur-sm md:p-10"
             >
-              <span className={`font-display text-lg tabular-nums ${active === i ? "text-[color:var(--red)]" : "text-foreground/30"}`}>
-                0{i + 1}
-              </span>
-              <span>{dir.short}</span>
-              {active === i && (
-                <motion.span
-                  layoutId="dir-underline"
-                  className="absolute inset-x-0 -bottom-px h-[2px] bg-[color:var(--red)]"
-                />
-              )}
-            </button>
+              <div className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--red)]">
+                Сценарий {s.n}
+              </div>
+              <h3 className="font-display text-2xl font-extrabold leading-tight sm:text-3xl">
+                {s.short}
+              </h3>
+              <p className="mt-4 text-base leading-relaxed text-muted-foreground">
+                {s.lead}
+              </p>
+            </div>
           ))}
         </div>
 
-        {/* Контент таба: keyed remount + CSS-фейд .tab-fade (скрытие только в
-            from-кадре keyframes, базовое состояние видимое — «залипнуть» пустым
-            невозможно). JS-анимации тут не используем: прежний
-            AnimatePresence(mode="wait") зависал из-за вложенного AnimatePresence
-            (раскрывашки) — старый блок уходил в opacity:0, новый не монтировался. */}
-          <div key={active} className="mt-12 tab-fade">
-            <div className="max-w-4xl">
-              <div className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-[color:var(--red)]">
-                {d.tag}
-              </div>
-              <h3 className="font-display text-[1.5rem] font-extrabold leading-tight [hyphens:auto] [overflow-wrap:break-word] sm:text-3xl md:text-4xl">
-                {d.title}
-              </h3>
-              <p className="mt-6 text-lg text-muted-foreground">{d.lead}</p>
-            </div>
-
-            <div className="mt-12 grid gap-4 md:grid-cols-2">
-              {d.subs.map((sub) => {
-                const isOpen = openSub === sub.code;
-                return (
-                  <button
-                    key={sub.code}
-                    onClick={() => setOpenSub(isOpen ? null : sub.code)}
-                    className={`group relative text-left rounded-2xl border border-border bg-background/60 p-5 backdrop-blur-sm transition hover:border-[color:var(--red)]/40 md:p-6 ${isOpen ? "border-[color:var(--red)]/40" : ""}`}
-                  >
-                    <div className="flex items-start gap-3">
-                      <span className="font-display text-xl font-bold tabular-nums text-[color:var(--red)]">
-                        {sub.code}
-                      </span>
-                      <div className="flex-1">
-                        <h4 className="font-display text-lg font-extrabold leading-tight md:text-xl">
-                          {sub.title}
-                        </h4>
-                        {!isOpen && (
-                          <span className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition group-hover:text-foreground">
-                            Подробнее
-                            <Plus className="h-3.5 w-3.5" />
-                          </span>
-                        )}
-                      </div>
-                      <span className="ml-1 flex h-7 w-7 flex-none items-center justify-center rounded-full border border-border bg-secondary/60 transition group-hover:border-[color:var(--red)]/30">
-                        <motion.div
-                          animate={{ rotate: isOpen ? 45 : 0 }}
-                          transition={{ duration: 0.2 }}
-                        >
-                          <Plus className="h-4 w-4" />
-                        </motion.div>
-                      </span>
-                    </div>
-
-                    <AnimatePresence initial={false}>
-                      {isOpen && (
-                        <motion.div
-                          initial={{ opacity: 0, height: 0 }}
-                          animate={{ opacity: 1, height: "auto" }}
-                          exit={{ opacity: 0, height: 0 }}
-                          transition={{ duration: 0.25, ease: "easeInOut" }}
-                          className="overflow-hidden"
-                        >
-                          <div className="pt-5">
-                            {sub.intro && (
-                              <p className="text-sm leading-relaxed text-muted-foreground md:text-[15px]">
-                                {sub.intro}
-                              </p>
-                            )}
-
-                            {sub.bullets && (
-                              <div className="mt-5">
-                                {sub.listTitle && (
-                                  <div className="mb-3 text-xs font-semibold uppercase tracking-widest text-foreground/60">
-                                    {sub.listTitle}
-                                  </div>
-                                )}
-                                <ul className="space-y-2">
-                                  {sub.bullets.map((b, i) => (
-                                    <li key={i} className="flex gap-3 text-sm leading-relaxed md:text-[15px]">
-                                      <span className="mt-2 h-1 w-1 flex-none rounded-full bg-[color:var(--red)]" />
-                                      <span>{b}</span>
-                                    </li>
-                                  ))}
-                                </ul>
-                              </div>
-                            )}
-
-                            {sub.note && (
-                              <p className="mt-5 text-sm italic leading-relaxed text-muted-foreground">
-                                {sub.note}
-                              </p>
-                            )}
-
-                            {sub.result && (
-                              <div className="mt-6 border-l-2 border-[color:var(--red)] bg-secondary/60 p-4">
-                                <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-[color:var(--red)]">
-                                  Результат
-                                </div>
-                                <p className="text-sm leading-relaxed">{sub.result}</p>
-                              </div>
-                            )}
-
-                            {sub.subCta && (
-                              <a
-                                href="#contact"
-                                className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-foreground underline-offset-4 hover:underline"
-                              >
-                                {sub.subCta}
-                                <ArrowRight className="h-4 w-4" />
-                              </a>
-                            )}
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                  </button>
-                );
-              })}
-            </div>
-
-            <div className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4">
-              <a
-                href={d.ctaHref}
-                onClick={() => selectScenario(d.short)}
-                className="group inline-flex items-center gap-3 rounded-full bg-[color:var(--red)] px-7 py-4 text-base font-semibold text-[color:var(--paper)] shadow-lg shadow-[color:var(--red)]/20 transition hover:bg-foreground"
-              >
-                {d.cta}
-                <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
-              </a>
-              <a
-                href="#cases"
-                onClick={() => highlightCases(active)}
-                className="group inline-flex items-center gap-2 text-sm font-semibold text-muted-foreground transition hover:text-[color:var(--red)]"
-              >
-                Кейсы этого сценария
-                <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1" />
-              </a>
-            </div>
-          </div>
-
         <p className="mx-auto mt-14 max-w-3xl text-center text-sm text-muted-foreground sm:text-base">
-          В любом формате вы получаете не часы отдельных специалистов, а согласованный объём работ, сроки, критерии приёмки и принцип «единого окна» в работе с нашей командой.
+          В любом формате вы получаете не часы отдельных специалистов, а
+          согласованный объем работ, сроки, критерии приемки и принцип «единого окна».
         </p>
       </div>
     </section>
   );
 }
+
 
 /* ------------------------------- Cases ---------------------------------- */
 
@@ -1747,7 +1473,7 @@ function CaseCard({
             </div>
             <a
               href="#directions"
-              onClick={() => pickScenario(item.scenario)}
+              onClick={() => selectScenario(SCENARIOS[item.scenario].short)}
               className="rounded-full border border-border/70 px-2 py-1 text-[10px] font-semibold uppercase tracking-wider text-muted-foreground transition hover:border-[color:var(--red)]/50 hover:text-[color:var(--red)]"
             >
               Сценарий 0{item.scenario + 1}
@@ -1845,7 +1571,7 @@ function Cases() {
       <LiquidDrop size={32} className="right-[22%] bottom-[90px] hidden md:block" tone="warm" delay={1.5} duration={9} />
 
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="05">Результаты клиентов</SectionLabel>
+        <SectionLabel n="04">Результаты клиентов</SectionLabel>
         <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <RevealHeading className="max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
             Кейсы с конкретными метриками
@@ -1865,41 +1591,52 @@ function Cases() {
             />
           ))}
         </div>
+
+        <div className="mt-12 text-center">
+          <a
+            href="#contact"
+            className="group inline-flex items-center gap-3 rounded-full bg-[color:var(--red)] px-7 py-4 text-base font-semibold text-[color:var(--paper)] shadow-lg shadow-[color:var(--red)]/20 transition hover:bg-foreground"
+          >
+            Запросить похожий кейс
+            <ArrowRight className="h-5 w-5 transition group-hover:translate-x-1" />
+          </a>
+        </div>
       </div>
     </section>
   );
 }
 
-/* ----------------------------- Trust ------------------------------------ */
+/* ------------------- TrustStrip + WhenNeeded (блоки 2–3) ------------------ */
+/* Блок 2: полоса логотипов сразу под hero, без заголовка. Девять основных —
+   статично, остальные — бегущей строкой (при калм-режиме строка статична). */
 
-function Trust() {
-  const clients = [
-    "РОЛЬФ",
-    "Avito",
-    "Kaspersky",
-    "Ozon",
-    "Castorama",
-    "Норникель",
-    "McDonald's",
-    "Toyota",
-    "Home Credit Bank",
-    "InBev",
-    "МТС",
-    "Danone",
-    "Газпромбанк",
-  ];
+function TrustStrip() {
+  const main = ["РОЛЬФ", "Avito", "Kaspersky", "Ozon", "Castorama", "Норникель", "МТС", "Danone", "Газпромбанк"];
+  const rest = ["McDonald's", "Toyota", "Home Credit Bank", "InBev"];
+  const [calm] = useCalm();
+  const ticker = [...rest, ...rest, ...rest];
   return (
     <section className="relative overflow-hidden border-b border-border bg-secondary/30">
-      <div className="relative mx-auto max-w-7xl px-6 py-16">
-        <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">
-            Нам доверяют
-          </div>
-          <div className="flex flex-wrap gap-3">
-            {clients.map((name) => (
+      <div className="relative mx-auto max-w-7xl px-6 py-10">
+        <div className="flex flex-wrap justify-center gap-3">
+          {main.map((name) => (
+            <span
+              key={name}
+              className="inline-flex items-center rounded-full border border-border/70 bg-background/60 px-4 py-2 text-sm font-semibold text-foreground/80 backdrop-blur-sm"
+            >
+              {name}
+            </span>
+          ))}
+        </div>
+        <div className="relative mt-4 overflow-hidden" aria-hidden={calm ? undefined : true}>
+          <div
+            className="flex w-max gap-3 whitespace-nowrap"
+            style={calm ? undefined : { animation: "trust-ticker 26s linear infinite" }}
+          >
+            {[...ticker, ...ticker].map((name, i) => (
               <span
-                key={name}
-                className="inline-flex items-center rounded-full border border-border/70 bg-background/60 px-4 py-2 text-sm font-semibold text-foreground/80 backdrop-blur-sm transition hover:border-[color:var(--red)]/30 hover:text-foreground"
+                key={name + i}
+                className="inline-flex items-center rounded-full border border-border/50 px-4 py-1.5 text-xs font-semibold text-muted-foreground"
               >
                 {name}
               </span>
@@ -1910,6 +1647,68 @@ function Trust() {
     </section>
   );
 }
+
+/* Блок 3: четыре ситуации, в которых подход даёт максимальный эффект. */
+
+function WhenNeeded() {
+  const items = [
+    {
+      t: "Есть бизнес-задача, но нет ТЗ на обучение",
+      d: "Приходите с идеями и вводными в любом виде. Мы соберем смыслы, разложим их в логику и вернемся с архитектурой продукта и дорожной картой.",
+    },
+    {
+      t: "Знания и опыт распределены между сильными экспертами и материалами",
+      d: "Соберем их в единый структурированный продукт, адаптированный к вашему контексту, — экспертиза станет активом компании, а не отдельных людей.",
+    },
+    {
+      t: "Бизнес идет в новую нишу, готовых решений по обучению нет",
+      d: "Найдем на рынке практика, который уже прошел этот путь, договоримся с ним и встроим его опыт в программу под ваши цели.",
+    },
+    {
+      t: "Инициатив стало кратно больше, чем рук у L&D",
+      d: "Подключим команду на параллельные запуски: эксперт приступает через 72 часа, штат расширять не нужно.",
+    },
+  ];
+  return (
+    <section id="when" className="relative overflow-hidden border-b border-border">
+      <AmbientHalo className="-left-40 top-10" color="var(--lav)" size={520} opacity={0.18} />
+      <LiquidDrop size={56} className="right-[5%] top-[140px] hidden md:block" tone="red" delay={0.6} duration={11} />
+      <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
+        <SectionLabel n="02">Когда к нам обращаются</SectionLabel>
+        <RevealHeading className="mt-6 max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
+          Когда нужна команда «Без Воды»
+        </RevealHeading>
+        <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
+          Четыре ситуации, в которых наш подход дает максимальный эффект
+        </p>
+        <div className="mt-12 grid gap-5 md:grid-cols-2">
+          {items.map((c, i) => (
+            <motion.div
+              key={c.t}
+              initial={{ opacity: 0, y: 24 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: i * 0.06 }}
+            >
+              <GlassCard className="h-full p-6 md:p-8">
+                <div className="font-display text-sm font-bold tabular-nums text-[color:var(--red)]">
+                  0{i + 1}
+                </div>
+                <h3 className="mt-3 font-display text-lg font-extrabold leading-snug md:text-xl">
+                  {c.t}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-[15px]">
+                  {c.d}
+                </p>
+              </GlassCard>
+            </motion.div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 
 /* ----------------------------- Guarantees ------------------------------ */
 
@@ -1922,7 +1721,7 @@ const GUARANTEE_ITEMS: { t: string; blocks: GBlock[] }[] = [
       { p: "В коммерческом предложении, задании и договоре фиксируем:" },
       { ul: [
         "какие задачи решает «Без Воды»",
-        "какие исследования, распаковки и встречи проводим",
+        "какие исследования и рабочие встречи проводим",
         "какой продукт, программу или экспертное решение разрабатываем",
         "какие материалы создаем",
         "какие этапы запуска или реализации сопровождаем",
@@ -2215,7 +2014,7 @@ function Reviews() {
       <LiquidDrop size={70} className="right-[6%] top-[140px] hidden md:block" tone="red" delay={0.4} duration={12} />
       <LiquidDrop size={42} className="left-[5%] bottom-[110px] hidden md:block" tone="chrome" delay={1.0} duration={10} />
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="07">Отзывы</SectionLabel>
+        <SectionLabel n="05">Отзывы</SectionLabel>
         <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <RevealHeading className="max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
             Что говорят клиенты
@@ -2250,6 +2049,41 @@ function Reviews() {
     </section>
   );
 }
+
+/* ---------------------- NotFit (Кому не подходит) ---------------------- */
+/* Блок 9 структуры v2: честные границы — рационально, без лаванды. */
+
+function NotFit() {
+  const items = [
+    "Не подбираем специалистов в штат и не работаем по модели аутстаффинга",
+    "Не внедряем и не поддерживаем LMS-системы",
+    "Не продаем готовые типовые программы и не работаем как каталог тренеров",
+    "Не берем на себя event-продакшн",
+    "Не выстраиваем лидогенерацию и не работаем как внешний отдел продаж",
+  ];
+  return (
+    <section id="notfit" className="relative overflow-hidden border-b border-border bg-secondary/40">
+      <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
+        <SectionLabel n="09">Кому не подходит</SectionLabel>
+        <RevealHeading className="mt-6 max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
+          Что остается за рамками наших проектов
+        </RevealHeading>
+        <p className="mt-5 max-w-2xl text-lg text-muted-foreground">
+          Мы делаем образовательные продукты — и не беремся за смежные задачи
+        </p>
+        <ul className="mt-10 max-w-3xl divide-y divide-border border-y border-border">
+          {items.map((t) => (
+            <li key={t} className="flex items-start gap-4 py-4 text-[15px] leading-relaxed text-foreground/85">
+              <span className="mt-1 flex-none font-display text-sm font-bold text-[color:var(--red)]">—</span>
+              <span>{t}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 
 /* -------------------------------- Contact ------------------------------- */
 
@@ -2372,20 +2206,27 @@ function Contact() {
       <div className="relative mx-auto grid max-w-7xl gap-16 px-4 py-14 md:px-6 md:py-24 lg:grid-cols-[1fr_1fr]">
         <div>
           <div className="text-xs font-semibold uppercase tracking-[0.2em] text-background/50">
-            08 — Диагностика
+            10 — Разбор задачи
           </div>
           <RevealHeading as="h2" className="mt-6 font-display text-3xl font-extrabold leading-[1.05] sm:text-4xl md:text-6xl">
-            ЗАПИСАТЬСЯ НА ДИАГНОСТИКУ
+            Обсудим задачу и предложим следующий шаг
           </RevealHeading>
           <p className="mt-8 max-w-md text-lg text-background/70">
-            30 минут онлайн. Разберем вашу задачу и определим, можем ли мы вам помочь решить ее.
+            С готовым брифом или с задачей, которую еще нужно уточнить.
+          </p>
+
+          <div className="mt-10 text-sm font-semibold uppercase tracking-[0.14em] text-background/60">
+            Начинаем со структурирования вашей задачи
+          </div>
+          <p className="mt-2 max-w-md text-sm text-background/60">
+            Не нужно готовить ТЗ — достаточно прийти с идеей
           </p>
 
           <ol className="mt-10 space-y-5">
             {[
-              ["Заявка", "заполняете форму — 1 минута"],
-              ["Диагностика", "30 минут онлайн, разбираем задачу"],
-              ["Модель решения", "присылаем состав работ, сроки и стоимость"],
+              ["Разбор", "за 30 минут собираем ваши ожидания, гипотезы и разрозненные вводные"],
+              ["Логика", "раскладываем фактуру и переводим запрос в образовательную механику"],
+              ["Дорожная карта", "как выглядит продукт, чья экспертиза нужна, сколько займет запуск"],
             ].map(([t, d], i) => (
               <li key={t} className="flex items-start gap-5">
                 <span className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-background/25 font-display text-lg font-bold text-background/90">
@@ -2431,7 +2272,7 @@ function Contact() {
                 </p>
                 {tasks.length > 0 && (
                   <p className="mt-3 text-background/70">
-                    На диагностике разберём ваш сценарий{" "}
+                    На разборе задачи обсудим ваш сценарий{" "}
                     <span className="font-semibold text-background">
                       «{tasks.join("» и «")}»
                     </span>
@@ -2440,8 +2281,8 @@ function Contact() {
                 )}
                 <ol className="mt-8 space-y-3 border-t border-background/15 pt-6">
                   {[
-                    ["Диагностика", "30 минут онлайн, разбираем задачу"],
-                    ["Модель решения", "присылаем состав работ, сроки и стоимость"],
+                    ["Разбор задачи", "30 минут онлайн, собираем вводные"],
+                    ["Дорожная карта", "как выглядит продукт и сколько займет запуск"],
                   ].map(([t, d], i) => (
                     <li key={t} className="flex items-start gap-4">
                       <span className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-background/25 font-display text-sm font-bold text-background/90">
@@ -2538,7 +2379,7 @@ function Contact() {
                   className="group relative mt-4 inline-flex items-center justify-center gap-3 overflow-hidden rounded-full border border-background/25 bg-background/10 px-7 py-4 text-base font-semibold text-background backdrop-blur-xl transition hover:border-background/50 hover:bg-background/20 disabled:cursor-default disabled:opacity-60"
                 >
                   <span className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/15 to-transparent opacity-60" />
-                  <span className="relative">{sending ? "ОТПРАВЛЯЕМ…" : "ЗАПИСАТЬСЯ НА ДИАГНОСТИКУ"}</span>
+                  <span className="relative">{sending ? "Отправляем…" : "Назначить 30-минутный разбор задачи"}</span>
                   <ArrowUpRight className="relative h-5 w-5 transition group-hover:rotate-45" />
                 </button>
                 <div className="flex flex-wrap items-center justify-between gap-3">
@@ -2559,6 +2400,22 @@ function Contact() {
         </form>
         </GlassCard>
 
+      </div>
+      <div className="relative border-t border-background/15">
+        <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center gap-x-3 gap-y-2 px-4 py-5 text-center text-xs text-background/60 md:px-6">
+          {[
+            "Договор и NDA",
+            "смета и сроки до старта",
+            "закрывающие документы, работаем с закупками",
+            "УСН, без НДС",
+            "ответ в течение 2 часов в рабочее время",
+          ].map((t, i) => (
+            <span key={t} className="inline-flex items-center gap-3">
+              {i > 0 && <span className="text-background/30">·</span>}
+              <span>{t}</span>
+            </span>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -2625,7 +2482,7 @@ function Footer() {
     ["Кейсы", "#cases"],
     ["Наш подход", "#guarantees"],
     ["Отзывы", "#reviews"],
-    ["Диагностика", "#contact"],
+    ["Разбор задачи", "#contact"],
   ];
   return (
     <footer className="border-t border-border bg-background">
@@ -2749,15 +2606,16 @@ export default function Landing() {
         <Nav />
         <main className="pb-20 md:pb-0">
           <Hero />
-          <Principle />
-          
-          <BookSection />
-          <Team />
+          <TrustStrip />
+          <WhenNeeded />
           <Scenarios />
+          <WhyItWorks />
           <Cases />
-          <Trust />
-          <Guarantees />
           <Reviews />
+          <Guarantees />
+          <Team />
+          <BookSection />
+          <NotFit />
           <Contact />
         </main>
         <Footer />
@@ -2771,7 +2629,7 @@ export default function Landing() {
             href="#contact"
             className="flex w-full items-center justify-center gap-2 rounded-full bg-[color:var(--red)] px-5 py-3 text-sm font-semibold text-background shadow-lg shadow-[color:var(--red)]/25 transition active:scale-[0.98]"
           >
-            Бесплатная диагностика
+            Обсудить задачу
             <ArrowRight className="h-4 w-4" />
           </a>
         </div>
