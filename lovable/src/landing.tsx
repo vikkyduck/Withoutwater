@@ -1659,6 +1659,7 @@ const REVIEWS = [
     ],
     name: "Тамара Квиркелия",
     role: "Head of Acquisition & Onboarding, Авито",
+    photo: "/img/reviews/kvirkeliya.jpg",
   },
   {
     text: [
@@ -1669,6 +1670,7 @@ const REVIEWS = [
     ],
     name: "Мария Хмеленко",
     role: "Руководитель проектов консалтинговой компании Beyond Taylor (ВкусВилл)",
+    photo: "/img/reviews/khmelenko.jpg",
   },
   {
     text: [
@@ -1677,8 +1679,116 @@ const REVIEWS = [
     ],
     name: "Ринат Алиев",
     role: "Член совета директоров Red Bull",
+    photo: "/img/reviews/aliev.jpg",
   },
 ];
+
+/* Слайдер отзывов: квадратная карточка, круглая ЧБ аватарка слева,
+   листание стрелками, точками и свайпом. */
+function ReviewsCarousel() {
+  const [i, setI] = useState(0);
+  const [dir, setDir] = useState(1);
+  const [calm] = useCalm();
+  const total = REVIEWS.length;
+
+  const go = (next: number) => {
+    setDir(next > i ? 1 : -1);
+    setI((next + total) % total);
+  };
+
+  const r = REVIEWS[i];
+
+  return (
+    <div className="mt-14">
+      <div className="relative mx-auto max-w-3xl">
+        <div className="relative md:aspect-square">
+          <AnimatePresence initial={false} mode="wait" custom={dir}>
+            <motion.div
+              key={r.name}
+              custom={dir}
+              initial={calm ? { opacity: 0 } : { opacity: 0, x: dir * 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={calm ? { opacity: 0 } : { opacity: 0, x: dir * -40 }}
+              transition={{ duration: calm ? 0.15 : 0.35, ease: [0.2, 0.8, 0.2, 1] }}
+              drag={calm ? false : "x"}
+              dragConstraints={{ left: 0, right: 0 }}
+              dragElastic={0.12}
+              onDragEnd={(_, info) => {
+                if (info.offset.x < -60) go(i + 1);
+                else if (info.offset.x > 60) go(i - 1);
+              }}
+              className="h-full md:absolute md:inset-0"
+            >
+              <GlassCard className="flex h-full flex-col gap-6 p-6 md:flex-row md:gap-8 md:p-10">
+                {/* левая колонка: круглое ЧБ фото + подпись */}
+                <div className="flex shrink-0 items-center gap-4 md:w-[190px] md:flex-col md:items-start md:justify-start md:gap-5">
+                  <div className="size-20 shrink-0 overflow-hidden rounded-full border border-border/70 bg-secondary md:size-[150px]">
+                    <img
+                      src={r.photo}
+                      alt={r.name}
+                      loading="lazy"
+                      width={300}
+                      height={300}
+                      className="size-full object-cover grayscale"
+                    />
+                  </div>
+                  <div className="md:mt-1">
+                    <div className="font-display text-base font-bold leading-tight">{r.name}</div>
+                    <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{r.role}</p>
+                  </div>
+                </div>
+
+                {/* правая колонка: сам отзыв */}
+                <div className="flex min-w-0 flex-1 flex-col md:overflow-y-auto">
+                  <span className="font-display text-4xl leading-none text-[color:var(--red)]">«</span>
+                  <blockquote className="mt-4 flex flex-col gap-3 text-sm leading-relaxed text-foreground/85">
+                    {r.text.map((p) => (
+                      <p key={p}>{p}</p>
+                    ))}
+                  </blockquote>
+                </div>
+              </GlassCard>
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* управление: стрелки + точки */}
+        <div className="mt-6 flex items-center justify-center gap-4">
+          <button
+            type="button"
+            onClick={() => go(i - 1)}
+            aria-label="Предыдущий отзыв"
+            className="grid size-10 place-items-center rounded-full border border-border bg-background/70 transition hover:border-[color:var(--red)] hover:text-[color:var(--red)]"
+          >
+            <ArrowRight className="size-4 rotate-180" />
+          </button>
+          <div className="flex items-center gap-2">
+            {REVIEWS.map((rev, n) => (
+              <button
+                key={rev.name}
+                type="button"
+                onClick={() => go(n)}
+                aria-label={`Отзыв ${n + 1} из ${total}`}
+                aria-current={n === i}
+                className={`h-2 rounded-full transition-all ${
+                  n === i ? "w-6 bg-[color:var(--red)]" : "w-2 bg-foreground/25 hover:bg-foreground/40"
+                }`}
+              />
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => go(i + 1)}
+            aria-label="Следующий отзыв"
+            className="grid size-10 place-items-center rounded-full border border-border bg-background/70 transition hover:border-[color:var(--red)] hover:text-[color:var(--red)]"
+          >
+            <ArrowRight className="size-4" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 function Reviews() {
   return (
@@ -1697,30 +1807,7 @@ function Reviews() {
             О работе методологов «Без Воды» — дословно.
           </p>
         </div>
-        <div className="mt-14 grid items-start gap-6 md:grid-cols-3">
-          {REVIEWS.map((r, i) => (
-            <motion.div
-              key={r.name}
-              initial={{ opacity: 0, y: 24 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ delay: i * 0.1, duration: 0.5, ease: [0.2, 0.8, 0.2, 1] }}
-            >
-              <GlassCard className="flex h-full flex-col gap-5 p-6 md:p-7">
-                <span className="font-display text-4xl leading-none text-[color:var(--red)]">«</span>
-                <blockquote className="flex flex-col gap-3 text-sm leading-relaxed text-foreground/85">
-                  {r.text.map((p) => (
-                    <p key={p}>{p}</p>
-                  ))}
-                </blockquote>
-                <div className="mt-auto border-t border-border/70 pt-4">
-                  <div className="font-display text-base font-bold leading-tight">{r.name}</div>
-                  <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{r.role}</p>
-                </div>
-              </GlassCard>
-            </motion.div>
-          ))}
-        </div>
+        <ReviewsCarousel />
       </div>
     </section>
   );
