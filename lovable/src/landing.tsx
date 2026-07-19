@@ -126,30 +126,29 @@ function Nav() {
     ["FAQ", "#faq"],
   ];
   return (
-    <header className="sticky top-0 z-50 border-b border-border/60 bg-background/75 backdrop-blur-xl">
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3.5 md:px-6 md:py-4">
+    <header className="sticky top-0 z-50 border-b border-border/40 bg-background/70 backdrop-blur-2xl">
+      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 md:px-8 md:py-4">
         <a href="#top" className="text-foreground shrink-0">
           <StencilLogo className="text-[13px] md:text-[14px]" />
         </a>
-        <nav className="hidden items-center gap-1 text-sm font-medium md:flex">
+        <nav className="hidden items-center gap-0.5 text-[13px] font-medium tracking-[0.005em] md:flex">
           {links.map(([label, href]) => (
             <a
               key={href}
               href={href}
-              className="group relative rounded-full px-4 py-2 text-foreground/65 transition hover:text-foreground"
+              className="group relative rounded-full px-3.5 py-1.5 text-foreground/60 transition-colors duration-300 hover:text-foreground"
             >
               <span className="relative z-10">{label}</span>
-              <span className="absolute inset-0 -z-0 scale-95 rounded-full bg-secondary opacity-0 transition group-hover:scale-100 group-hover:opacity-100" />
+              <span className="absolute inset-0 -z-0 scale-90 rounded-full bg-secondary opacity-0 transition-all duration-300 group-hover:scale-100 group-hover:opacity-100" />
             </a>
           ))}
         </nav>
         <a
           href="#contact"
-          className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-[color:var(--red)] px-4 py-2.5 text-xs font-semibold text-background shadow-sm shadow-[color:var(--red)]/20 transition hover:bg-foreground md:px-5 md:text-sm"
+          className="group inline-flex shrink-0 items-center gap-2 rounded-full bg-foreground px-4 py-2 text-[12px] font-semibold tracking-wide text-background transition-all duration-300 hover:bg-[color:var(--red)] md:px-5 md:py-2.5 md:text-[13px]"
         >
-          <span className="hidden sm:inline">Контакты</span>
-          <span className="sm:hidden">Контакты</span>
-          <ArrowUpRight className="h-4 w-4 transition group-hover:rotate-45" />
+          <span>Контакты</span>
+          <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </a>
       </div>
     </header>
@@ -516,7 +515,7 @@ function AmbientHalo({
         width: size,
         height: size,
         background: `radial-gradient(circle, ${color}, transparent 65%)`,
-        opacity: calm ? opacity * 0.6 : opacity,
+        opacity: calm ? opacity * 0.4 : opacity * 0.65,
         animation: calm ? undefined : "breathe 9s ease-in-out infinite",
       }}
     />
@@ -524,16 +523,14 @@ function AmbientHalo({
 }
 
 /* --------------------------- MeetingSpheres ---------------------------- */
-/* «От встреч рождается новая вселенная», v2 по фидбеку заказчицы:
-   — рождение происходит ОТ КАСАНИЯ: шарики физически не проходят друг сквозь
-     друга — каждый контакт либо рождает третий, либо мягко отталкивает
-     (пересечений «вхолостую» не бывает);
-   — цвет новорождённого — СМЕСЬ цветов двух столкнувшихся; стартовые родители
-     разных тонов палитры (лаванда + хром), так что дети — новые оттенки
-     внутри той же гаммы;
-   — плановые встречи: первая через ~9–14 с, дальше раз в 40–70 с шарики сами
-     тянутся друг к другу; случайные касания тоже рождают (с кулдауном);
-   — живёт не больше 6 шариков: старший новорождённый тихо растворяется.
+/* «От встреч рождается новая вселенная», v3 — «залипательный» режим:
+   — каждое касание двух шариков рождает третий, цвет = смесь родителей;
+   — при рождении: белая вспышка + расходящееся кольцо + короткая «нить»
+     между родителями (визуально видно момент слияния);
+   — все шарики мягко притягиваются друг к другу (лёгкая гравитация) —
+     встречи происходят часто и естественно;
+   — популяция удерживается: старшие «дети» плавно растворяются, чтобы
+     дать место новым; родители-«предки» вечны.
    Canvas, pointer-events: none; в калм-режиме не рендерится. */
 
 type SphereRGB = [number, number, number];
@@ -586,9 +583,10 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
     ];
     const css = (c: SphereRGB, a = 1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 
-    const LAV: SphereRGB = [153, 146, 165];      // лаванда сайта #9992A5
-    const CHROME: SphereRGB = [167, 169, 174];   // хром/серебро
-    const LAV_LIGHT: SphereRGB = [201, 196, 210]; // светлая лаванда #C9C4D2
+    const LAV: SphereRGB = [153, 146, 165];       // #9992A5
+    const CHROME: SphereRGB = [167, 169, 174];    // хром/серебро
+    const LAV_LIGHT: SphereRGB = [201, 196, 210]; // #C9C4D2
+    const BERRY: SphereRGB = [137, 41, 63];       // #89293F — редкий бордовый предок
 
     type Orb = {
       id: number;
@@ -600,7 +598,7 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
     };
     let orbSeq = 0;
 
-    const zone = () => ({ x0: W * 0.44, x1: W * 0.78, y0: H * 0.12, y1: H * 0.86 });
+    const zone = () => ({ x0: W * 0.62, x1: W * 0.94, y0: H * 0.08, y1: H * 0.88 });
     const makeOrb = (color: SphereRGB, r: number, cx?: number, cy?: number): Orb => {
       const z = zone();
       const x = cx ?? rand(z.x0 + r, z.x1 - r);
@@ -609,7 +607,7 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
         id: ++orbSeq,
         r, x, y, vx: 0, vy: 0,
         homeX: x, homeY: y,
-        ampX: rand(W * 0.05, W * 0.13), ampY: rand(H * 0.1, H * 0.24),
+        ampX: rand(W * 0.06, W * 0.14), ampY: rand(H * 0.12, H * 0.26),
         freqX: rand(0.00014, 0.00024) * (Math.random() < 0.5 ? 1 : -1),
         freqY: rand(0.00012, 0.0002) * (Math.random() < 0.5 ? 1 : -1),
         phaseX: rand(0, Math.PI * 2), phaseY: rand(0, Math.PI * 2),
@@ -625,45 +623,50 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
       return makeOrb(color, r);
     };
     const orbsInit: Orb[] = [];
-    orbsInit.push(Object.assign(makeSpaced(LAV, rand(38, 48), orbsInit), { isParent: true }));
-    orbsInit.push(Object.assign(makeSpaced(CHROME, rand(30, 40), orbsInit), { isParent: true }));
-    orbsInit.push(Object.assign(makeSpaced(LAV_LIGHT, rand(20, 26), orbsInit), { isParent: true }));
+    orbsInit.push(Object.assign(makeSpaced(LAV, rand(40, 50), orbsInit), { isParent: true }));
+    orbsInit.push(Object.assign(makeSpaced(CHROME, rand(32, 42), orbsInit), { isParent: true }));
+    orbsInit.push(Object.assign(makeSpaced(LAV_LIGHT, rand(22, 30), orbsInit), { isParent: true }));
+    orbsInit.push(Object.assign(makeSpaced(BERRY, rand(18, 24), orbsInit), { isParent: true }));
     let orbs: Orb[] = orbsInit;
-    const MAX_ORBS = 6;
-    type Flash = { x: number; y: number; t0: number; color: SphereRGB };
+    const MAX_ORBS = 11;
+
+    type Flash = { x: number; y: number; t0: number; color: SphereRGB; r: number };
     let flashes: Flash[] = [];
-    const touching = new Set<string>();
-    let birthCooldownUntil = 0;
-    // плановая встреча: пара мягко тянется друг к другу до касания
-    let steer: [Orb, Orb] | null = null;
-    let steerSince = 0;
-    let nextMeetAt = performance.now() + rand(4000, 7000);
+    type Link = { a: Orb; b: Orb; t0: number; color: SphereRGB };
+    let links: Link[] = [];
+    const lastPairBirth = new Map<string, number>(); // per-pair cooldown, чтоб не спамили
 
     const birth = (a: Orb, b: Orb, now: number) => {
       const nx = (a.x * b.r + b.x * a.r) / (a.r + b.r);
       const ny = (a.y * b.r + b.y * a.r) / (a.r + b.r);
       const color = mixRGB(a.color, b.color);
-      flashes.push({ x: nx, y: ny, t0: now, color });
-      const nb = makeOrb(color, rand(16, 24), nx, ny);
+      const targetR = rand(14, 22);
+      flashes.push({ x: nx, y: ny, t0: now, color, r: targetR });
+      links.push({ a, b, t0: now, color });
+      const nb = makeOrb(color, targetR, nx, ny);
       nb.growT = now;
-      nb.growTarget = nb.r;
+      nb.growTarget = targetR;
       nb.r = 2;
-      nb.vx = rand(-0.6, 0.6);
-      nb.vy = rand(-0.6, 0.6);
+      nb.vx = rand(-0.8, 0.8);
+      nb.vy = rand(-0.8, 0.8);
       orbs.push(nb);
       // держим популяцию: всё сверх MAX_ORBS — старшие дети растворяются
       let excess = orbs.filter((o) => !o.dying).length - MAX_ORBS;
-      for (const kid of orbs) {
+      // сначала гасим самых старых детей
+      const kids = orbs.filter((o) => !o.isParent && !o.dying).sort((x, y) => x.born - y.born);
+      for (const kid of kids) {
         if (excess <= 0) break;
-        if (!kid.isParent && !kid.dying) { kid.dying = true; excess--; }
+        if (kid !== nb) { kid.dying = true; excess--; }
       }
-      birthCooldownUntil = now + rand(25000, 40000);
     };
 
     const drawOrb = (o: Orb) => {
       if (o.opacity <= 0.01 || o.r <= 0.5) return;
       ctx.save();
       ctx.globalAlpha = o.opacity;
+      // мягкое цветное свечение вокруг — «липкость»
+      ctx.shadowColor = css(o.color, 0.55);
+      ctx.shadowBlur = o.r * 1.4;
       const g = ctx.createRadialGradient(
         o.x - o.r * 0.32, o.y - o.r * 0.34, o.r * 0.05, o.x, o.y, o.r
       );
@@ -675,7 +678,8 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
       ctx.beginPath();
       ctx.arc(o.x, o.y, o.r, 0, Math.PI * 2);
       ctx.fill();
-      ctx.globalAlpha = o.opacity * 0.4;
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = o.opacity * 0.45;
       ctx.fillStyle = "#FFFFFF";
       ctx.beginPath();
       ctx.ellipse(o.x - o.r * 0.32, o.y - o.r * 0.36, o.r * 0.32, o.r * 0.18, -0.5, 0, Math.PI * 2);
@@ -691,128 +695,132 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
       ctx.clearRect(0, 0, W, H);
       const z = zone();
 
-      // плановая встреча: выбираем ближайшую пару и тянем друг к другу
-      if (!steer && now >= nextMeetAt && orbs.length >= 2 && W > 480) {
-        let pick: [Orb, Orb] | null = null;
-        let bd = Infinity;
-        for (let i = 0; i < orbs.length; i++)
-          for (let j = i + 1; j < orbs.length; j++) {
-            if (orbs[i].dying || orbs[j].dying) continue;
-            const d = Math.hypot(orbs[i].x - orbs[j].x, orbs[i].y - orbs[j].y);
-            if (d < bd) { bd = d; pick = [orbs[i], orbs[j]]; }
+      // лёгкая взаимная гравитация — шарики сами тянутся друг к другу
+      for (let i = 0; i < orbs.length; i++) {
+        for (let j = i + 1; j < orbs.length; j++) {
+          const a = orbs[i], b = orbs[j];
+          if (a.dying || b.dying) continue;
+          const dx = b.x - a.x, dy = b.y - a.y;
+          const d = Math.hypot(dx, dy) || 0.001;
+          if (d > a.r + b.r + 6 && d < 380) {
+            const f = 0.010 * dt / (d * 0.6);
+            a.vx += (dx / d) * f * b.r * 0.08;
+            a.vy += (dy / d) * f * b.r * 0.08;
+            b.vx -= (dx / d) * f * a.r * 0.08;
+            b.vy -= (dy / d) * f * a.r * 0.08;
           }
-        steer = pick;
-        steerSince = now;
-      }
-      // страховка: если сведение зависло — пересобрать план
-      if (steer && now - steerSince > 10000) {
-        steer = null;
-        nextMeetAt = now + 1500;
+        }
       }
 
       orbs.forEach((o) => {
-        // рост новорождённого
         if (o.growT != null && o.growTarget != null) {
           const u = clamp01((now - o.growT) / 900);
           o.r = 2 + (o.growTarget - 2) * easeOut(u);
           if (u >= 1) { o.growT = undefined; }
         }
-        // блуждающая «домашняя» точка + пружина к ней;
-        // в плановую встречу цель пары — их общая середина (пружина сама сводит)
         const t = now - o.born;
-        let tx = o.homeX + o.ampX * Math.sin(o.freqX * t + o.phaseX);
-        let ty = o.homeY + o.ampY * Math.cos(o.freqY * t + o.phaseY);
-        let k = 0.00035;
-        if (steer && (o === steer[0] || o === steer[1])) {
-          const other = o === steer[0] ? steer[1] : steer[0];
-          tx = (o.x + other.x) / 2;
-          ty = (o.y + other.y) / 2;
-          k = 0.0013;
-        }
+        const tx = o.homeX + o.ampX * Math.sin(o.freqX * t + o.phaseX);
+        const ty = o.homeY + o.ampY * Math.cos(o.freqY * t + o.phaseY);
+        const k = 0.00028;
         o.vx += (tx - o.x) * k * dt;
         o.vy += (ty - o.y) * k * dt;
-        // мягкие границы зоны
-        if (o.x < z.x0 + o.r) o.vx += (z.x0 + o.r - o.x) * 0.0004 * dt;
-        if (o.x > z.x1 - o.r) o.vx -= (o.x - (z.x1 - o.r)) * 0.0004 * dt;
-        if (o.y < z.y0 + o.r) o.vy += (z.y0 + o.r - o.y) * 0.0004 * dt;
-        if (o.y > z.y1 - o.r) o.vy -= (o.y - (z.y1 - o.r)) * 0.0004 * dt;
-        const damp = Math.pow(0.92, dt / 16);
+        if (o.x < z.x0 + o.r) o.vx += (z.x0 + o.r - o.x) * 0.0005 * dt;
+        if (o.x > z.x1 - o.r) o.vx -= (o.x - (z.x1 - o.r)) * 0.0005 * dt;
+        if (o.y < z.y0 + o.r) o.vy += (z.y0 + o.r - o.y) * 0.0005 * dt;
+        if (o.y > z.y1 - o.r) o.vy -= (o.y - (z.y1 - o.r)) * 0.0005 * dt;
+        const damp = Math.pow(0.94, dt / 16);
         o.vx *= damp; o.vy *= damp;
+        // ограничение скорости — не разлетаются в стороны
+        const sp = Math.hypot(o.vx, o.vy);
+        const MAXV = 2.4;
+        if (sp > MAXV) { o.vx = (o.vx / sp) * MAXV; o.vy = (o.vy / sp) * MAXV; }
         o.x += o.vx * (dt / 16);
         o.y += o.vy * (dt / 16);
         if (o.dying) {
-          o.opacity = Math.max(0, o.opacity - 0.012 * (dt / 16));
+          o.opacity = Math.max(0, o.opacity - 0.008 * (dt / 16));
         } else {
           o.opacity = Math.min(1, o.opacity + 0.02 * (dt / 16));
         }
       });
       orbs = orbs.filter((o) => !(o.dying && o.opacity <= 0));
 
-      // столкновения: касание = рождение (или мягкий отскок в кулдаун)
+      // столкновения: каждое касание = рождение (при наличии места + per-pair cooldown)
       for (let i = 0; i < orbs.length; i++) {
         for (let j = i + 1; j < orbs.length; j++) {
           const a = orbs[i], b = orbs[j];
           const dx = b.x - a.x, dy = b.y - a.y;
           const dist = Math.hypot(dx, dy) || 0.001;
-          const minD = a.r + b.r + 4;
-          const key = a.id + "-" + b.id;
+          const minD = a.r + b.r + 2;
           if (dist < minD) {
-            // позиционное разведение + мягкий импульс (сквозь не проходят)
             const nx = dx / dist, ny = dy / dist;
             const overlap = minD - dist;
             const wa = b.r / (a.r + b.r), wb = a.r / (a.r + b.r);
             a.x -= nx * overlap * 0.5 * wa; a.y -= ny * overlap * 0.5 * wa;
             b.x += nx * overlap * 0.5 * wb; b.y += ny * overlap * 0.5 * wb;
-            const imp = overlap * 0.012 * dt;
-            a.vx -= nx * imp * wa; a.vy -= ny * imp * wa;
-            b.vx += nx * imp * wb; b.vy += ny * imp * wb;
-            const firstTouch = !touching.has(key);
-            touching.add(key);
-            {
-              const growing = a.growT != null || b.growT != null;
-              const planned = steer && ((steer[0] === a && steer[1] === b) || (steer[0] === b && steer[1] === a));
-              const chanceAllowed = firstTouch && now >= birthCooldownUntil && orbs.length < MAX_ORBS;
-              if (!growing && !a.dying && !b.dying && (planned || chanceAllowed)) {
-                birth(a, b, now);
-                if (planned) {
-                  steer = null;
-                  nextMeetAt = now + rand(35000, 60000);
-                  // разлёт: дома́ разводим вдоль нормали, дрейф стартует из своей точки
-                  const D = (a.r + b.r) * 1.6;
-                  const home = (o: Orb, sgn: number) => {
-                    o.born = now;
-                    const px = o.x + sgn * nx * D * 0.5;
-                    const py = o.y + sgn * ny * D * 0.5;
-                    o.homeX = px - o.ampX * Math.sin(o.phaseX);
-                    o.homeY = py - o.ampY * Math.cos(o.phaseY);
-                  };
-                  home(a, -1);
-                  home(b, 1);
-                  a.vx -= nx * 1.1; a.vy -= ny * 1.1;
-                  b.vx += nx * 1.1; b.vy += ny * 1.1;
-                }
-              }
+            const key = a.id < b.id ? `${a.id}-${b.id}` : `${b.id}-${a.id}`;
+            const lastB = lastPairBirth.get(key) ?? -Infinity;
+            const growing = a.growT != null || b.growT != null;
+            if (!growing && !a.dying && !b.dying
+              && orbs.filter((o) => !o.dying).length < MAX_ORBS
+              && now - lastB > 1400) {
+              lastPairBirth.set(key, now);
+              birth(a, b, now);
+              // мягкий разлёт — эстетика «поцелуя», не отскока
+              a.vx -= nx * 0.6; a.vy -= ny * 0.6;
+              b.vx += nx * 0.6; b.vy += ny * 0.6;
+            } else {
+              // мягкий отскок в кулдаун
+              const imp = overlap * 0.010 * dt;
+              a.vx -= nx * imp * wa; a.vy -= ny * imp * wa;
+              b.vx += nx * imp * wb; b.vy += ny * imp * wb;
             }
-          } else {
-            touching.delete(key);
           }
         }
       }
 
-      // вспышки рождения
-      flashes = flashes.filter((f) => {
-        const u = (now - f.t0) / 500;
+      // «нить» между родителями в момент рождения
+      links = links.filter((l) => {
+        const u = (now - l.t0) / 520;
         if (u >= 1) return false;
         ctx.save();
-        ctx.globalAlpha = (1 - u) * 0.85;
-        const fg = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, 64);
+        ctx.globalAlpha = (1 - u) * 0.7;
+        ctx.strokeStyle = css(lighten(l.color, 0.6));
+        ctx.lineWidth = 1.5 * (1 - u * 0.8);
+        ctx.shadowColor = css(l.color, 0.8);
+        ctx.shadowBlur = 12;
+        ctx.beginPath();
+        ctx.moveTo(l.a.x, l.a.y);
+        ctx.lineTo(l.b.x, l.b.y);
+        ctx.stroke();
+        ctx.restore();
+        return true;
+      });
+
+      // вспышка + расходящееся кольцо
+      flashes = flashes.filter((f) => {
+        const u = (now - f.t0) / 900;
+        if (u >= 1) return false;
+        ctx.save();
+        // мягкая заливка
+        ctx.globalAlpha = (1 - u) * 0.9;
+        const R = 20 + u * 90;
+        const fg = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, R);
         fg.addColorStop(0, "rgba(255,255,255,0.95)");
         fg.addColorStop(0.4, css(lighten(f.color, 0.5), 0.5));
         fg.addColorStop(1, css(lighten(f.color, 0.5), 0));
         ctx.fillStyle = fg;
         ctx.beginPath();
-        ctx.arc(f.x, f.y, 64, 0, Math.PI * 2);
+        ctx.arc(f.x, f.y, R, 0, Math.PI * 2);
         ctx.fill();
+        // расходящееся кольцо
+        ctx.globalAlpha = (1 - u) * 0.9;
+        ctx.strokeStyle = css(lighten(f.color, 0.35));
+        ctx.lineWidth = 1.4 * (1 - u);
+        ctx.shadowColor = css(f.color, 0.8);
+        ctx.shadowBlur = 14;
+        ctx.beginPath();
+        ctx.arc(f.x, f.y, f.r + u * 70, 0, Math.PI * 2);
+        ctx.stroke();
         ctx.restore();
         return true;
       });
@@ -830,13 +838,15 @@ function MeetingSpheres({ className = "" }: { className?: string }) {
 
   if (calm) return null;
   return (
-    <canvas
-      ref={ref}
+    <div
+      className={`pointer-events-none sticky top-0 z-0 -mb-[100vh] h-screen w-full ${className}`}
       aria-hidden
-      className={`pointer-events-none absolute inset-0 h-full w-full ${className}`}
-    />
+    >
+      <canvas ref={ref} className="block h-full w-full" />
+    </div>
   );
 }
+
 
 
 function RevealHeading({
@@ -855,13 +865,12 @@ function RevealHeading({
   }
   return (
     <MotionTag
-      initial={{ opacity: 0, y: 24, filter: "blur(6px)" }}
+      initial={{ opacity: 0, y: 16, filter: "blur(4px)" }}
       whileInView={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-      viewport={{ once: true, margin: "-80px" }}
-      transition={{ duration: 0.7, ease: [0.2, 0.8, 0.2, 1] }}
+      viewport={{ once: true, amount: 0.1, margin: "0px 0px -10% 0px" }}
+      transition={{ duration: 0.55, ease: [0.2, 0.8, 0.2, 1] }}
       className={className}
     >
-
       {children}
     </MotionTag>
   );
@@ -871,59 +880,57 @@ function RevealHeading({
 
 function Hero() {
   return (
-    <section id="top" className="relative overflow-hidden border-b border-border">
-      <div className="grid-lines absolute inset-0 opacity-60" />
-      <AmbientHalo className="-right-40 -top-20" color="var(--lav)" size={680} opacity={0.3} />
-      <AmbientHalo className="-left-40 bottom-0" color="oklch(0.85 0.02 260)" size={560} opacity={0.14} />
-      <div className="pointer-events-none absolute inset-x-0 top-24 mx-auto h-px max-w-7xl bg-border" />
-      <div className="pointer-events-none absolute left-1/2 top-0 h-full w-px bg-border/60" />
-      <LiquidOrb size={440} className="right-[-80px] top-8 hidden md:block" />
+    <section id="top" className="relative overflow-hidden border-b border-border/60">
       <MeetingSpheres className="hidden md:block" />
+      <div className="grid-lines pointer-events-none absolute inset-0 opacity-25" />
+      <AmbientHalo className="-right-40 -top-20" color="var(--lav)" size={520} opacity={0.14} />
+      <AmbientHalo className="-left-40 bottom-0" color="oklch(0.85 0.02 260)" size={560} opacity={0.10} />
+      <LiquidOrb size={440} className="right-[-80px] top-8 hidden md:block" />
 
-      <div className="relative mx-auto max-w-7xl px-4 pb-14 pt-12 md:px-6 md:pb-24 md:pt-24">
-        <RevealHeading as="h1" className="max-w-5xl font-display text-[clamp(1.6rem,6vw,2.2rem)] font-extrabold leading-[1.08] tracking-tight sm:text-4xl md:text-6xl md:leading-[1.05]">
-          Сохраняем{" "}
-          <span className="relative inline-block">
-            <span className="relative z-10">опыт ключевых сотрудников</span>
-            <span className="absolute inset-x-0 bottom-1 -z-0 h-4 bg-[color:var(--red)]/25" />
-          </span>{" "}
-          и усиливаем команду внешними экспертами без расширения штата
+      <div className="relative z-10 mx-auto max-w-7xl px-5 pb-16 pt-14 md:px-8 md:pb-28 md:pt-28">
+        <div className="mb-8 inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground md:mb-10">
+          <span className="h-px w-8 bg-foreground/25" />
+          <span>Проектная команда · с 2016</span>
+        </div>
+
+        <RevealHeading as="h1" className="max-w-4xl font-display text-[clamp(1.8rem,5.6vw,2.2rem)] font-extrabold leading-[1.06] tracking-[-0.025em] sm:text-[44px] md:text-[60px] md:leading-[1.02]">
+          Ваши люди работают как топ-перформеры. Без найма новых звезд с рынка.
         </RevealHeading>
 
-        <p className="mt-6 max-w-2xl text-base md:text-lg text-muted-foreground">
+        <p className="mt-8 max-w-xl text-base leading-relaxed text-muted-foreground md:mt-10 md:text-[17px]">
           Переводим подходы сильных экспертов в алгоритмы, стандарты и материалы,
           которыми может пользоваться вся команда
         </p>
 
-        <div className="mt-8 max-w-2xl">
-          <div className="text-xs font-semibold uppercase tracking-[0.18em] text-[color:var(--red)]">
+        <div className="mt-10 max-w-xl md:mt-12">
+          <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--red)]">
             Почему с нами удобно
           </div>
-          <ul className="mt-4 flex flex-col gap-3">
+          <ul className="mt-5 flex flex-col gap-3.5">
             {[
               "Можно прийти без готового ТЗ: принимаем вводные в любом виде и собираем из них архитектуру решения и план работ",
               "В течение 24 часов после согласования назначаем команду и проводим стартовую встречу",
             ].map((b) => (
-              <li key={b} className="flex items-start gap-3 text-sm leading-relaxed text-foreground/85 md:text-base">
-                <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--red)]" />
+              <li key={b} className="flex items-start gap-3 text-[15px] leading-relaxed text-foreground/80 md:text-base">
+                <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--red)]" strokeWidth={2.5} />
                 <span>{b}</span>
               </li>
             ))}
           </ul>
         </div>
 
-        <div className="mt-8 flex flex-col gap-4 md:mt-10">
-          <div>
-            <a
-              href="#contact"
-              className="group inline-flex w-full items-center justify-center gap-3 rounded-full bg-[color:var(--red)] px-6 py-3.5 text-sm font-semibold text-background shadow-lg shadow-[color:var(--red)]/20 transition hover:bg-foreground sm:w-auto sm:px-7 sm:py-4 sm:text-base"
-            >
-              Назначить разбор
-              <ArrowRight className="h-4 w-4 transition group-hover:translate-x-1 sm:h-5 sm:w-5" />
-            </a>
-          </div>
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted-foreground sm:text-sm">
-            <span className="inline-flex items-center gap-2"><span className="h-1.5 w-1.5 rounded-full bg-[color:var(--red)]" />30 минут онлайн. Сверимся по задаче и определим следующий шаг</span>
+        <div className="mt-12 flex flex-col items-start gap-5 md:mt-14">
+          <a
+            href="#contact"
+            className="group relative inline-flex w-full items-center justify-center gap-3 rounded-full bg-[color:var(--red)] px-7 py-4 text-[14px] font-semibold tracking-wide text-background transition-all duration-500 hover:bg-foreground sm:w-auto sm:px-8 sm:py-[18px] sm:text-[15px]"
+            style={{ boxShadow: "0 1px 0 0 rgba(255,255,255,0.15) inset, 0 12px 32px -12px color-mix(in oklab, var(--red) 55%, transparent)" }}
+          >
+            <span>Назначить разбор</span>
+            <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
+          </a>
+          <div className="flex items-center gap-2.5 text-[13px] text-muted-foreground">
+            <span className="h-1 w-1 rounded-full bg-[color:var(--red)]" />
+            <span>30 минут онлайн. Сверимся по задаче и определим следующий шаг</span>
           </div>
         </div>
       </div>
@@ -940,16 +947,25 @@ function Stats() {
     ["30+", "компаний-клиентов"],
   ];
   return (
-    <section className="relative overflow-hidden border-b border-border">
-      <div className="relative mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
-        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
-          Наш опыт в цифрах
+    <section className="relative overflow-hidden border-b border-border/60">
+      <div className="relative mx-auto max-w-7xl px-5 py-14 md:px-8 md:py-20">
+        <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+          <span className="h-px w-8 bg-foreground/25" />
+          <span>Наш опыт в цифрах</span>
         </div>
-        <div className="mt-8 grid gap-8 sm:grid-cols-3">
-          {items.map(([n, d]) => (
-            <div key={n} className="border-t-2 border-[color:var(--red)]/60 pt-4">
-              <div className="font-display text-4xl font-extrabold tabular-nums md:text-5xl">{n}</div>
-              <p className="mt-2 max-w-xs text-sm leading-relaxed text-muted-foreground">{d}</p>
+        <div className="mt-10 grid gap-10 sm:grid-cols-3 sm:gap-6">
+          {items.map(([n, d], i) => (
+            <div key={n} className="relative pt-6">
+              <span
+                aria-hidden
+                className="absolute inset-x-0 top-0 h-px bg-foreground/15"
+              />
+              <span
+                aria-hidden
+                className="absolute left-0 top-0 h-px w-10 bg-[color:var(--red)]"
+              />
+              <div className="font-display text-5xl font-extrabold leading-none tabular-nums tracking-[-0.02em] md:text-[64px]">{n}</div>
+              <p className="mt-4 max-w-xs text-[14px] leading-relaxed text-muted-foreground">{d}</p>
             </div>
           ))}
         </div>
@@ -961,44 +977,152 @@ function Stats() {
 /* --------------------- Flow (схема взаимодействия) ---------------------- */
 
 function Flow() {
+  const stages = [
+    { n: "01", t: "2 рабочих часа", d: "отвечаем на заявку" },
+    { n: "02", t: "30 минут", d: "проводим первичный разбор" },
+  ];
+  const branches = [
+    {
+      tag: "Для методологического проекта",
+      time: "24 часа",
+      desc: "назначаем команду и проводим стартовую встречу",
+    },
+    {
+      tag: "Если нужен внешний эксперт",
+      time: "72 часа",
+      desc: "представляем первые релевантные профили",
+    },
+  ];
   return (
     <section className="relative overflow-hidden border-b border-border bg-secondary/30">
-      <div className="relative mx-auto max-w-7xl px-4 py-12 md:px-6 md:py-16">
+      <AmbientHalo className="-left-40 top-10" color="var(--lav)" size={420} opacity={0.10} />
+      <AmbientHalo className="-right-56 bottom-10" color="var(--red-glow)" size={360} opacity={0.06} />
+      <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
         <div className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">
           Схема взаимодействия
         </div>
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          {[
-            ["2 рабочих часа", "отвечаем на заявку"],
-            ["30 минут", "проводим первичный разбор"],
-          ].map(([t, d], i) => (
-            <div key={t} className="flex items-start gap-4 rounded-2xl border border-border bg-background/70 p-5 md:p-6">
-              <span className="flex h-9 w-9 flex-none items-center justify-center rounded-full border border-[color:var(--red)]/50 bg-[color:var(--red)]/10 font-display text-sm font-bold text-[color:var(--red)]">
-                {i + 1}
+        <h2 className="mt-4 max-w-3xl font-display text-2xl font-extrabold leading-tight sm:text-3xl md:text-4xl">
+          Как мы двигаемся от заявки до старта работы
+        </h2>
+
+        {/* ===== Линейные шаги 01 → 02 ===== */}
+        <div className="relative mt-12 grid gap-6 md:grid-cols-2 md:gap-8">
+          {/* соединительная линия между 01 и 02 (desktop) */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-1/2 top-1/2 hidden h-px w-16 -translate-x-1/2 -translate-y-1/2 md:block"
+            style={{
+              background:
+                "linear-gradient(to right, transparent, color-mix(in oklab, var(--red) 55%, transparent), transparent)",
+            }}
+          />
+          {stages.map((s, i) => (
+            <motion.div
+              key={s.n}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ delay: i * 0.1 }}
+              className="relative flex items-start gap-5 rounded-3xl border border-border bg-background/80 p-6 backdrop-blur-sm md:p-7"
+            >
+              <span className="flex h-12 w-12 flex-none items-center justify-center rounded-full border border-[color:var(--red)]/40 bg-[color:var(--red)]/10 font-display text-sm font-extrabold tracking-tight text-[color:var(--red)]">
+                {s.n}
               </span>
-              <div>
-                <div className="font-display text-lg font-extrabold">{t}</div>
-                <div className="mt-1 text-sm text-muted-foreground">{d}</div>
+              <div className="min-w-0">
+                <div className="font-display text-2xl font-extrabold tracking-tight md:text-3xl">
+                  {s.t}
+                </div>
+                <div className="mt-2 text-[15px] leading-relaxed text-muted-foreground">
+                  {s.d}
+                </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
-        {/* развилка */}
-        <div className="mx-auto mt-4 h-6 w-px bg-border md:mt-6" />
-        <div className="grid gap-4 md:grid-cols-2">
-          <div className="rounded-2xl border border-border bg-background/70 p-5 md:p-6">
-            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              Для методологического проекта
-            </div>
-            <div className="mt-3 font-display text-lg font-extrabold">24 часа</div>
-            <div className="mt-1 text-sm text-muted-foreground">назначаем команду и проводим стартовую встречу</div>
+
+        {/* ===== Развилка ===== */}
+        <div className="relative mt-10 md:mt-14">
+          {/* Вертикальная линия сверху к «развилке» */}
+          <div
+            aria-hidden
+            className="mx-auto h-10 w-px"
+            style={{
+              background:
+                "linear-gradient(to bottom, color-mix(in oklab, var(--red) 45%, transparent), transparent)",
+            }}
+          />
+          {/* Точка развилки */}
+          <div className="relative mx-auto -mt-1 flex h-6 w-6 items-center justify-center">
+            <span className="absolute inset-0 rounded-full bg-[color:var(--red)]/15" />
+            <span className="h-2.5 w-2.5 rounded-full bg-[color:var(--red)]" />
           </div>
-          <div className="rounded-2xl border border-border bg-background/70 p-5 md:p-6">
-            <div className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-              Если нужен внешний эксперт
-            </div>
-            <div className="mt-3 font-display text-lg font-extrabold">72 часа</div>
-            <div className="mt-1 text-sm text-muted-foreground">представляем первые релевантные профили</div>
+
+          {/* SVG-развилка (desktop) */}
+          <svg
+            aria-hidden
+            viewBox="0 0 800 90"
+            preserveAspectRatio="none"
+            className="mx-auto -mt-3 hidden h-16 w-full max-w-4xl md:block"
+          >
+            <defs>
+              <linearGradient id="flowFork" x1="50%" y1="0%" x2="50%" y2="100%">
+                <stop offset="0%" stopColor="var(--red)" stopOpacity="0.7" />
+                <stop offset="100%" stopColor="var(--red)" stopOpacity="0.15" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M400 0 C 400 45, 160 40, 160 90"
+              fill="none"
+              stroke="url(#flowFork)"
+              strokeWidth="1.5"
+            />
+            <path
+              d="M400 0 C 400 45, 640 40, 640 90"
+              fill="none"
+              stroke="url(#flowFork)"
+              strokeWidth="1.5"
+            />
+          </svg>
+
+          {/* Подпись «развилка» */}
+          <div className="mt-4 text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground md:mt-2">
+            дальше — зависит от задачи
+          </div>
+
+          <div className="mt-8 grid gap-6 md:grid-cols-2 md:gap-8">
+            {branches.map((b, i) => (
+              <motion.div
+                key={b.tag}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, amount: 0.1 }}
+                transition={{ delay: 0.1 + i * 0.1, duration: 0.5 }}
+                className="group relative overflow-hidden rounded-3xl border border-border bg-background/80 p-6 backdrop-blur-sm md:p-8"
+              >
+                <span
+                  aria-hidden
+                  className="absolute inset-x-0 top-0 h-[2px]"
+                  style={{
+                    background:
+                      "linear-gradient(to right, transparent, color-mix(in oklab, var(--red) 65%, transparent), transparent)",
+                  }}
+                />
+                <div className="flex items-center gap-3">
+                  <span className="inline-flex h-2 w-2 rounded-full bg-[color:var(--red)]" />
+                  <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                    {b.tag}
+                  </div>
+                </div>
+                <div className="mt-6 flex items-baseline gap-3">
+                  <div className="font-display text-4xl font-extrabold tracking-tight text-foreground md:text-5xl">
+                    {b.time}
+                  </div>
+                </div>
+                <div className="mt-3 text-[15px] leading-relaxed text-muted-foreground">
+                  {b.desc}
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
       </div>
@@ -1019,7 +1143,7 @@ function Capital() {
     <section id="capital" className="relative overflow-hidden border-b border-border bg-[color:var(--lav-soft)]/45">
       <AmbientHalo className="-right-40 top-10" color="var(--lav)" size={520} opacity={0.2} />
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="03">Интеллектуальный капитал</SectionLabel>
+        <SectionLabel n="02">Интеллектуальный капитал</SectionLabel>
         <RevealHeading className="mt-6 max-w-4xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
           С нами экспертный опыт становится интеллектуальным капиталом компании
         </RevealHeading>
@@ -1060,8 +1184,10 @@ function Approach() {
         <LiquidDrop size={64} className="left-[8%] top-[220px] hidden md:block" tone="chrome" delay={0.4} duration={11} />
       </div>
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <div className="text-xs font-semibold uppercase tracking-[0.2em] text-background/50">
-          Наш подход
+        <div className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.2em] text-background/60">
+          <span className="font-display text-sm font-bold tabular-nums text-[color:var(--red-bright)]">03</span>
+          <span className="h-px w-10 bg-background/25" />
+          <span>Наш подход</span>
         </div>
         <RevealHeading className="mt-6 max-w-4xl font-display text-2xl font-extrabold leading-tight sm:text-3xl md:text-5xl">
           Почему нам доверяют работу с экспертным опытом
@@ -1097,7 +1223,7 @@ function FirstStage() {
     <section id="firststage" className="relative overflow-hidden border-b border-border">
       <LiquidDrop size={56} className="right-[6%] top-[120px] hidden md:block" tone="red" delay={0.5} duration={11} />
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="05">Как начинаем</SectionLabel>
+        <SectionLabel n="04">Как начинаем</SectionLabel>
         <RevealHeading className="mt-6 max-w-4xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
           Сначала — отдельный этап с самостоятельным результатом
         </RevealHeading>
@@ -1129,7 +1255,7 @@ function BookSection() {
       <LiquidDrop size={44} className="right-[8%] bottom-[100px] hidden md:block" tone="chrome" delay={1.0} duration={10} />
 
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="08">Методология издана</SectionLabel>
+        <SectionLabel n="07">Методология издана</SectionLabel>
         <div className="mt-14">
           <GlassCard className="overflow-hidden p-0">
             <div className="grid items-stretch gap-0 md:grid-cols-[360px_1fr]">
@@ -1400,7 +1526,7 @@ function Cases() {
       <LiquidDrop size={32} className="right-[22%] bottom-[90px] hidden md:block" tone="warm" delay={1.5} duration={9} />
 
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="04">Результаты клиентов</SectionLabel>
+        <SectionLabel n="05">Результаты клиентов</SectionLabel>
         <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <RevealHeading className="max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
             Кейсы с конкретными метриками
@@ -1485,7 +1611,7 @@ function WhenNeeded() {
       <AmbientHalo className="-left-40 top-10" color="var(--lav)" size={520} opacity={0.18} />
       <LiquidDrop size={56} className="right-[5%] top-[140px] hidden md:block" tone="red" delay={0.6} duration={11} />
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="02">Когда к нам обращаются</SectionLabel>
+        <SectionLabel n="01">Когда к нам обращаются</SectionLabel>
         <RevealHeading className="mt-6 max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
           Когда нужна команда «Без Воды»
         </RevealHeading>
@@ -1549,7 +1675,7 @@ function Reviews() {
       <LiquidDrop size={70} className="right-[6%] top-[140px] hidden md:block" tone="red" delay={0.4} duration={12} />
       <LiquidDrop size={42} className="left-[5%] bottom-[110px] hidden md:block" tone="chrome" delay={1.0} duration={10} />
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="05">Отзывы</SectionLabel>
+        <SectionLabel n="06">Отзывы</SectionLabel>
         <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <RevealHeading className="max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
             Что говорят клиенты
@@ -1597,7 +1723,7 @@ function NotFit() {
   return (
     <section id="notfit" className="relative overflow-hidden border-b border-border bg-secondary/40">
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="09">Границы</SectionLabel>
+        <SectionLabel n="08">Границы</SectionLabel>
         <RevealHeading className="mt-6 max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
           Когда нужен другой подрядчик
         </RevealHeading>
@@ -1638,7 +1764,7 @@ function FAQ() {
   return (
     <section id="faq" className="relative overflow-hidden border-b border-border">
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
-        <SectionLabel n="10">FAQ</SectionLabel>
+        <SectionLabel n="09">FAQ</SectionLabel>
         <RevealHeading className="mt-6 max-w-3xl font-display text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
           Частые вопросы
         </RevealHeading>
@@ -1771,8 +1897,10 @@ function Contact() {
       <LiquidDrop size={58} className="right-[28%] bottom-[120px] hidden md:block" tone="chrome" delay={1.1} duration={11} />
       <div className="relative mx-auto grid max-w-7xl gap-16 px-4 py-14 md:px-6 md:py-24 lg:grid-cols-[1fr_1fr]">
         <div>
-          <div className="text-xs font-semibold uppercase tracking-[0.2em] text-background/50">
-            11 — Контакты
+          <div className="flex items-center gap-4 text-xs font-semibold uppercase tracking-[0.2em] text-background/60">
+            <span className="font-display text-sm font-bold tabular-nums text-[color:var(--red-bright)]">10</span>
+            <span className="h-px w-10 bg-background/25" />
+            <span>Контакты</span>
           </div>
           <RevealHeading as="h2" className="mt-6 font-display text-3xl font-extrabold leading-[1.05] sm:text-4xl md:text-6xl">
             С чего начинается наше сотрудничество
@@ -2031,12 +2159,10 @@ function CalmToggle() {
       aria-pressed={calm}
       aria-label={calm ? "Включить анимации" : "Уменьшить анимации"}
       title={calm ? "Включить анимации" : "Уменьшить анимации"}
-      className="group fixed bottom-20 right-4 z-50 inline-flex items-center gap-2 rounded-full border border-border/70 bg-background/80 px-3 py-2 text-xs font-semibold text-foreground/80 shadow-lg shadow-black/10 backdrop-blur-xl transition hover:text-foreground md:bottom-6 md:right-6"
+      className="group fixed bottom-20 right-4 z-50 inline-flex h-10 w-10 items-center justify-center rounded-full border border-border/60 bg-background/75 text-foreground/70 backdrop-blur-xl transition-all duration-300 hover:scale-105 hover:text-foreground md:bottom-6 md:right-6"
+      style={{ boxShadow: "0 8px 24px -12px rgba(4,6,9,0.15)" }}
     >
       {calm ? <Sparkles className="h-4 w-4" /> : <Waves className="h-4 w-4" />}
-      <span className="hidden sm:inline">
-        {calm ? "Анимации" : "Тише анимации"}
-      </span>
     </button>
   );
 }
@@ -2053,10 +2179,13 @@ function CookieBar() {
   }, []);
   if (!show) return null;
   return (
-    <div className="fixed inset-x-3 bottom-16 z-50 mx-auto flex max-w-xl items-center gap-3 rounded-2xl border border-border/70 bg-background/90 px-4 py-3 shadow-xl shadow-black/10 backdrop-blur-xl md:bottom-4">
-      <p className="flex-1 text-xs leading-relaxed text-muted-foreground">
-        Мы используем cookie и Яндекс Метрику. Подробнее — в{" "}
-        <a href="/politics_pd" className="underline underline-offset-2 hover:text-foreground">политике конфиденциальности</a>.
+    <div
+      className="fixed inset-x-3 bottom-20 z-50 mx-auto flex max-w-lg items-center gap-3 rounded-full border border-border/60 bg-background/85 py-2 pl-4 pr-2 backdrop-blur-2xl md:bottom-6 md:left-1/2 md:right-auto md:-translate-x-1/2"
+      style={{ boxShadow: "0 12px 40px -16px rgba(4,6,9,0.25)" }}
+    >
+      <p className="flex-1 text-[12px] leading-snug text-muted-foreground">
+        Мы используем cookie и Яндекс Метрику ·{" "}
+        <a href="/politics_pd" className="underline underline-offset-2 hover:text-foreground">политика</a>
       </p>
       <button
         type="button"
@@ -2064,13 +2193,14 @@ function CookieBar() {
           try { window.localStorage.setItem("bv-cookie-ok", "1"); } catch {}
           setShow(false);
         }}
-        className="shrink-0 rounded-full bg-foreground px-4 py-2 text-xs font-semibold text-background transition hover:bg-[color:var(--red)]"
+        className="shrink-0 rounded-full bg-foreground px-4 py-1.5 text-[11px] font-semibold uppercase tracking-wide text-background transition hover:bg-[color:var(--red)]"
       >
-        Понятно
+        Ок
       </button>
     </div>
   );
 }
+
 
 export default function Landing() {
   const [calm] = useCalm();
@@ -2100,10 +2230,11 @@ export default function Landing() {
         <CookieBar />
 
         {/* Mobile sticky CTA */}
-        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border/70 bg-background/85 px-4 py-3 backdrop-blur-xl md:hidden">
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t border-border/50 bg-background/85 px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3 backdrop-blur-2xl md:hidden">
           <a
             href="#contact"
-            className="flex w-full items-center justify-center gap-2 rounded-full bg-[color:var(--red)] px-5 py-3 text-sm font-semibold text-background shadow-lg shadow-[color:var(--red)]/25 transition active:scale-[0.98]"
+            className="flex w-full items-center justify-center gap-2.5 rounded-full bg-[color:var(--red)] px-5 py-3.5 text-[13px] font-semibold tracking-wide text-background transition active:scale-[0.98]"
+            style={{ boxShadow: "0 1px 0 0 rgba(255,255,255,0.15) inset, 0 10px 24px -10px color-mix(in oklab, var(--red) 55%, transparent)" }}
           >
             Назначить разбор
             <ArrowRight className="h-4 w-4" />

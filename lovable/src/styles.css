@@ -46,8 +46,9 @@
   --graphite: #45494E;        /* графитовый текст */
   --red: #89293F;             /* ягодно-бордовый: CTA, номера, активные состояния */
   --red-deep: #5E1B2B;
-  --red-glow: #A84A60;        /* свечение на тёмных секциях */
-  --red-bright: #D08CA0;      /* ягодный акцент на тёмном фоне (читаемый) */
+  --red-glow: #89293F;        /* halo — тот же бордовый, работает через opacity */
+  --red-bright: #A84255;      /* акцент на тёмном фоне (глубокий, не розовый) */
+  --graphite: #45494E;        /* графитовый вспомогательный текст */
   --lav: #9992A5;             /* лавандовый: шарики и мягкие градиенты */
   --lav-light: #C9C4D2;
   --lav-soft: #E6E3E9;        /* светлая лавандовая поверхность */
@@ -120,9 +121,9 @@
 
 @utility grid-lines {
   background-image:
-    linear-gradient(to right, oklch(0 0 0 / 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, oklch(0 0 0 / 0.04) 1px, transparent 1px);
-  background-size: 80px 80px;
+    linear-gradient(to right, oklch(0 0 0 / 0.025) 1px, transparent 1px),
+    linear-gradient(to bottom, oklch(0 0 0 / 0.025) 1px, transparent 1px);
+  background-size: 96px 96px;
 }
 
 /* ---------- Liquid Glass ---------- */
