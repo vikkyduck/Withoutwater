@@ -894,7 +894,9 @@ function Hero() {
         </div>
 
         <RevealHeading as="h1" className="max-w-4xl font-display text-[clamp(1.8rem,5.6vw,2.2rem)] font-extrabold leading-[1.06] tracking-[-0.025em] sm:text-[44px] md:text-[60px] md:leading-[1.02]">
-          Ваши люди работают как топ-перформеры Без найма новых звезд с рынка
+          {/* две фразы отдельными строками: без тире, точек и запятых */}
+          <span className="block">Ваши люди работают как топ-перформеры</span>
+          <span className="block">Без найма новых звезд с рынка</span>
         </RevealHeading>
 
         <p className="mt-8 max-w-xl text-base leading-relaxed text-muted-foreground md:mt-10 md:text-[17px]">
