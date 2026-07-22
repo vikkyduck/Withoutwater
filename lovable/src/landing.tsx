@@ -2230,7 +2230,7 @@ function Footer() {
             <ul className="mt-4 space-y-1.5 text-sm">
               <li><a href="tel:+79645842225" className="text-foreground/75 transition hover:text-[color:var(--red)]">+7 964 584 22 25</a></li>
               <li><a href="https://t.me/vikki_duck" target="_blank" rel="noreferrer" className="text-foreground/75 transition hover:text-[color:var(--red)]">Telegram: @vikki_duck</a></li>
-              <li><a href="mailto:vikavika.utkina@yandex.ru" className="text-foreground/75 transition hover:text-[color:var(--red)]">vikavika.utkina@yandex.ru</a></li>
+              <li><a href="mailto:vu@withoutwater.ru" className="text-foreground/75 transition hover:text-[color:var(--red)]">vu@withoutwater.ru</a></li>
             </ul>
           </div>
         </div>
