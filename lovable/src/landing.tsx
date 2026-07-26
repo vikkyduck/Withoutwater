@@ -2259,9 +2259,11 @@ export default function Landing() {
         <Nav />
         <main className="pb-20 md:pb-0">
           <Hero />
+          {/* Названия клиентов сразу под первым экраном — социальное
+              доказательство раньше цифр и схемы работы. */}
+          <TrustStrip />
           <Stats />
           <Flow />
-          <TrustStrip />
           <WhenNeeded />
           <Capital />
           <Approach />
