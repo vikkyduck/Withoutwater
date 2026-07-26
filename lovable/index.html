@@ -4,10 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>БЕЗ ВОДЫ — проектная команда методологов и продактов</title>
-    <meta name="description" content="Переводим подходы сильных экспертов в алгоритмы, стандарты и материалы, которыми может пользоваться вся команда." />
+    <meta name="description" content="Трансформируем подходы сильных экспертов в алгоритмы, стандарты и процессы, которыми пользуется вся команда." />
     <link rel="canonical" href="https://withoutwater.ru/" />
     <meta property="og:title" content="БЕЗ ВОДЫ — проектная команда методологов и продактов" />
-    <meta property="og:description" content="Переводим подходы сильных экспертов в алгоритмы, стандарты и материалы, которыми может пользоваться вся команда." />
+    <meta property="og:description" content="Трансформируем подходы сильных экспертов в алгоритмы, стандарты и процессы, которыми пользуется вся команда." />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://withoutwater.ru/" />
     <meta property="og:image" content="https://withoutwater.ru/img/og.jpg" />
@@ -19,6 +19,12 @@
     <meta name="twitter:image" content="https://withoutwater.ru/img/og.jpg" />
     <meta name="theme-color" content="#FBFAF8" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23111114'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='30' font-weight='800' fill='white' text-anchor='middle'%3EБВ%3C/text%3E%3C/svg%3E" />
+    <!-- Предзагрузка шрифтов первого экрана: без неё font-display:swap рисует
+         первый кадр системным шрифтом, а подмена на Unbounded сдвигает вёрстку
+         (замерено: скачок ~100px в hero на мобильном). -->
+    <link rel="preload" href="/fonts/unbounded-800-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/unbounded-800-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="/fonts/manrope-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/fonts/fonts.css" />
     <!-- Яндекс Метрика 110744367 (данные в РФ), цель lead_sent на отправку формы -->
     <script type="text/javascript">

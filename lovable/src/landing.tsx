@@ -887,38 +887,58 @@ function Hero() {
       <AmbientHalo className="-left-40 bottom-0" color="oklch(0.85 0.02 260)" size={560} opacity={0.10} />
       <LiquidOrb size={440} className="right-[-80px] top-8 hidden md:block" />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-5 pb-16 pt-14 md:px-8 md:pb-28 md:pt-28">
-        <div className="mb-8 inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground md:mb-10">
+      <div className="relative z-10 mx-auto max-w-7xl px-5 pb-16 pt-8 md:px-8 md:pb-28 md:pt-24">
+        <div className="mb-5 inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground md:mb-10">
           <span className="h-px w-8 bg-foreground/25" />
           <span>Проектная команда · с 2016</span>
         </div>
 
-        <RevealHeading as="h1" className="max-w-4xl font-display text-[clamp(1.8rem,5.6vw,2.2rem)] font-extrabold leading-[1.06] tracking-[-0.025em] sm:text-[44px] md:text-[60px] md:leading-[1.02]">
-          {/* две фразы отдельными строками: без тире, точек и запятых */}
-          <span className="block">Ваши люди работают как топ-перформеры</span>
-          <span className="block">Без найма новых звезд с рынка</span>
+        {/* Кегль держим крупнее меток преимуществ ниже (26/32px), иначе
+            ломается иерархия. Текст сжатый — обе ключевые фразы влезают
+            в первый экран смартфона вместе. */}
+        <RevealHeading as="h1" className="max-w-3xl font-display text-[28px] font-extrabold leading-[1.16] tracking-[-0.025em] sm:text-[38px] sm:leading-[1.12] md:max-w-4xl md:text-[44px] md:leading-[1.1]">
+          Управляемый результат сотрудников: меньше рутины и больше времени
+          на важное для руководителя
         </RevealHeading>
 
-        <p className="mt-8 max-w-xl text-base leading-relaxed text-muted-foreground md:mt-10 md:text-[17px]">
-          Переводим подходы сильных экспертов в алгоритмы, стандарты и материалы,
-          которыми может пользоваться вся команда
-        </p>
+        {/* Вторая ключевая фраза — акцентная карточка с бордовой полосой. */}
+        <div
+          className="mt-5 max-w-2xl rounded-l-sm rounded-r-2xl border-l-[3px] px-5 py-4 md:mt-8 md:px-7 md:py-6"
+          style={{
+            borderLeftColor: "var(--red)",
+            background:
+              "linear-gradient(100deg, color-mix(in oklab, var(--red) 8%, var(--paper)) 0%, color-mix(in oklab, var(--red) 3%, var(--paper)) 100%)",
+          }}
+        >
+          <p className="font-display text-[17px] font-bold leading-[1.38] tracking-[-0.01em] sm:text-[19px] md:text-[23px]">
+            Трансформируем подходы сильных экспертов в{" "}
+            <span className="text-[color:var(--red)]">алгоритмы, стандарты и процессы</span>,
+            которыми пользуется вся команда
+          </p>
+        </div>
 
-        <div className="mt-10 max-w-xl md:mt-12">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.28em] text-[color:var(--red)]">
-            Почему с нами удобно
-          </div>
-          <ul className="mt-5 flex flex-col gap-3.5">
+        {/* Ключевые преимущества — крупным кеглем, две колонки. */}
+        <div className="mt-7 max-w-2xl overflow-hidden rounded-2xl border border-border bg-background/55 md:mt-9">
+          <div className="grid sm:grid-cols-2">
             {[
-              "Можно прийти без готового ТЗ: принимаем вводные в любом виде и собираем из них архитектуру решения и план работ",
-              "В течение 24 часов после согласования назначаем команду и проводим стартовую встречу",
-            ].map((b) => (
-              <li key={b} className="flex items-start gap-3 text-[15px] leading-relaxed text-foreground/80 md:text-base">
-                <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--red)]" strokeWidth={2.5} />
-                <span>{b}</span>
-              </li>
+              ["Без ТЗ", "Принимаем вводные в любом виде и собираем из них архитектуру решения и план работ"],
+              ["24 часа", "После согласования назначаем команду и проводим стартовую встречу"],
+            ].map(([label, desc], i) => (
+              <div
+                key={label}
+                className={`px-6 py-6 md:px-7 md:py-7 ${
+                  i === 1 ? "border-t border-border sm:border-l sm:border-t-0" : ""
+                }`}
+              >
+                <div className="font-display text-[26px] font-extrabold leading-none tracking-[-0.025em] md:text-[32px]">
+                  {label}
+                </div>
+                <p className="mt-3 text-[14px] leading-relaxed text-muted-foreground md:text-[15px]">
+                  {desc}
+                </p>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
 
         <div className="mt-12 flex flex-col items-start gap-5 md:mt-14">
@@ -931,7 +951,7 @@ function Hero() {
             <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
           </a>
           <div className="flex items-center gap-2.5 text-[13px] text-muted-foreground">
-            <span className="h-1 w-1 rounded-full bg-[color:var(--red)]" />
+            <span className="h-1 w-1 shrink-0 rounded-full bg-[color:var(--red)]" />
             <span>30 минут онлайн. Сверимся по задаче и определим следующий шаг</span>
           </div>
         </div>
