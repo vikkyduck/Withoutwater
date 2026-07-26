@@ -887,12 +887,7 @@ function Hero() {
       <AmbientHalo className="-left-40 bottom-0" color="oklch(0.85 0.02 260)" size={560} opacity={0.10} />
       <LiquidOrb size={440} className="right-[-80px] top-8 hidden md:block" />
 
-      <div className="relative z-10 mx-auto max-w-7xl px-5 pb-16 pt-8 md:px-8 md:pb-28 md:pt-24">
-        <div className="mb-5 inline-flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground md:mb-10">
-          <span className="h-px w-8 bg-foreground/25" />
-          <span>Проектная команда · с 2016</span>
-        </div>
-
+      <div className="relative z-10 mx-auto max-w-7xl px-5 pb-16 pt-12 md:px-8 md:pb-28 md:pt-24">
         {/* Кегль держим крупнее меток преимуществ ниже (26/32px), иначе
             ломается иерархия. Текст сжатый — обе ключевые фразы влезают
             в первый экран смартфона вместе. */}
