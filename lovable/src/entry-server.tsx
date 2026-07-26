@@ -1,10 +1,15 @@
 // SSR-точка входа для пререндера (см. prerender.mjs).
-// Рендерит лендинг в статический HTML, чтобы боты без JS (Яндекс и текстовые
-// краулеры) получали полный текст страницы, а не пустой <div id="root">.
-// На клиенте main.tsx всё равно монтирует интерактивную версию поверх.
+// Рендерит КАЖДУЮ страницу многостраничника в статический HTML, чтобы боты
+// без JS (Яндекс и текстовые краулеры) получали полный текст, а не пустой
+// <div id="root">. На клиенте main.tsx монтирует интерактивную версию поверх.
 import { renderToStaticMarkup } from "react-dom/server";
-import Landing from "./landing";
+import { ROUTES } from "./site/pages";
 
-export function render(): string {
-  return renderToStaticMarkup(<Landing />);
+export { ROUTES };
+
+export function render(path: string): string {
+  const route = ROUTES.find((r) => r.path === path);
+  if (!route) throw new Error(`[entry-server] неизвестный маршрут: ${path}`);
+  const Page = route.Component;
+  return renderToStaticMarkup(<Page />);
 }

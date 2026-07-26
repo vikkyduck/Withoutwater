@@ -3,45 +3,59 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script>(function(){try{var t=localStorage.getItem('theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
-<title>Страница не найдена — Без Воды</title>
+<title>Страница не найдена — БЕЗ ВОДЫ</title>
 <meta name="robots" content="noindex">
-<link rel="stylesheet" href="/assets/css/site.css?v=8">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23111114'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='30' font-weight='800' fill='white' text-anchor='middle'%3EБВ%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="/fonts/fonts.css">
 <style>
-.nf{min-height:80vh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:20px;max-width:640px}
-.nf .code{font-size:clamp(56px,10vw,120px);font-weight:900;letter-spacing:-.03em;line-height:1}
-.nf h1{font-size:clamp(22px,3vw,32px)}
-.nf p{color:var(--soft);font-size:17px;max-width:520px}
-.nf .row{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px}
+  :root{--paper:#FBFAF8;--ink:#040609;--graphite:#45494E;--red:#89293F;--border:#E3E1DD}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Manrope",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1280px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--border);padding:14px 0}
+  header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
+  .logo{font-family:"Unbounded",system-ui,sans-serif;font-weight:800;font-size:15px;letter-spacing:-.02em;text-decoration:none;color:var(--ink);line-height:1.1}
+  .logo small{display:block;font-size:8px;letter-spacing:.02em}
+  nav{display:flex;gap:18px;flex-wrap:wrap}
+  nav a{font-size:13px;color:var(--graphite);text-decoration:none}
+  nav a:hover{color:var(--red)}
+  .nf{min-height:70vh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:18px;max-width:640px}
+  .code{font-family:"Unbounded",system-ui,sans-serif;font-size:clamp(56px,10vw,110px);font-weight:800;letter-spacing:-.04em;line-height:1}
+  h1{font-family:"Unbounded",system-ui,sans-serif;font-size:clamp(21px,3vw,30px);font-weight:800;letter-spacing:-.02em;margin:0}
+  p{color:var(--graphite);font-size:16px;line-height:1.6;margin:0;max-width:520px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+  .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:13px 24px;font-size:14px;font-weight:700;text-decoration:none}
+  .btn-primary{background:var(--red);color:var(--paper)}
+  .btn-ghost{border:1px solid var(--border);color:var(--ink)}
+  footer{border-top:1px solid var(--border);padding:24px 0;font-size:12px;color:var(--graphite)}
 </style>
 </head>
 <body>
-<header class="site-header">
+<header>
   <div class="wrap">
-    <a class="logo" href="/"><span>Без Воды — withoutwater</span></a>
-    <nav class="nav">
-      <a href="/#directions">Направления</a>
-      <a href="/#cases">Кейсы</a>
-      <a href="/#team">Команда</a>
-      <a href="/#contacts">Контакты</a>
+    <a class="logo" href="/">БЕЗ ВОДЫ<small>withoutwater</small></a>
+    <nav>
+      <a href="/tasks/">Задачи и решения</a>
+      <a href="/cases/">Кейсы</a>
+      <a href="/team/">О нас</a>
+      <a href="/how-we-work/">Как мы работаем</a>
     </nav>
-    <a class="head-tel" href="tel:+79645842225">+7 964 584 22 25</a>
-    <button class="theme-btn" id="theme-toggle" aria-label="Переключить светлую или тёмную тему" title="Сменить тему">◐</button>
-    <a class="btn btn-primary" href="/#lead">Оставить заявку</a>
   </div>
 </header>
-<div class="wrap">
+<main class="wrap">
   <div class="nf">
     <div class="code">404</div>
     <h1>Такой страницы нет</h1>
-    <p>Возможно, ссылка устарела или в адресе опечатка. Вернитесь на главную — там всё, чем мы можем быть полезны.</p>
+    <p>Возможно, адрес устарел или в нём опечатка. Вот главные разделы — оттуда точно найдётся нужное.</p>
     <div class="row">
       <a class="btn btn-primary" href="/">На главную</a>
-      <a class="btn" style="border:1px solid var(--line)" href="/#lead">Оставить заявку</a>
+      <a class="btn btn-ghost" href="/cases/">Смотреть кейсы</a>
+      <a class="btn btn-ghost" href="/contacts/">Написать нам</a>
     </div>
   </div>
-</div>
-<script src="/assets/js/site.js?v=8"></script>
+</main>
+<footer>
+  <div class="wrap">© БЕЗ ВОДЫ · withoutwater · ИП Уткина Виктория Викторовна · ИНН 771586055972</div>
+</footer>
 </body>
 </html>

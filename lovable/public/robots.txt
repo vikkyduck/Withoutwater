@@ -1,6 +1,4 @@
 User-agent: *
 Allow: /
 Disallow: /admin
-Disallow: /wizard-preview
-Disallow: /orbs-preview
 Sitemap: https://withoutwater.ru/sitemap.xml

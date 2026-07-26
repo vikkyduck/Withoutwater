@@ -14,3 +14,6 @@ dist/
 .DS_Store
 *.log
 npm-debug.log*
+
+# отложенный контент: фото, ждущие согласования публикации (см. lovable/src/site/data-pending.txt)
+lovable/assets-pending/
