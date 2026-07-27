@@ -496,7 +496,7 @@ export function CaseCard({ item, index }: { item: CaseItem; index: number }) {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 sm:gap-2.5">
+        <div className={`grid grid-cols-2 gap-2 sm:gap-2.5 ${item.metrics.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-4"}`}>
           {item.metrics.map(([value, label]) => (
             <div
               key={label}
