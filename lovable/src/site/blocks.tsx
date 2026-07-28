@@ -228,7 +228,7 @@ export function Production() {
           href="/for-your-boss"
           className="group mt-8 inline-flex items-center gap-2 text-[15px] font-semibold text-[color:var(--red)] transition hover:text-foreground"
         >
-          Аргументы для вашего руководителя
+          Бизнес-эффект от методологии
           <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
         </a>
       </div>

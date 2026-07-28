@@ -1071,7 +1071,7 @@ export function Footer() {
     ["Как мы работаем", "/how-we-work"],
     ["Частые вопросы", "/faq"],
     ["Контакты", "/contacts"],
-    ["Аргументы для руководителя", "/for-your-boss"],
+    ["Бизнес-эффект от методологии", "/for-your-boss"],
   ];
   return (
     <footer className="border-t border-border bg-background">
