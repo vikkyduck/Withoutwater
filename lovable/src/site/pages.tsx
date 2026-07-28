@@ -151,29 +151,66 @@ function BusinessEffectPage() {
 }
 
 /* --------------------------- Задачи и решения ----------------------------- */
-/* Навигатор: три входа по роли. Пока страниц ролей нет — ведут на кейсы. */
+/* Ситуации, а НЕ роли-адресаты (правка Виктории 26.07): одна и та же
+   ситуация возникает у разных людей, поэтому обращения «директору по
+   персоналу», «руководителю функции» убраны. Карточка ведёт не на кейсы,
+   а на развёрнутое решение ниже по странице. */
+
+const SITUATIONS = [
+  {
+    id: "practice",
+    situation: "Результат держится на одном-двух сильных сотрудниках",
+    detail:
+      "Они закрывают сложные задачи, остальные работают заметно слабее. Как именно работают сильные — нигде не записано: знание живёт в голове, передаётся «с голоса» и уходит вместе с человеком.",
+    solutionTitle: "Тиражируем практику сильных сотрудников",
+    solutionLead:
+      "Разбираем, что именно делают сильные, и превращаем это в способ работы, которым пользуется вся команда.",
+    steps: [
+      "проводим интервью с носителями практики и разбираем их реальные решения",
+      "отделяем то, что даёт результат, от личного стиля и случайностей",
+      "переводим в алгоритмы, стандарты, разборы кейсов и рабочие материалы",
+      "проверяем на реальных задачах и дорабатываем по обратной связи",
+    ],
+    outcome:
+      "Команда работает по единому подходу, а результат перестаёт зависеть от отпусков, загрузки и увольнений.",
+  },
+  {
+    id: "capacity",
+    situation: "Инициатив больше, чем ресурсов внутренней команды",
+    detail:
+      "Портфель задач растёт быстрее, чем штат. Часть инициатив уходит подрядчикам — и у каждого свой стандарт разработки, свои сроки и своё качество на выходе.",
+    solutionTitle: "Берём согласованный объём разработки на себя",
+    solutionLead:
+      "Работаем как производственное продолжение вашей команды: вы управляете портфелем, мы закрываем производство.",
+    steps: [
+      "фиксируем объём, этапы, сроки и критерии приёмки до старта",
+      "ведём до 10–12 проектов параллельно по единому стандарту",
+      "держим контрольные точки — вы видите промежуточный результат, а не только финал",
+      "дорабатываем без доплаты, если результат не соответствует критериям",
+    ],
+    outcome:
+      "Производство перестаёт быть ограничением: инициативы выходят в срок, качество не зависит от того, кому достался проект.",
+  },
+  {
+    id: "external",
+    situation: "Нужна практика, которой пока нет внутри компании",
+    detail:
+      "Компания заходит в новую нишу, запускает незнакомое направление или сталкивается с задачей, по которой внутри нет носителя опыта. Искать и проверять экспертов самостоятельно — долго.",
+    solutionTitle: "Находим практика на рынке и переводим его опыт в ваш контекст",
+    solutionLead:
+      "Подключаем специалиста, который уже решал сопоставимую задачу, — и отвечаем за то, что его опыт станет применимым материалом.",
+    steps: [
+      "фиксируем, какой именно опыт нужен и какие вопросы должен закрыть специалист",
+      "представляем первые релевантные профили в течение 72 часов",
+      "методолог работает рядом с практиком и переводит его решения в программу",
+      "адаптируем под ваш контекст: процессы, ограничения и язык компании",
+    ],
+    outcome:
+      "Команда получает проверенный способ работы быстрее, чем через наём и самостоятельный поиск. Договор один — с нами.",
+  },
+];
 
 function TasksPage() {
-  const roles = [
-    {
-      who: "Директору по персоналу и руководителю обучения",
-      task: "Инициатив кратно больше, чем рук в L&D, а стандарты разработки у каждого подрядчика свои.",
-      result: "Берём согласованный объём разработки на себя: единый стандарт, параллельные проекты, сроки по договору.",
-      href: "/cases",
-    },
-    {
-      who: "Руководителю функции",
-      task: "Результат держится на одном-двух сильных сотрудниках, остальные работают заметно слабее.",
-      result: "Практика сильнейших становится рабочим стандартом всей команды — и перестаёт зависеть от отпусков и увольнений.",
-      href: "/cases",
-    },
-    {
-      who: "Владельцу образовательного направления",
-      task: "Направление входит в новую нишу, а носителя нужной практики внутри нет.",
-      result: "Подключаем практика с релевантным опытом и переводим его решения в программу под ваш контекст.",
-      href: "/cases",
-    },
-  ];
   return (
     <PageShell path="/tasks">
       <section className="relative overflow-hidden border-b border-border/60">
@@ -181,14 +218,15 @@ function TasksPage() {
         <PageHead
           kicker="Задачи и решения"
           title={<>С какой задачей вы пришли</>}
-          lead="Выберите ситуацию, похожую на вашу, — покажем, что делаем в ней и где это уже сработало."
+          lead="Выберите ситуацию, похожую на вашу, — ниже разобрано, что делаем в каждой и что остаётся у вас на руках."
         />
         <div className="relative mx-auto max-w-7xl px-5 pb-16 md:px-8 md:pb-24">
+          {/* Навигатор: ситуация → якорь решения ниже */}
           <div className="mt-8 grid gap-5 md:grid-cols-3">
-            {roles.map((r, i) => (
+            {SITUATIONS.map((it, i) => (
               <motion.a
-                key={r.who}
-                href={r.href}
+                key={it.id}
+                href={`#${it.id}`}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
@@ -199,17 +237,12 @@ function TasksPage() {
                   <div className="font-display text-sm font-bold tabular-nums text-[color:var(--red)]">
                     0{i + 1}
                   </div>
-                  <h2 className="mt-3 font-display text-lg font-extrabold leading-snug">{r.who}</h2>
-                  <p className="mt-4 text-sm leading-relaxed text-muted-foreground">
-                    <span className="font-semibold text-foreground/80">Задача: </span>
-                    {r.task}
-                  </p>
-                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground">
-                    <span className="font-semibold text-foreground/80">Результат: </span>
-                    {r.result}
-                  </p>
+                  <h2 className="mt-3 font-display text-[19px] font-extrabold leading-snug [overflow-wrap:break-word]">
+                    {it.situation}
+                  </h2>
+                  <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{it.detail}</p>
                   <span className="mt-auto inline-flex items-center gap-1.5 pt-5 text-[13px] font-semibold text-[color:var(--red)] transition group-hover:text-foreground">
-                    Смотреть кейсы
+                    Как решаем
                     <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                   </span>
                 </GlassCard>
@@ -217,10 +250,62 @@ function TasksPage() {
             ))}
           </div>
 
+          {/* Развёрнутые решения */}
+          <div className="mt-20 flex flex-col gap-16 md:mt-24 md:gap-20">
+            {SITUATIONS.map((it, i) => (
+              <div key={it.id} id={it.id} className="scroll-mt-28">
+                <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-12">
+                  <div>
+                    <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                      <span className="font-display text-[color:var(--red)]">0{i + 1}</span>
+                      <span className="h-px w-8 bg-border" />
+                      <span>Решение</span>
+                    </div>
+                    <RevealHeading className="mt-5 font-display text-2xl font-extrabold leading-tight md:text-[32px]">
+                      {it.solutionTitle}
+                    </RevealHeading>
+                    <p className="mt-4 text-[15px] leading-relaxed text-foreground/85 md:text-base">
+                      {it.solutionLead}
+                    </p>
+                    <a
+                      href="/cases"
+                      className="group mt-6 inline-flex items-center gap-2 text-[14px] font-semibold text-[color:var(--red)] transition hover:text-foreground"
+                    >
+                      Где это уже сработало
+                      <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                    </a>
+                  </div>
+
+                  <div>
+                    <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                      Что делаем
+                    </div>
+                    <ul className="mt-5 divide-y divide-border border-y border-border">
+                      {it.steps.map((step) => (
+                        <li key={step} className="flex items-start gap-3 py-3.5 text-[15px] leading-relaxed text-foreground/85">
+                          <Check className="mt-1 h-4 w-4 flex-none text-[color:var(--red)]" />
+                          <span>{step}</span>
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-6 rounded-2xl border-l-[3px] border-[color:var(--red)] bg-[color:var(--red)]/5 px-5 py-4">
+                      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                        Что меняется
+                      </div>
+                      <p className="mt-1.5 text-[15px] font-medium leading-relaxed text-foreground/90">
+                        {it.outcome}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
           {/* Материальные активы вместо абстракций (разбор 26.07: раздел
               называется по трансформации, «интеллектуальный капитал» —
               вторичное объяснение) */}
-          <div className="mt-16 max-w-4xl">
+          <div className="mt-20 max-w-4xl md:mt-24">
             <RevealHeading className="font-display text-2xl font-extrabold leading-tight md:text-3xl">
               Опыт перестаёт зависеть от его носителя
             </RevealHeading>
@@ -545,7 +630,7 @@ export const ROUTES: RouteDef[] = [
     path: "/tasks",
     title: "Задачи и решения — БЕЗ ВОДЫ",
     description:
-      "Тиражировать практику сильных сотрудников, запустить больше инициатив без расширения штата или быстро привнести практику извне — выберите свою ситуацию.",
+      "Три ситуации и решения к ним: результат держится на одном-двух сильных сотрудниках, инициатив больше, чем ресурсов команды, нужна практика, которой нет внутри.",
     Component: TasksPage,
   },
   {

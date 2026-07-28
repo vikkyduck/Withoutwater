@@ -245,14 +245,17 @@ export function WhenNeeded() {
     {
       t: "Тиражировать практику сильных сотрудников",
       d: "Чтобы результат не зависел от нескольких людей, а их рабочий подход могли применять другие команды",
+      href: "/tasks#practice",
     },
     {
       t: "Запустить больше инициатив без расширения постоянного штата",
       d: "Чтобы внутренний L&D сохранил управление портфелем, а производство не стало ограничением",
+      href: "/tasks#capacity",
     },
     {
       t: "Быстро привнести практику, которой пока нет внутри",
       d: "Чтобы команда получила проверенный способ работы быстрее найма и самостоятельного поиска",
+      href: "/tasks#external",
     },
   ];
   return (
@@ -276,17 +279,23 @@ export function WhenNeeded() {
               viewport={{ once: true }}
               transition={{ delay: i * 0.06 }}
             >
-              <GlassCard className="h-full p-6 md:p-8">
-                <div className="font-display text-sm font-bold tabular-nums text-[color:var(--red)]">
-                  0{i + 1}
-                </div>
-                <h3 className="mt-3 font-display text-base font-extrabold leading-snug md:text-lg">
-                  {c.t}
-                </h3>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-[15px]">
-                  {c.d}
-                </p>
-              </GlassCard>
+              <a href={c.href} className="group block h-full">
+                <GlassCard className="flex h-full flex-col p-6 transition-transform duration-300 group-hover:-translate-y-1 md:p-8">
+                  <div className="font-display text-sm font-bold tabular-nums text-[color:var(--red)]">
+                    0{i + 1}
+                  </div>
+                  <h3 className="mt-3 font-display text-base font-extrabold leading-snug md:text-lg">
+                    {c.t}
+                  </h3>
+                  <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-[15px]">
+                    {c.d}
+                  </p>
+                  <span className="mt-auto inline-flex items-center gap-1.5 pt-5 text-[13px] font-semibold text-[color:var(--red)] transition group-hover:text-foreground">
+                    Как решаем
+                    <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
+                  </span>
+                </GlassCard>
+              </a>
             </motion.div>
           ))}
         </div>
