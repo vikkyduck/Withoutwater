@@ -8,7 +8,7 @@ import {
   ArrowUpRight, ArrowRight, Plus, Check, ExternalLink,
   useRef, useState, useEffect,
   ymGoal,
-  SectionLabel, GlassCard, PaperCard, Scene,
+  SectionLabel, GlassCard, PaperCard, Scene, NodeScene,
   RevealHeading, Field, StencilLogo,
   CTA_LABEL, CTA_NOTE,
 } from "./core";
@@ -25,56 +25,83 @@ const bookCover = { url: "/img/book-cover.webp" };
 
 export function Hero() {
   return (
-    <section id="top" className="stage border-b border-[color:var(--color-line)]">
-      
-      <Scene blobs={[{ className: "-right-40 -top-20", tone: "rose", size: 520 }, { className: "-left-40 bottom-0", tone: "chrome", size: 560 }]} />
+    <section id="top" className="stage sec-dark grain border-b border-[color:var(--color-line-dark)]">
+      {/* Сцена обложки: узлы, хромовое кольцо и стеклянные плашки поверх.
+          Хром — только объект, под текст не кладётся. */}
+      <div className="stage__bg" aria-hidden>
+        <div
+          className="absolute right-[-4%] top-1/2 hidden aspect-square w-[min(34vw,440px)] -translate-y-1/2 md:block"
+          style={{ opacity: 0.92 }}
+        >
+          <div className="chrome-ring absolute inset-[8%]" />
+          <NodeScene className="text-[color:var(--color-text-inverse-2)]" opacity={0.55} />
+        </div>
+        {/* тёплое свечение за кольцом */}
+        <div
+          className="absolute right-[2%] top-1/2 hidden h-[420px] w-[420px] -translate-y-1/2 rounded-pill md:block"
+          style={{
+            background:
+              "radial-gradient(closest-side, rgba(233,196,189,0.20), rgba(233,196,189,0))",
+            filter: "blur(10px)",
+          }}
+        />
+      </div>
 
-      <div className="relative z-10 mx-auto max-w-7xl px-5 pb-14 pt-12 md:px-8 md:pb-20 md:pt-24">
-        {/* Центральная история (разбор 26.07): стандартом становится не
-            результат, а СПОСОБ работы. Подзаголовок держит внутреннюю и
-            внешнюю экспертизу в одном механизме. */}
-        <RevealHeading as="h1" className="max-w-3xl font-display text-[30px] font-medium leading-[1.12] tracking-[-0.03em] sm:text-[42px] sm:leading-[1.08] md:max-w-4xl md:text-[52px] md:leading-[1.04]">
-          Практика сильнейшего сотрудника становится{" "}
-          <span className="text-[color:var(--color-accent)]">стандартом всей команды</span>
-        </RevealHeading>
-
-        <div className="mt-5 max-w-2xl border-l-[3px] border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/5 pl-4 py-2 md:mt-7 md:pl-5 md:py-2.5">
-          <p className="text-[16px] font-medium leading-[1.5] text-foreground md:text-[19px]">
-            Выделяем решения, которые дают результат, проверяем их и переводим
-            в алгоритмы, стандарты, кейсы и материалы. Если нужной практики нет
-            внутри — находим её на рынке и адаптируем под контекст компании.
-          </p>
+      <div className="relative z-10 mx-auto max-w-7xl px-5 pb-14 pt-10 md:px-8 md:pb-24 md:pt-24">
+        {/* Надзаголовок с узлами-разделителями */}
+        <div className="t-eyebrow flex flex-wrap items-center gap-x-3 gap-y-2 text-[color:var(--color-text-inverse-2)]">
+          <span>Методологическое бюро</span>
+          <span className="node-dot node-dot-active" />
+          <span>Практика в стандарт</span>
         </div>
 
-        {/* Два аргумента — компактной строкой. */}
-        <div className="mt-8 grid max-w-2xl gap-px overflow-hidden rounded-md border border-[color:var(--color-line)] bg-border sm:grid-cols-2 md:mt-10">
+        {/* Центральная история. Срез — на акцентном слове, один на макет. */}
+        <RevealHeading as="h1" className="t-h1 mt-6 max-w-3xl text-[color:var(--color-text-inverse)] md:mt-9">
+          Практика сильнейшего сотрудника становится{" "}
+          <span className="text-[color:var(--color-accent-glass)]">стандартом всей команды</span>
+        </RevealHeading>
+
+        <p className="t-lead measure mt-5 text-[color:var(--color-text-inverse-2)] md:mt-8">
+          Выделяем решения, которые дают результат, проверяем их и переводим
+          в алгоритмы, стандарты, кейсы и материалы. Если нужной практики нет
+          внутри — находим её на рынке и адаптируем под контекст компании.
+        </p>
+
+        {/* Два аргумента — стеклянными плашками на тёмной сцене */}
+        <div className="mt-8 grid max-w-2xl gap-4 sm:grid-cols-2 md:mt-12">
           {[
             ["Без ТЗ", "Принимаем вводные в любом виде и собираем из них архитектуру решения и план работ"],
             ["24 часа", "После согласования назначаем команду и проводим стартовую встречу"],
           ].map(([label, desc]) => (
-            <div key={label} className="bg-[color:var(--color-surface)] px-5 py-5 md:px-6">
-              <div className="font-display text-[17px] font-bold leading-none tracking-[-0.02em] md:text-[19px]">
+            <div key={label} className="lg lg-dark rounded-md px-5 py-5 md:px-6">
+              <div className="font-display text-[19px] font-medium leading-none tracking-[-0.015em] text-[color:var(--color-text-inverse)] md:text-[21px]">
                 {label}
               </div>
-              <p className="mt-2.5 text-[13px] leading-relaxed text-[color:var(--color-text-secondary)] md:text-[14px]">
+              <p className="t-body-sm mt-3 text-[color:var(--color-text-inverse-2)]">
                 {desc}
               </p>
             </div>
           ))}
         </div>
 
-        <div className="mt-10 flex flex-col items-start gap-4 md:mt-12">
-          <a
-            href="#contact"
-            className="btn btn-primary group w-full sm:w-auto"
-          >
+        <div className="mt-8 flex flex-col items-start gap-4 md:mt-12">
+          <a href="#contact" className="btn btn-invert group w-full sm:w-auto">
             <span>{CTA_LABEL}</span>
             <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
           </a>
-          <div className="flex items-center gap-2.5 text-[13px] text-[color:var(--color-text-secondary)]">
-            <span className="h-1 w-1 shrink-0 rounded-pill bg-[color:var(--color-accent)]" />
+          <div className="t-body-sm flex items-center gap-2.5 text-[color:var(--color-text-inverse-2)]">
+            <span className="node-dot node-dot-active" />
             <span>{CTA_NOTE}</span>
           </div>
+        </div>
+
+        {/* Характер бюро — как в обложке системы */}
+        <div className="t-label mt-10 flex flex-wrap items-center gap-x-3 gap-y-2 text-[color:var(--color-text-inverse)] md:mt-16">
+          <span>точный</span>
+          <span className="node-dot node-dot-active" />
+          <span>осязаемый</span>
+          <span className="node-dot node-dot-active" />
+          <span>интеллектуальный</span>
         </div>
       </div>
     </section>

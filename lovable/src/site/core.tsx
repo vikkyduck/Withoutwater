@@ -168,7 +168,7 @@ export function GlassPointer() {
     if (calm) return;
     if (!window.matchMedia?.("(pointer: fine)").matches) return;
 
-    const SEL = ".lg, .btn-primary, .btn-secondary, .btn-glass";
+    const SEL = ".lg, .btn-primary, .btn-secondary, .btn-glass, .btn-invert";
     const bound = new WeakSet<HTMLElement>();
 
     const bind = (el: HTMLElement) => {

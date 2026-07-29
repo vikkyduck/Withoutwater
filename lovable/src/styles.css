@@ -349,6 +349,20 @@
 }
 .lg-dark::after { mix-blend-mode: overlay; }
 
+/* Хромовое кольцо — объект-артефакт первого экрана: жидкий металл,
+   свет по кругу. Под текст не кладётся (раздел 3: хром — только объекты). */
+@utility chrome-ring {
+  border-radius: 50%;
+  background: conic-gradient(
+    from 210deg,
+    #F4F5F6 0deg, #EDEFF1 28deg, #A9AEB5 66deg, #F2F3F5 116deg,
+    #7E848C 174deg, #E7E9EC 224deg, #B4B9C0 288deg, #F4F5F6 360deg
+  );
+  -webkit-mask: radial-gradient(circle, transparent 62%, #000 66%, #000 97%, transparent 100%);
+  mask: radial-gradient(circle, transparent 62%, #000 66%, #000 97%, transparent 100%);
+  filter: drop-shadow(0 24px 60px rgba(0, 0, 0, 0.55));
+}
+
 /* Плоская хромовая поверхность — жидкий металл без стекла (обложки, детали) */
 @utility tex-chrome {
   background: linear-gradient(105deg, #EDEFF1 0%, #A9AEB5 18%, #F2F3F5 32%,
@@ -449,6 +463,36 @@
   --lg-glow: 0.16;
 }
 .btn-glass:hover { --lg-glow: 0.62; box-shadow: var(--lg-rim), var(--shadow-float); }
+
+/* На угольной сцене графитовая кнопка не читается — главное действие
+   переворачивается в светлую заливку (Мел на Угле). */
+@utility btn-invert {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  --lg-glow: 0;
+}
+.btn-invert:hover {
+  background: #fff;
+  box-shadow: var(--shadow-float);
+  --lg-glow: 0.38;
+  --lift: -1px;
+}
+.btn-invert::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(120px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2) 42%, transparent 70%),
+    linear-gradient(var(--sheen, 100deg),
+      transparent 38%, rgba(255, 255, 255, 0.78) 50%, transparent 62%);
+  mix-blend-mode: overlay;
+  opacity: var(--lg-glow, 0);
+  transition: opacity var(--duration-slow) var(--ease-glass);
+}
 
 /* Текстовая ссылка-действие */
 @utility btn-ghost {
