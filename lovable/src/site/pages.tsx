@@ -7,7 +7,7 @@
 import {
   motion,
   ArrowUpRight, ArrowRight, Check,
-  PageShell, PageHead, SectionLabel, GlassCard, AmbientHalo,
+  PageShell, PageHead, SectionLabel, GlassCard, PaperCard, Scene,
   RevealHeading,
 } from "./core";
 import {
@@ -56,7 +56,7 @@ function BusinessEffectPage() {
   ];
   return (
     <PageShell path="/for-your-boss">
-      <section className="relative overflow-hidden border-b border-border/60 print:border-0">
+      <section className="relative overflow-hidden border-b border-[color:var(--color-line)] print:border-0">
         <PageHead
           kicker="Эффект для бизнеса"
           title={<>Бизнес-эффект от методологии</>}
@@ -66,10 +66,10 @@ function BusinessEffectPage() {
 
           {/* Что теряет компания */}
           <div className="mt-10 max-w-3xl">
-            <h2 className="font-display text-2xl font-extrabold leading-tight md:text-3xl">
+            <h2 className="font-display text-2xl font-medium leading-tight md:text-3xl">
               Что компания теряет прямо сейчас
             </h2>
-            <p className="mt-4 text-[15px] leading-relaxed text-foreground/85 md:text-base">
+            <p className="mt-4 text-[15px] leading-relaxed text-[color:var(--color-text-primary)] md:text-base">
               Ключевая практика заперта в головах двух-трёх сильных людей. Пока
               это так, компания платит дважды: результат зависит от их загрузки,
               а каждый уход — в отпуск, на повышение, к конкуренту — уносит
@@ -80,10 +80,10 @@ function BusinessEffectPage() {
 
           {/* Что бизнес получает за первый этап */}
           <div className="mt-12 max-w-3xl">
-            <h2 className="font-display text-2xl font-extrabold leading-tight md:text-3xl">
+            <h2 className="font-display text-2xl font-medium leading-tight md:text-3xl">
               Что вы получаете за первый этап
             </h2>
-            <p className="mt-4 text-[15px] leading-relaxed text-foreground/85 md:text-base">
+            <p className="mt-4 text-[15px] leading-relaxed text-[color:var(--color-text-primary)] md:text-base">
               Первый этап завершается самостоятельным результатом: модель решения
               и дорожная карта. Это готовый рабочий материал — он остаётся у
               компании и применим даже в том случае, если сотрудничество не
@@ -94,17 +94,17 @@ function BusinessEffectPage() {
 
           {/* Как закрыты риски */}
           <div className="mt-12">
-            <h2 className="font-display text-2xl font-extrabold leading-tight md:text-3xl">
+            <h2 className="font-display text-2xl font-medium leading-tight md:text-3xl">
               Как закрыты риски
             </h2>
             <div className="mt-6 grid max-w-4xl gap-4 sm:grid-cols-2">
               {risks.map(([t, d]) => (
-                <div key={t} className="rounded-2xl border border-border bg-background/70 p-5">
+                <div key={t} className="rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-5">
                   <div className="flex items-start gap-3">
-                    <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--red)]" />
+                    <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--color-accent)]" />
                     <div>
                       <div className="font-display text-[15px] font-bold">{t}</div>
-                      <p className="mt-1.5 text-sm leading-relaxed text-muted-foreground">{d}</p>
+                      <p className="mt-1.5 text-sm leading-relaxed text-[color:var(--color-text-secondary)]">{d}</p>
                     </div>
                   </div>
                 </div>
@@ -113,11 +113,11 @@ function BusinessEffectPage() {
           </div>
 
           {/* Порядок расчёта — черновик формулировки, Виктория поправит */}
-          <div className="mt-12 max-w-3xl rounded-2xl border-l-[3px] border-[color:var(--red)] bg-[color:var(--red)]/5 p-6 md:p-7">
-            <h2 className="font-display text-xl font-extrabold leading-tight md:text-2xl">
+          <div className="mt-12 max-w-3xl rounded-md border-l-[3px] border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/5 p-6 md:p-7">
+            <h2 className="font-display text-xl font-medium leading-tight md:text-2xl">
               Как считается стоимость
             </h2>
-            <p className="mt-3 text-[15px] leading-relaxed text-foreground/85">
+            <p className="mt-3 text-[15px] leading-relaxed text-[color:var(--color-text-primary)]">
               Стоимость считается по формуле: объём материала × число носителей
               опыта × глубина проверки знаний × срок. Срочность — отдельным
               коэффициентом. После 30-минутного разбора вы получаете расчёт под
@@ -131,14 +131,14 @@ function BusinessEffectPage() {
             <button
               type="button"
               onClick={() => window.print()}
-              className="group inline-flex items-center gap-2 rounded-full border border-border px-6 py-3 text-[14px] font-semibold text-foreground transition hover:border-[color:var(--red)] hover:text-[color:var(--red)]"
+              className="btn btn-secondary group"
             >
               Сохранить в PDF
               <ArrowUpRight className="h-4 w-4" />
             </button>
             <a
               href="/contacts#form"
-              className="group inline-flex items-center gap-3 rounded-full bg-[color:var(--red)] px-7 py-4 text-[14px] font-semibold tracking-wide text-background transition-all duration-500 hover:bg-foreground"
+              className="btn btn-primary group"
             >
               Позовите нас на встречу с командой — ответим на вопросы напрямую
               <ArrowRight className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
@@ -213,8 +213,8 @@ const SITUATIONS = [
 function TasksPage() {
   return (
     <PageShell path="/tasks">
-      <section className="relative overflow-hidden border-b border-border/60">
-        <AmbientHalo className="-right-40 top-0" color="var(--lav)" size={480} opacity={0.14} />
+      <section className="stage border-b border-[color:var(--color-line)]">
+        <Scene blobs={[{ className: "-right-40 top-0", tone: "rose", size: 480 }]} />
         <PageHead
           kicker="Задачи и решения"
           title={<>С какой задачей вы пришли</>}
@@ -234,14 +234,14 @@ function TasksPage() {
                 className="group"
               >
                 <GlassCard className="flex h-full flex-col p-6 transition-transform duration-300 group-hover:-translate-y-1 md:p-7">
-                  <div className="font-display text-sm font-bold tabular-nums text-[color:var(--red)]">
+                  <div className="font-display text-sm font-bold tabular-nums text-[color:var(--color-accent)]">
                     0{i + 1}
                   </div>
-                  <h2 className="mt-3 font-display text-[19px] font-extrabold leading-snug [overflow-wrap:break-word]">
+                  <h2 className="mt-3 font-display text-[19px] font-medium leading-snug [overflow-wrap:break-word]">
                     {it.situation}
                   </h2>
-                  <p className="mt-4 text-sm leading-relaxed text-muted-foreground">{it.detail}</p>
-                  <span className="mt-auto inline-flex items-center gap-1.5 pt-5 text-[13px] font-semibold text-[color:var(--red)] transition group-hover:text-foreground">
+                  <p className="mt-4 text-sm leading-relaxed text-[color:var(--color-text-secondary)]">{it.detail}</p>
+                  <span className="mt-auto inline-flex items-center gap-1.5 pt-5 text-[13px] font-semibold text-[color:var(--color-accent)] transition group-hover:text-foreground">
                     Как решаем
                     <ArrowRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                   </span>
@@ -256,20 +256,20 @@ function TasksPage() {
               <div key={it.id} id={it.id} className="scroll-mt-28">
                 <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-12">
                   <div>
-                    <div className="flex items-center gap-3 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
-                      <span className="font-display text-[color:var(--red)]">0{i + 1}</span>
+                    <div className="flex items-center gap-3 t-eyebrow text-[color:var(--color-text-secondary)]">
+                      <span className="font-display text-[color:var(--color-accent)]">0{i + 1}</span>
                       <span className="h-px w-8 bg-border" />
                       <span>Решение</span>
                     </div>
-                    <RevealHeading className="mt-5 font-display text-2xl font-extrabold leading-tight md:text-[32px]">
+                    <RevealHeading className="mt-5 font-display text-2xl font-medium leading-tight md:text-[32px]">
                       {it.solutionTitle}
                     </RevealHeading>
-                    <p className="mt-4 text-[15px] leading-relaxed text-foreground/85 md:text-base">
+                    <p className="mt-4 text-[15px] leading-relaxed text-[color:var(--color-text-primary)] md:text-base">
                       {it.solutionLead}
                     </p>
                     <a
                       href="/cases"
-                      className="group mt-6 inline-flex items-center gap-2 text-[14px] font-semibold text-[color:var(--red)] transition hover:text-foreground"
+                      className="group mt-6 inline-flex items-center gap-2 text-[14px] font-semibold text-[color:var(--color-accent)] transition hover:text-foreground"
                     >
                       Где это уже сработало
                       <ArrowRight className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -277,19 +277,19 @@ function TasksPage() {
                   </div>
 
                   <div>
-                    <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                    <div className="t-eyebrow text-[color:var(--color-text-secondary)]">
                       Что делаем
                     </div>
-                    <ul className="mt-5 divide-y divide-border border-y border-border">
+                    <ul className="mt-5 divide-y divide-border border-y border-[color:var(--color-line)]">
                       {it.steps.map((step) => (
-                        <li key={step} className="flex items-start gap-3 py-3.5 text-[15px] leading-relaxed text-foreground/85">
-                          <Check className="mt-1 h-4 w-4 flex-none text-[color:var(--red)]" />
+                        <li key={step} className="flex items-start gap-3 py-3.5 text-[15px] leading-relaxed text-[color:var(--color-text-primary)]">
+                          <Check className="mt-1 h-4 w-4 flex-none text-[color:var(--color-accent)]" />
                           <span>{step}</span>
                         </li>
                       ))}
                     </ul>
-                    <div className="mt-6 rounded-2xl border-l-[3px] border-[color:var(--red)] bg-[color:var(--red)]/5 px-5 py-4">
-                      <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted-foreground">
+                    <div className="mt-6 rounded-md border-l-[3px] border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/5 px-5 py-4">
+                      <div className="t-label text-[color:var(--color-text-secondary)]">
                         Что меняется
                       </div>
                       <p className="mt-1.5 text-[15px] font-medium leading-relaxed text-foreground/90">
@@ -306,10 +306,10 @@ function TasksPage() {
               называется по трансформации, «интеллектуальный капитал» —
               вторичное объяснение) */}
           <div className="mt-20 max-w-4xl md:mt-24">
-            <RevealHeading className="font-display text-2xl font-extrabold leading-tight md:text-3xl">
+            <RevealHeading className="font-display text-2xl font-medium leading-tight md:text-3xl">
               Опыт перестаёт зависеть от его носителя
             </RevealHeading>
-            <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-muted-foreground">
+            <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-[color:var(--color-text-secondary)]">
               Экспертный опыт становится интеллектуальным капиталом компании —
               и это не метафора, а перечень передаваемых активов:
             </p>
@@ -320,8 +320,8 @@ function TasksPage() {
                 "сценарии применения и материалы для руководителей",
                 "исходники и правила обновления — материалы живут без нас",
               ].map((t) => (
-                <li key={t} className="flex items-start gap-3 rounded-2xl border border-border bg-background/70 p-5 text-sm leading-relaxed text-foreground/85 md:text-[15px]">
-                  <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--red)]" />
+                <li key={t} className="flex items-start gap-3 rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-5 text-sm leading-relaxed text-[color:var(--color-text-primary)] md:text-[15px]">
+                  <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--color-accent)]" />
                   <span>{t}</span>
                 </li>
               ))}
@@ -346,12 +346,12 @@ function CasesPage() {
         />
       </section>
       <CasesBlock compactHeader />
-      <section className="relative border-b border-border">
+      <section className="relative border-b border-[color:var(--color-line)]">
         <div className="mx-auto max-w-7xl px-5 py-10 md:px-8">
-          <p className="max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          <p className="max-w-2xl text-sm leading-relaxed text-[color:var(--color-text-secondary)]">
             Готовим к публикации кейсы проектов с Авито, ВкусВилл, Beyond Taylor,
             Global Creative Hub, McDonald's (2021) и World Class — пока
-            почитайте, <a href="/reviews" className="font-semibold text-[color:var(--red)] underline underline-offset-2 hover:text-foreground">что говорят сами клиенты</a>.
+            почитайте, <a href="/reviews" className="font-semibold text-[color:var(--color-accent)] underline underline-offset-2 hover:text-foreground">что говорят сами клиенты</a>.
           </p>
         </div>
       </section>
@@ -365,8 +365,8 @@ function ReviewsPage() {
   const items = visibleReviews();
   return (
     <PageShell path="/reviews">
-      <section className="relative overflow-hidden border-b border-border bg-[color:var(--lav-soft)]/30">
-        <AmbientHalo className="-left-40 top-10" color="var(--lav)" size={560} opacity={0.2} />
+      <section className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-[color:var(--color-bg-secondary)])]/30">
+        <Scene blobs={[{ className: "-left-40 top-10", tone: "rose", size: 560 }]} />
         <PageHead
           kicker="У нас получилось"
           title={<>Что говорят клиенты</>}
@@ -396,8 +396,8 @@ function TeamPage() {
   ];
   return (
     <PageShell path="/team">
-      <section className="relative overflow-hidden border-b border-border/60">
-        <AmbientHalo className="-right-40 top-0" color="var(--lav)" size={520} opacity={0.16} />
+      <section className="stage border-b border-[color:var(--color-line)]">
+        <Scene blobs={[{ className: "-right-40 top-0", tone: "rose", size: 520 }]} />
         <PageHead
           kicker="О нас"
           title={<>Команда и сеть экспертов</>}
@@ -408,7 +408,7 @@ function TeamPage() {
         <div className="relative mx-auto max-w-7xl px-5 pb-4 md:px-8">
           <GlassCard className="mt-8 overflow-hidden p-0">
             <div className="grid items-stretch md:grid-cols-[320px_1fr]">
-              <div className="relative min-h-[320px] bg-[color:var(--lav)]/10 md:min-h-0">
+              <div className="relative min-h-[320px] bg-[color:var(--color-chrome)]/10 md:min-h-0">
                 <img
                   src={founder.photo}
                   alt={founder.name}
@@ -417,14 +417,14 @@ function TeamPage() {
                 />
               </div>
               <div className="p-7 md:p-10">
-                <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[color:var(--red)]">
+                <div className="t-eyebrow text-[color:var(--color-accent)]">
                   Основатель
                 </div>
-                <h2 className="mt-2 font-display text-2xl font-extrabold md:text-3xl">{founder.name}</h2>
-                <p className="mt-1 text-sm text-muted-foreground">{founder.role} · {founder.fact}</p>
-                <div className="mt-6 flex flex-col gap-3.5 border-l-[3px] border-[color:var(--red)] pl-4 md:pl-5">
+                <h2 className="mt-2 font-display text-2xl font-medium md:text-3xl">{founder.name}</h2>
+                <p className="mt-1 text-sm text-[color:var(--color-text-secondary)]">{founder.role} · {founder.fact}</p>
+                <div className="mt-6 flex flex-col gap-3.5 border-l-[3px] border-[color:var(--color-accent)] pl-4 md:pl-5">
                   {FOUNDER_WORDS.map((p) => (
-                    <p key={p} className="text-[15px] leading-relaxed text-foreground/85">{p}</p>
+                    <p key={p} className="text-[15px] leading-relaxed text-[color:var(--color-text-primary)]">{p}</p>
                   ))}
                 </div>
               </div>
@@ -442,7 +442,7 @@ function TeamPage() {
                 transition={{ delay: i * 0.07 }}
               >
                 <GlassCard className="h-full overflow-hidden p-0">
-                  <div className="aspect-[4/3] w-full overflow-hidden bg-secondary">
+                  <div className="aspect-[4/3] w-full overflow-hidden bg-[color:var(--color-bg-secondary)]">
                     <img
                       src={p.photo}
                       alt={p.name}
@@ -452,8 +452,8 @@ function TeamPage() {
                   </div>
                   <div className="p-5">
                     <div className="font-display text-lg font-bold leading-tight">{p.name}</div>
-                    <p className="mt-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">{p.role}</p>
-                    <p className="mt-3 text-sm leading-relaxed text-foreground/80">{p.fact}</p>
+                    <p className="mt-1 text-xs font-medium uppercase tracking-wide text-[color:var(--color-text-secondary)]">{p.role}</p>
+                    <p className="mt-3 text-sm leading-relaxed text-[color:var(--color-text-primary)]">{p.fact}</p>
                   </div>
                 </GlassCard>
               </motion.div>
@@ -464,18 +464,18 @@ function TeamPage() {
         {/* Как устроена сеть */}
         <div className="relative mx-auto max-w-7xl px-5 py-16 md:px-8 md:py-20">
           <SectionLabel n="02">Сеть экспертов</SectionLabel>
-          <RevealHeading className="mt-6 max-w-3xl font-display text-2xl font-extrabold leading-tight sm:text-3xl md:text-4xl">
+          <RevealHeading className="mt-6 max-w-3xl font-display text-2xl font-medium leading-tight sm:text-3xl md:text-4xl">
             Как устроена профессиональная сеть команды
           </RevealHeading>
           <div className="mt-10 grid gap-8 md:grid-cols-3 md:gap-10">
             {network.map(([t, d]) => (
-              <div key={t} className="border-t border-border pt-6">
+              <div key={t} className="border-t border-[color:var(--color-line)] pt-6">
                 <div className="font-display text-lg font-bold">{t}</div>
-                <p className="mt-3 text-sm leading-relaxed text-muted-foreground md:text-[15px]">{d}</p>
+                <p className="mt-3 text-sm leading-relaxed text-[color:var(--color-text-secondary)] md:text-[15px]">{d}</p>
               </div>
             ))}
           </div>
-          <p className="mt-10 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+          <p className="mt-10 max-w-2xl text-sm leading-relaxed text-[color:var(--color-text-secondary)]">
             Фотографии и имена экспертов сети мы не публикуем: у многих действуют
             соглашения о неразглашении с работодателями, а прямой контакт в обход
             проектной рамки обесценил бы работу для всех сторон. На проекте вы
@@ -507,28 +507,28 @@ function HowWeWorkPage() {
         />
       </section>
       <Flow />
-      <section className="relative overflow-hidden border-b border-border">
+      <section className="relative overflow-hidden border-b border-[color:var(--color-line)]">
         <div className="relative mx-auto max-w-7xl px-5 py-14 md:px-8 md:py-20">
           <SectionLabel n="02">Страховки заказчика</SectionLabel>
-          <RevealHeading className="mt-6 max-w-3xl font-display text-2xl font-extrabold leading-tight sm:text-3xl md:text-4xl">
+          <RevealHeading className="mt-6 max-w-3xl font-display text-2xl font-medium leading-tight sm:text-3xl md:text-4xl">
             Что защищает ваш результат
           </RevealHeading>
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
             {guarantees.map(([t, d]) => (
-              <div key={t} className="rounded-2xl border border-border bg-background/70 p-6">
+              <div key={t} className="rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-6">
                 <div className="flex items-start gap-3">
-                  <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--red)]" />
+                  <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--color-accent)]" />
                   <div>
                     <div className="font-display text-[16px] font-bold">{t}</div>
-                    <p className="mt-2 text-sm leading-relaxed text-muted-foreground">{d}</p>
+                    <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-text-secondary)]">{d}</p>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-          <div className="mt-10 max-w-3xl rounded-2xl border-l-[3px] border-[color:var(--red)] bg-[color:var(--red)]/5 p-6">
+          <div className="mt-10 max-w-3xl rounded-md border-l-[3px] border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/5 p-6">
             <div className="font-display text-[16px] font-bold">Один договор. Одна команда. Одна точка ответственности</div>
-            <p className="mt-2 text-sm leading-relaxed text-foreground/80">
+            <p className="mt-2 text-sm leading-relaxed text-[color:var(--color-text-primary)]">
               Подключаем практиков, оформляем договорённости, координируем их
               работу и переводим опыт в согласованный результат. Вы работаете
               с одной проектной командой и одним договором — без оформления
@@ -548,7 +548,7 @@ function HowWeWorkPage() {
 function FaqPage() {
   return (
     <PageShell path="/faq">
-      <section className="relative overflow-hidden border-b border-border">
+      <section className="relative overflow-hidden border-b border-[color:var(--color-line)]">
         <PageHead
           kicker="Мы вместе"
           title={<>Частые вопросы</>}
@@ -556,8 +556,8 @@ function FaqPage() {
         />
         <div className="relative mx-auto max-w-7xl px-5 pb-16 md:px-8 md:pb-24">
           <FaqAccordion items={FAQ_ITEMS} />
-          <p className="mt-8 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            Не нашли свой вопрос? <a href="/contacts#form" className="font-semibold text-[color:var(--red)] underline underline-offset-2 hover:text-foreground">Спросите напрямую</a> — ответим в течение двух рабочих часов.
+          <p className="mt-8 max-w-2xl text-sm leading-relaxed text-[color:var(--color-text-secondary)]">
+            Не нашли свой вопрос? <a href="/contacts#form" className="font-semibold text-[color:var(--color-accent)] underline underline-offset-2 hover:text-foreground">Спросите напрямую</a> — ответим в течение двух рабочих часов.
           </p>
         </div>
       </section>
@@ -571,27 +571,27 @@ function ContactsPage() {
   return (
     <PageShell path="/contacts">
       <Contact asH1 />
-      <section className="relative border-b border-border">
+      <section className="relative border-b border-[color:var(--color-line)]">
         <div className="mx-auto max-w-7xl px-5 py-12 md:px-8 md:py-16">
           <div className="grid gap-8 text-sm md:grid-cols-3">
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Напрямую</div>
+              <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Напрямую</div>
               <ul className="mt-4 space-y-2">
-                <li><a href="tel:+79645842225" className="text-foreground/80 transition hover:text-[color:var(--red)]">+7 964 584 22 25</a></li>
-                <li><a href="https://t.me/vikki_duck" target="_blank" rel="noreferrer" className="text-foreground/80 transition hover:text-[color:var(--red)]">Telegram: @vikki_duck</a></li>
-                <li><a href="mailto:vu@withoutwater.ru" className="text-foreground/80 transition hover:text-[color:var(--red)]">vu@withoutwater.ru</a></li>
+                <li><a href="tel:+79645842225" className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">+7 964 584 22 25</a></li>
+                <li><a href="https://t.me/vikki_duck" target="_blank" rel="noreferrer" className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">Telegram: @vikki_duck</a></li>
+                <li><a href="mailto:vu@withoutwater.ru" className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">vu@withoutwater.ru</a></li>
               </ul>
             </div>
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Реквизиты</div>
-              <p className="mt-4 leading-relaxed text-muted-foreground">
+              <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Реквизиты</div>
+              <p className="mt-4 leading-relaxed text-[color:var(--color-text-secondary)]">
                 ИП Уткина Виктория Викторовна<br />
                 ИНН 771586055972
               </p>
             </div>
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.24em] text-muted-foreground">Обязательство</div>
-              <p className="mt-4 leading-relaxed text-muted-foreground">
+              <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Обязательство</div>
+              <p className="mt-4 leading-relaxed text-[color:var(--color-text-secondary)]">
                 Отвечаем в течение двух рабочих часов.
               </p>
             </div>

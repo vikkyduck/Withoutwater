@@ -1,280 +1,526 @@
 @import "tailwindcss" source(none);
 @source "../src";
-@import "tw-animate-css";
 
-
-@custom-variant dark (&:is(.dark *));
+/* ============================================================================
+   БЕЗ ВОДЫ · дизайн-система 2.4 «Сухой остаток» (июль 2026)
+   Токены из брендбука, раздел 17. Если значения нет здесь — его нет в макете.
+   ========================================================================== */
 
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
-  --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary: var(--primary);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary: var(--secondary);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-accent: var(--accent);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-border: var(--border);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-ink: var(--ink);
-  --color-paper: var(--paper);
-  --color-red: var(--red);
-  --font-display: "Unbounded", system-ui, sans-serif;
-  --font-sans: "Manrope", system-ui, sans-serif;
+  --radius-xs: 4px;
+  --radius-sm: 10px;
+  --radius-md: 18px;
+  --radius-lg: 28px;
+  --radius-pill: 999px;
+
+  --color-background: var(--color-bg-primary);
+  --color-foreground: var(--color-text-primary);
+  --color-card: var(--color-surface);
+  --color-secondary: var(--color-bg-secondary);
+  --color-muted: var(--color-bg-secondary);
+  --color-muted-foreground: var(--color-text-secondary);
+  --color-border: var(--color-line);
+  --color-ink: var(--color-text-primary);
+  --color-paper: var(--color-bg-primary);
+  --color-rose: var(--color-accent);
+
+  --font-display: "Unbounded", "Arial Black", sans-serif;
+  --font-sans: "Golos Text", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
 }
 
 :root {
-  --radius: 0.25rem;
-  /* Палитра 2026-07 (80% Мудрец / 20% Бунтарь / примесь Творца):
-     молочный + чёрный + графит; ягодный ТОЛЬКО для CTA, номеров и маркеров;
-     лавандовый — сферы, слабые градиенты и поверхности «человечных» секций. */
-  --paper: #FBFAF8;           /* молочный фон */
-  --ink: #040609;             /* чёрный */
-  --graphite: #45494E;        /* графитовый текст */
-  --red: #89293F;             /* ягодно-бордовый: CTA, номера, активные состояния */
-  --red-deep: #5E1B2B;
-  --red-glow: #89293F;        /* halo — тот же бордовый, работает через opacity */
-  --red-bright: #A84255;      /* акцент на тёмном фоне (глубокий, не розовый) */
-  --graphite: #45494E;        /* графитовый вспомогательный текст */
-  --lav: #9992A5;             /* лавандовый: шарики и мягкие градиенты */
-  --lav-light: #C9C4D2;
-  --lav-soft: #E6E3E9;        /* светлая лавандовая поверхность */
-  --lav-deep: #5C5568;
-  --background: var(--paper);
-  --foreground: var(--ink);
-  --card: oklch(1 0 0);
-  --card-foreground: var(--ink);
-  --popover: oklch(1 0 0);
-  --popover-foreground: var(--ink);
-  --primary: var(--ink);
-  --primary-foreground: var(--paper);
-  --secondary: #F2F0ED;
-  --secondary-foreground: var(--ink);
-  --muted: #F2F0ED;
-  --muted-foreground: var(--graphite);
-  --accent: var(--red);
-  --accent-foreground: oklch(1 0 0);
-  --destructive: oklch(0.6 0.24 25);
-  --destructive-foreground: oklch(1 0 0);
-  --border: #E3E1DD;
-  --input: #E3E1DD;
-  --ring: var(--red);
-}
+  /* --- Фоны и поверхности --- */
+  --color-bg-primary: #F7F5F1;    /* Бумага */
+  --color-bg-secondary: #EDEAE4;  /* Галерея */
+  --color-surface: #FCFBF8;       /* Мел */
+  --color-bg-dark: #131417;       /* Уголь */
+  --color-surface-dark: #22242A;  /* Уголь-поверхность */
 
-.dark {
-  --background: oklch(0.12 0.01 260);
-  --foreground: var(--paper);
+  /* --- Текст --- */
+  --color-text-primary: #1D1F23;   /* Графит */
+  --color-text-secondary: #545860; /* Сталь-текст */
+  --color-text-inverse: #F1EFEA;   /* Бумага-на-угле */
+  --color-text-inverse-2: #C9CDD4; /* Хром */
+
+  /* --- Акценты и материалы --- */
+  --color-accent: #A3564B;         /* Пыльная роза — действие */
+  --color-accent-hover: #6C60AE;   /* Лаванда — наведение */
+  --color-accent-glass: #E9C4BD;   /* Розовое стекло */
+  --color-accent-soft: #F5E4E1;    /* Розовая дымка */
+  --color-chrome: #C9CDD4;
+  --color-steel: #8B9098;
+  --color-ink-hover: #31353C;
+  --color-line: #DBD7CF;           /* Штрих */
+  --color-line-dark: rgba(241, 239, 234, 0.16);
+
+  /* --- Статусы: приглушённые, не «светофор» --- */
+  --color-success: #456E60;      --color-success-soft: #DEEDE6;
+  --color-error: #8E3B54;        --color-error-soft: #F2DCE5;
+
+  /* --- Единственный допустимый градиент --- */
+  --gradient-glass: linear-gradient(165deg, #F3DBD7, #E9C4BD);
+
+  /* --- Жидкое стекло --- */
+  --lg-tint: rgba(252, 251, 248, 0.28);
+  --lg-blur: 3px;      /* 1.5 тонкое · 3 основное · 16 плотное */
+  --lg-sat: 1.65;
+  --lg-light: 0.35;
+  --lg-glow: 0.13;
+  --sheen: 100deg;
+  --lg-rim:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.88),
+    inset 0 -1.5px 1px rgba(29, 31, 35, 0.10),
+    inset 1.5px 0 1px rgba(255, 255, 255, 0.45),
+    inset -1.5px 0 1px rgba(29, 31, 35, 0.05);
+
+  /* --- Тени: высота слоя, а не украшение --- */
+  --shadow-hairline: 0 1px 2px rgba(29, 31, 35, 0.05), 0 2px 6px rgba(29, 31, 35, 0.04);
+  --shadow-soft: 0 6px 18px rgba(29, 31, 35, 0.07), 0 2px 6px rgba(29, 31, 35, 0.05);
+  --shadow-float: 0 18px 44px rgba(29, 31, 35, 0.13), 0 6px 14px rgba(29, 31, 35, 0.07);
+  --shadow-inner: inset 0 1px 3px rgba(29, 31, 35, 0.10), inset 0 -1px 1px rgba(255, 255, 255, 0.65);
+
+  /* --- Контейнеры --- */
+  --container: 1200px;
+  --container-wide: 1360px;
+  --measure: 680px;
+
+  /* --- Движение --- */
+  --duration-fast: 160ms;
+  --duration-base: 240ms;
+  --duration-slow: 420ms;
+  --ease-out: cubic-bezier(0.22, 0.61, 0.24, 1);
+  --ease-glass: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @layer base {
-  * {
-    border-color: var(--color-border);
-  }
+  * { border-color: var(--color-line); }
+
   html {
     scroll-behavior: smooth;
     scroll-padding-top: 96px;
   }
-  body {
 
-    background-color: var(--color-background);
-    color: var(--color-foreground);
-    font-family: var(--font-sans);
+  body {
+    background-color: var(--color-bg-primary);
+    color: var(--color-text-primary);
+    font-family: "Golos Text", -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
     -webkit-font-smoothing: antialiased;
-    font-feature-settings: "ss01", "ss02";
   }
+
+  /* Заголовки набираются весом самой гарнитуры: жирных начертаний
+     в системе нет, Unbounded только Medium 500. */
+  h1, h2, h3, h4 { font-weight: 500; }
+
+  h1, h2, h3, h4, blockquote { overflow-wrap: break-word; }
+
   ::selection {
-    background: var(--red);
-    color: white;
+    background: var(--color-accent-glass);
+    color: var(--color-text-primary);
+  }
+
+  /* Фокус — кольцо Пыльной розы 2 px с отступом 2 px */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
   }
 }
 
-@utility stencil {
+/* ============================================================================
+   Типографика — шкала раздела 4
+   ========================================================================== */
+
+@utility display-xl {
   font-family: var(--font-display);
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  font-weight: 500;
+  font-size: clamp(2.6rem, 6.4vw, 6rem);
+  line-height: 1;
+  letter-spacing: -0.015em;
+}
+@utility t-display {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2.1rem, 4.4vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.015em;
+}
+@utility t-h1 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.8rem, 3.2vw, 2.85rem);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+@utility t-h2 {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.45rem, 2.4vw, 2.1rem);
+  line-height: 1.18;
+  letter-spacing: -0.01em;
+}
+@utility t-h3 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: clamp(1.18rem, 1.7vw, 1.42rem);
+  line-height: 1.28;
+}
+@utility t-h4 {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 1.1875rem;
+  line-height: 1.32;
+}
+@utility t-lead {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: clamp(1.0625rem, 1.5vw, 1.3125rem);
+  line-height: 1.5;
+}
+@utility t-body-lg { font-size: 1.125rem; line-height: 1.58; }
+@utility t-body-sm { font-size: 0.875rem; line-height: 1.5; }
+@utility t-caption { font-size: 0.78125rem; line-height: 1.45; }
+@utility t-eyebrow {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.71875rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+@utility t-label {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+@utility t-quote {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.25rem, 2vw, 1.6875rem);
+  line-height: 1.35;
+}
+@utility t-number {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2.375rem, 4.4vw, 4rem);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.015em;
+}
+/* Строка наборного текста — 45–72 знака */
+@utility measure { max-width: var(--measure); }
+
+/* ============================================================================
+   Жидкое стекло — основной материал (раздел 7)
+   Слои: тинт → размытие → линза по кромке → кромка света → блик и перелив
+   ========================================================================== */
+
+@utility lg {
+  position: relative;
+  isolation: isolate;
+  background: var(--lg-tint);
+  backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat)) brightness(1.03);
+  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat)) brightness(1.03);
+  border: 0;
+  box-shadow: var(--lg-rim), var(--shadow-soft);
+  transition: box-shadow var(--duration-base) var(--ease-out),
+              background var(--duration-base) var(--ease-out);
+}
+
+.lg > * { position: relative; z-index: 2; }
+
+/* Слой 3 — линза: кромка преломляет фон внутрь, центр остаётся честным */
+.lg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 0;
+  pointer-events: none;
+  -webkit-mask: radial-gradient(125% 125% at 50% 50%, transparent 40%, #000 82%);
+  mask: radial-gradient(125% 125% at 50% 50%, transparent 40%, #000 82%);
+}
+@supports (backdrop-filter: url(#bv-lens)) {
+  .lg::before {
+    backdrop-filter: url(#bv-lens);
+    -webkit-backdrop-filter: url(#bv-lens);
+  }
+}
+/* Safari не умеет SVG-фильтр на подложке: кромка гнёт свет насыщенностью */
+@supports not (backdrop-filter: url(#bv-lens)) {
+  .lg::before {
+    inset: -1px;
+    transform: scale(1.012);
+    opacity: 0.75;
+    padding: 12px;
+    -webkit-mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+    mask: linear-gradient(#000, #000) content-box, linear-gradient(#000, #000);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    backdrop-filter: blur(3px) saturate(240%) brightness(1.07) contrast(1.06);
+    -webkit-backdrop-filter: blur(3px) saturate(240%) brightness(1.07) contrast(1.06);
+  }
+}
+
+/* Слои 5–6 — блик под курсором и перелив */
+.lg::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(140px circle at var(--mx, 50%) var(--my, 0%),
+      rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.22) 40%, transparent 68%),
+    linear-gradient(var(--sheen, 100deg),
+      transparent 36%, rgba(255, 255, 255, 0.55) 50%, transparent 64%);
+  mix-blend-mode: screen;
+  opacity: var(--lg-glow, 0.13);
+  transition: opacity var(--duration-slow) var(--ease-glass);
+}
+
+/* Градации плотности */
+@utility lg-thin  { --lg-blur: 1.5px; --lg-tint: rgba(252, 251, 248, 0.14); }
+@utility lg-thick { --lg-blur: 16px;  --lg-tint: rgba(247, 245, 241, 0.62); --lg-sat: 1.9; }
+@utility lg-rose  { --lg-tint: rgba(233, 196, 189, 0.32); }
+
+/* На угольной сцене тинт светлее фона — пластина приподнята */
+@utility lg-dark {
+  --lg-tint: rgba(241, 239, 234, 0.10);
+  --lg-sat: 1.3;
+  --lg-blur: 8px;
+  --lg-rim:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.34),
+    inset 0 -1.5px 1px rgba(0, 0, 0, 0.40),
+    inset 1.5px 0 1px rgba(255, 255, 255, 0.14),
+    inset -1.5px 0 1px rgba(0, 0, 0, 0.22);
+  color: var(--color-text-inverse);
+}
+/* Чернильное: тёмная пластина на светлой сцене */
+@utility lg-ink {
+  --lg-tint: rgba(29, 31, 35, 0.76);
+  --lg-sat: 1.2;
+  --lg-blur: 6px;
+  --lg-rim:
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.26),
+    inset 0 -1.5px 1px rgba(0, 0, 0, 0.34),
+    inset 1.5px 0 1px rgba(255, 255, 255, 0.10),
+    inset -1.5px 0 1px rgba(0, 0, 0, 0.2);
+  color: var(--color-text-inverse);
+}
+.lg-dark::after, .lg-ink::after {
+  background: radial-gradient(60% 80% at var(--mx, 50%) var(--my, 0%),
+    rgba(255, 255, 255, calc(0.26 * var(--lg-light, 0.35))) 0%,
+    rgba(255, 255, 255, calc(0.07 * var(--lg-light, 0.35))) 40%, transparent 72%);
+}
+
+/* Наклон плоскости к руке — из переменных, чтобы не спорить с hover */
+.lg-tilt, .btn-primary, .btn-secondary, .btn-glass {
+  transform: perspective(1200px) rotateX(var(--tx, 0deg)) rotateY(var(--ty, 0deg))
+             translateY(var(--lift, 0px));
+  transition: transform 620ms var(--ease-glass),
+              box-shadow var(--duration-base) var(--ease-out),
+              background var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
+}
+
+.lg-interactive { cursor: pointer; }
+.lg-interactive:hover { --lg-glow: 0.62; box-shadow: var(--lg-rim), var(--shadow-float); }
+.lg-interactive:active { --lg-glow: 0.4; --lift: 1px; }
+
+/* ============================================================================
+   Кнопки — перелив идёт за курсором (раздел 10)
+   ========================================================================== */
+
+@utility btn {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 12px 28px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  border: 1px solid transparent;
+  transition: background var(--duration-fast) var(--ease-out),
+              color var(--duration-fast) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+.btn > * { position: relative; z-index: 2; }
+
+.btn-primary::after, .btn-secondary::after, .btn-glass::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    radial-gradient(120px circle at var(--mx, 50%) var(--my, 50%),
+      rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.2) 42%, transparent 70%),
+    linear-gradient(var(--sheen, 100deg),
+      transparent 38%, rgba(255, 255, 255, 0.78) 50%, transparent 62%);
+  mix-blend-mode: screen;
+  opacity: var(--lg-glow, 0);
+  transition: opacity var(--duration-slow) var(--ease-glass);
+}
+
+@utility btn-primary {
+  background: var(--color-text-primary);
+  color: var(--color-surface);
+  --lg-glow: 0;
+}
+.btn-primary:hover {
+  background: var(--color-ink-hover);
+  box-shadow: var(--shadow-soft);
+  --lg-glow: 0.38;
+  --lift: -1px;
+}
+.btn-primary:active { background: var(--color-bg-dark); --lift: 0px; box-shadow: none; }
+
+@utility btn-secondary {
+  background: transparent;
+  color: var(--color-text-primary);
+  border-color: var(--color-text-primary);
+  --lg-glow: 0;
+}
+.btn-secondary:hover {
+  background: var(--color-text-primary);
+  color: var(--color-surface);
+  --lg-glow: 0.4;
+}
+
+@utility btn-glass {
+  background: var(--lg-tint);
+  backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat));
+  -webkit-backdrop-filter: blur(var(--lg-blur)) saturate(var(--lg-sat));
+  box-shadow: var(--lg-rim), var(--shadow-soft);
+  color: var(--color-text-primary);
+  --lg-glow: 0.16;
+}
+.btn-glass:hover { --lg-glow: 0.62; box-shadow: var(--lg-rim), var(--shadow-float); }
+
+/* Текстовая ссылка-действие */
+@utility btn-ghost {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  text-decoration-thickness: 1px;
+  font-weight: 600;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+.btn-ghost:hover { color: var(--color-accent-hover); }
+
+/* ============================================================================
+   Геометрия и декор (раздел 6)
+   ========================================================================== */
+
+/* Срез — фирменный приём. Один на макет. */
+@utility cut {
   background: linear-gradient(
     to bottom,
     currentColor 0%,
-    currentColor 44%,
-    transparent 44%,
-    transparent 56%,
-    currentColor 56%,
+    currentColor 55%,
+    transparent 55%,
+    transparent 64%,
+    currentColor 64%,
     currentColor 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
 }
-
-@utility grid-lines {
-  background-image:
-    linear-gradient(to right, oklch(0 0 0 / 0.025) 1px, transparent 1px),
-    linear-gradient(to bottom, oklch(0 0 0 / 0.025) 1px, transparent 1px);
-  background-size: 96px 96px;
+/* На мобильном в мелком кегле приём не читается — снимается */
+@media (max-width: 640px) {
+  .cut { background: none; -webkit-text-fill-color: currentColor; }
 }
 
-/* ---------- Liquid Glass ---------- */
-
-@utility glass {
-  position: relative;
-  isolation: isolate;
-  background:
-    radial-gradient(
-      600px circle at var(--mx, 50%) var(--my, 50%),
-      color-mix(in oklab, white 55%, transparent),
-      transparent 40%
-    ),
-    linear-gradient(
-      135deg,
-      color-mix(in oklab, white 60%, transparent) 0%,
-      color-mix(in oklab, white 20%, transparent) 40%,
-      color-mix(in oklab, white 8%, transparent) 100%
-    );
-  backdrop-filter: blur(22px) saturate(180%);
-  border: 1px solid color-mix(in oklab, white 55%, transparent);
-  box-shadow:
-    inset 0 1px 0 0 color-mix(in oklab, white 70%, transparent),
-    inset 0 -1px 0 0 color-mix(in oklab, white 20%, transparent),
-    0 20px 60px -20px color-mix(in oklab, var(--ink) 25%, transparent),
-    0 1px 2px color-mix(in oklab, var(--ink) 10%, transparent);
-  transition: transform 400ms cubic-bezier(0.2, 0.8, 0.2, 1),
-    box-shadow 400ms cubic-bezier(0.2, 0.8, 0.2, 1);
+/* Маркеры — точки-узлы вместо буллитов и стрелок */
+@utility node-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--color-text-primary);
+  flex: none;
 }
-@utility glass-dark {
-  background:
-    radial-gradient(
-      600px circle at var(--mx, 50%) var(--my, 50%),
-      color-mix(in oklab, white 22%, transparent),
-      transparent 45%
-    ),
-    linear-gradient(
-      135deg,
-      color-mix(in oklab, white 14%, transparent) 0%,
-      color-mix(in oklab, white 4%, transparent) 100%
-    );
-  backdrop-filter: blur(24px) saturate(160%);
-  border: 1px solid color-mix(in oklab, white 18%, transparent);
-  box-shadow:
-    inset 0 1px 0 0 color-mix(in oklab, white 28%, transparent),
-    0 30px 80px -20px oklch(0 0 0 / 0.5);
+@utility node-dot-active {
+  background: var(--color-accent);
+  box-shadow: 0 0 0 4px rgba(163, 86, 75, 0.14);
 }
 
-@utility glass-specular {
+/* Парадный разделитель с двумя узлами — не чаще одного на экран */
+.node-divider { display: flex; align-items: center; gap: 0; }
+.node-divider::before, .node-divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: var(--color-line);
+}
+.node-divider i {
+  width: 7px; height: 7px; border-radius: 50%;
+  background: var(--color-text-primary);
+  margin: 0 6px; flex: none;
+}
+.node-divider i:nth-child(2) { background: var(--color-accent); }
+
+/* Графическая сцена: под стеклом должно быть что преломлять */
+@utility stage { position: relative; overflow: hidden; }
+.stage__bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.stage > *:not(.stage__bg) { position: relative; z-index: 1; }
+
+.stage__blob { position: absolute; border-radius: 50%; filter: blur(4px); }
+.stage__blob--rose { background: radial-gradient(closest-side, rgba(233, 196, 189, 0.75), rgba(233, 196, 189, 0)); }
+.stage__blob--chrome { background: radial-gradient(closest-side, rgba(160, 168, 180, 0.5), rgba(160, 168, 180, 0)); }
+
+/* Бумажное зерно — фактура-компаньон, не громче 5% */
+@utility grain { position: relative; }
+.grain::after {
+  content: "";
   position: absolute;
   inset: 0;
   pointer-events: none;
+  opacity: 0.5;
   border-radius: inherit;
-  background:
-    radial-gradient(
-      160px circle at var(--mx, 50%) var(--my, 50%),
-      color-mix(in oklab, white 70%, transparent),
-      transparent 55%
-    ),
-    radial-gradient(
-      360px circle at var(--mx, 50%) var(--my, 50%),
-      color-mix(in oklab, white 22%, transparent),
-      transparent 70%
-    );
-  mix-blend-mode: overlay;
-  opacity: var(--spec-opacity, 0.35);
-  transition: opacity 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .05 0'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
-@utility glass-edge {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  background: conic-gradient(
-    from var(--edge-angle, 210deg) at 50% 50%,
-    transparent 0deg,
-    color-mix(in oklab, white 70%, transparent) 40deg,
-    transparent 90deg,
-    color-mix(in oklab, var(--lav) 55%, transparent) 200deg,
-    transparent 260deg,
-    color-mix(in oklab, white 60%, transparent) 320deg,
-    transparent 360deg
-  );
-  padding: 1px;
-  mask:
-    linear-gradient(#000 0 0) content-box,
-    linear-gradient(#000 0 0);
-  mask-composite: exclude;
-  opacity: 0.65;
+/* Тёмная сцена */
+@utility sec-dark {
+  background: var(--color-bg-dark);
+  color: var(--color-text-inverse);
+}
+.sec-dark .node-divider::before, .sec-dark .node-divider::after { background: var(--color-line-dark); }
+.sec-dark .node-divider i { background: var(--color-text-inverse); }
+.sec-dark .node-divider i:nth-child(2) { background: var(--color-accent-glass); }
+
+/* Карточка контента */
+@utility card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-hairline);
 }
 
-/* Edge refraction — magnifies + blurs the background along the card perimeter
-   to fake a lensing/meniscus effect at the glass rim. */
-@utility glass-refract {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  border-radius: inherit;
-  backdrop-filter: blur(6px) saturate(160%) contrast(105%);
-  transform: scale(1.04);
-  transform-origin: center;
-  mask:
-    radial-gradient(
-      120% 120% at 50% 50%,
-      transparent 58%,
-      #000 82%,
-      transparent 100%
-    );
-  opacity: 0.9;
-  transition: transform 500ms cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-
-
-/* Плавное появление контента таба. Безопасно by-design: скрытие есть ТОЛЬКО в
-   from-кадре анимации, базовое состояние — видимое (opacity:1). Не отработала
-   анимация (калм-режим, reduced-motion, сбой) — контент просто виден сразу. */
-@keyframes tab-fade {
-  from { opacity: 0; transform: translateY(10px); }
-}
-.tab-fade { animation: tab-fade 300ms cubic-bezier(0.2, 0.8, 0.2, 1); }
-
-@keyframes liquid-spin {
-  to { transform: rotate(360deg); }
-}
-@keyframes liquid-morph {
-  0%, 100% { transform: translate3d(0,0,0) scale(1); }
-  33% { transform: translate3d(6%, -4%, 0) scale(1.08); }
-  66% { transform: translate3d(-5%, 5%, 0) scale(0.94); }
-}
-@keyframes breathe {
-  0%, 100% { transform: translate3d(0,0,0) scale(1); opacity: 0.85; }
-  50% { transform: translate3d(0,-2%,0) scale(1.06); opacity: 1; }
-}
-@keyframes drift-slow {
-  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-  20%  { transform: translate3d(24vw, -12vh, 0) rotate(60deg); }
-  40%  { transform: translate3d(-18vw, 18vh, 0) rotate(-40deg); }
-  60%  { transform: translate3d(30vw, 22vh, 0) rotate(80deg); }
-  80%  { transform: translate3d(-22vw, -20vh, 0) rotate(-70deg); }
-  100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-}
-@keyframes drift-wide {
-  0%   { transform: translate3d(0, 0, 0) rotate(0deg); }
-  25%  { transform: translate3d(-28vw, 20vh, 0) rotate(-90deg); }
-  50%  { transform: translate3d(20vw, 30vh, 0) rotate(45deg); }
-  75%  { transform: translate3d(32vw, -18vh, 0) rotate(120deg); }
-  100% { transform: translate3d(0, 0, 0) rotate(0deg); }
-}
-
-/* ---------- Reduced motion / calm mode ---------- */
+/* ============================================================================
+   Спокойный режим, мобильные и печать
+   ========================================================================== */
 
 html[data-calm="true"] *,
 html[data-calm="true"] *::before,
@@ -284,12 +530,8 @@ html[data-calm="true"] *::after {
   transition-duration: 120ms !important;
   scroll-behavior: auto !important;
 }
-
-html[data-calm="true"] .glass,
-html[data-calm="true"] .glass-dark {
-  backdrop-filter: blur(14px) saturate(140%);
-}
-html[data-calm="true"] .glass-refract { display: none; }
+html[data-calm="true"] .lg { backdrop-filter: blur(10px) saturate(140%); }
+html[data-calm="true"] .lg::before { display: none; }
 
 @media (prefers-reduced-motion: reduce) {
   html:not([data-calm="false"]) *,
@@ -302,24 +544,26 @@ html[data-calm="true"] .glass-refract { display: none; }
   }
 }
 
-/* Cheaper glass on small screens — backdrop-filter is the main hit. */
+/* Мобильное стекло дешевле: backdrop-filter — основная нагрузка */
 @media (max-width: 767px) {
-  .glass, .glass-dark {
-    backdrop-filter: blur(14px) saturate(150%);
+  .lg { backdrop-filter: blur(10px) saturate(150%); }
+  .lg::before { display: none; }
+}
+
+@keyframes tab-fade {
+  from { opacity: 0; transform: translateY(10px); }
+}
+.tab-fade { animation: tab-fade 300ms var(--ease-out); }
+
+/* Стекла в печати нет — материала там нет (раздел 7) */
+@media print {
+  .lg, .btn-glass {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: var(--color-surface) !important;
+    box-shadow: none !important;
+    border: 1px solid var(--color-line) !important;
   }
-  .glass-refract { display: none; }
-}
-
-
-
-
-
-/* защита от переполнения длинных русских слов в заголовках (моб.) */
-h1, h2, h3, h4, blockquote {
-  overflow-wrap: break-word;
-}
-
-/* бегущая строка логотипов (TrustStrip); при калм-режиме анимация не задаётся */
-@keyframes trust-ticker {
-  to { transform: translateX(-50%); }
+  .lg::before, .lg::after { display: none !important; }
+  .stage__bg { display: none !important; }
 }
