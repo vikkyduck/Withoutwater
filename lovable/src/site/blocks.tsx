@@ -48,15 +48,8 @@ export function Hero() {
       </div>
 
       <div className="relative z-10 mx-auto max-w-7xl px-5 pb-14 pt-10 md:px-8 md:pb-24 md:pt-24">
-        {/* Надзаголовок с узлами-разделителями */}
-        <div className="t-eyebrow flex flex-wrap items-center gap-x-3 gap-y-2 text-[color:var(--color-text-inverse-2)]">
-          <span>Методологическое бюро</span>
-          <span className="node-dot node-dot-active" />
-          <span>Практика в стандарт</span>
-        </div>
-
         {/* Центральная история. Срез — на акцентном слове, один на макет. */}
-        <RevealHeading as="h1" className="t-h1 mt-6 max-w-3xl text-[color:var(--color-text-inverse)] md:mt-9">
+        <RevealHeading as="h1" className="t-h1 max-w-3xl text-[color:var(--color-text-inverse)]">
           Практика сильнейшего сотрудника становится{" "}
           <span className="text-[color:var(--color-accent-glass)]">стандартом всей команды</span>
         </RevealHeading>
@@ -93,15 +86,6 @@ export function Hero() {
             <span className="node-dot node-dot-active" />
             <span>{CTA_NOTE}</span>
           </div>
-        </div>
-
-        {/* Характер бюро — как в обложке системы */}
-        <div className="t-label mt-10 flex flex-wrap items-center gap-x-3 gap-y-2 text-[color:var(--color-text-inverse)] md:mt-16">
-          <span>точный</span>
-          <span className="node-dot node-dot-active" />
-          <span>осязаемый</span>
-          <span className="node-dot node-dot-active" />
-          <span>интеллектуальный</span>
         </div>
       </div>
     </section>
