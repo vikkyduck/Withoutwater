@@ -365,7 +365,7 @@ function ReviewsPage() {
   const items = visibleReviews();
   return (
     <PageShell path="/reviews">
-      <section className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-[color:var(--color-bg-secondary)])]/30">
+      <section className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
         <Scene blobs={[{ className: "-left-40 top-10", tone: "rose", size: 560 }]} />
         <PageHead
           kicker="У нас получилось"

@@ -88,7 +88,7 @@ export function Hero() {
 
 export function Bricks() {
   return (
-    <section className="relative overflow-hidden border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-[color:var(--color-bg-secondary)])]">
+    <section className="relative overflow-hidden border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
       <div className="relative mx-auto max-w-7xl px-5 py-12 md:px-8 md:py-16">
         <p className="t-eyebrow text-[color:var(--color-text-secondary)]">
           Работали с командами
@@ -102,7 +102,7 @@ export function Bricks() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ delay: i * 0.05, duration: 0.45, ease: [0.2, 0.8, 0.2, 1] }}
-              className="group relative flex min-h-[108px] flex-col justify-between rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-5 backdrop-blur-sm transition-all duration-300 hover:-translate-y-0.5 hover:border-[color:var(--color-accent)]/35 md:min-h-[124px] md:p-6"
+              className="group relative flex min-h-[108px] flex-col justify-between rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-[color:var(--color-accent)]/35 md:min-h-[124px] md:p-6"
             >
               <div className="flex items-start justify-between gap-2">
                 <span className="font-display text-[16px] font-medium leading-tight tracking-[-0.01em] text-[color:var(--color-text-primary)] transition group-hover:text-foreground md:text-[19px]">
@@ -157,14 +157,14 @@ export function NumbersBand() {
     <section className="relative overflow-hidden border-b border-[color:var(--color-line)]">
       <div className="relative mx-auto max-w-7xl px-5 py-14 md:px-8 md:py-20">
         <div className="flex items-center gap-3 t-eyebrow text-[color:var(--color-text-secondary)]">
-          <span className="h-px w-8 bg-foreground/25" />
+          <span className="tex-chrome h-[2px] w-12 rounded-pill" />
           <span>Наш опыт в цифрах</span>
         </div>
         <div className="mt-10 grid gap-10 sm:grid-cols-2 sm:gap-6">
           {items.map(([n, d]) => (
             <div key={n} className="relative pt-6">
-              <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-foreground/15" />
-              <span aria-hidden className="absolute left-0 top-0 h-px w-10 bg-[color:var(--color-accent)]" />
+              <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-[color:var(--color-line)]" />
+              <span aria-hidden className="tex-chrome absolute left-0 top-0 h-[2px] w-12 rounded-pill" />
               <div className="font-display text-5xl font-medium leading-none tabular-nums tracking-[-0.02em] md:text-[64px]">{n}</div>
               <p className="mt-4 max-w-xs text-[14px] leading-relaxed text-[color:var(--color-text-secondary)]">{d}</p>
             </div>
@@ -189,14 +189,14 @@ export function Production() {
     ["Этапы с результатом", "работа разбита на этапы, каждый завершается самостоятельным результатом"],
   ];
   return (
-    <section id="production" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-[color:var(--color-bg-secondary)])]/45">
+    <section id="production" className="stage sec-dark grain border-b border-[color:var(--color-line-dark)]">
       <Scene blobs={[{ className: "-right-40 top-10", tone: "rose", size: 520 }]} />
       <div className="relative mx-auto max-w-7xl px-5 py-14 md:px-8 md:py-24">
-        <SectionLabel n="02">Производство</SectionLabel>
+        <div className="t-eyebrow flex items-center gap-3 text-[color:var(--color-text-inverse-2)]"><span className="font-display tracking-normal text-[color:var(--color-accent-glass)]">02</span><span className="h-px w-10 bg-[color:var(--color-line-dark)]" /><span>Производство</span></div>
         <RevealHeading className="mt-6 max-w-4xl font-display text-3xl font-medium leading-tight sm:text-4xl md:text-5xl">
           Как устроено наше производство
         </RevealHeading>
-        <p className="mt-5 max-w-2xl text-lg text-[color:var(--color-text-secondary)]">
+        <p className="mt-5 max-w-2xl t-lead text-[color:var(--color-text-inverse-2)]">
           Отличие проектной команды от группы фрилансеров — производственная
           система: сроки, параллельность и приёмка, о которых договорились заранее.
         </p>
@@ -208,14 +208,14 @@ export function Production() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
               transition={{ delay: i * 0.06 }}
-              className="rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-6"
+              className="lg lg-dark rounded-md p-6"
             >
               <div className="font-display text-xl font-medium tracking-tight md:text-2xl">{t}</div>
-              <p className="mt-2.5 text-sm leading-relaxed text-[color:var(--color-text-secondary)] md:text-[15px]">{d}</p>
+              <p className="mt-2.5 text-sm leading-relaxed text-[color:var(--color-text-inverse-2)] md:text-[15px]">{d}</p>
             </motion.div>
           ))}
         </div>
-        <p className="mt-6 max-w-2xl t-caption text-[color:var(--color-text-secondary)]">
+        <p className="mt-6 max-w-2xl t-caption text-[color:var(--color-text-inverse-2)]">
           * Типовой курс — программа стандартной структуры на подготовленной
           фактуре заказчика, без исследовательского этапа и продуктовой разработки
           с нуля.
@@ -318,7 +318,7 @@ export function Flow() {
     },
   ];
   return (
-    <section className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-[color:var(--color-bg-secondary)])]">
+    <section className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
       <Scene blobs={[{ className: "-left-40 top-10", tone: "rose", size: 420 }, { className: "-right-56 bottom-10", tone: "rose", size: 360 }]} />
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
         <div className="t-eyebrow text-[color:var(--color-text-secondary)]">
@@ -346,7 +346,7 @@ export function Flow() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-80px" }}
               transition={{ delay: i * 0.1 }}
-              className="relative flex items-start gap-5 rounded-lg border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-6 backdrop-blur-sm md:p-7"
+              className="relative flex items-start gap-5 rounded-lg border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-6 md:p-7"
             >
               <span className="flex h-12 w-12 flex-none items-center justify-center rounded-pill border border-[color:var(--color-accent)]/40 bg-[color:var(--color-accent)]/10 font-display text-sm font-medium tracking-tight text-[color:var(--color-accent)]">
                 {s.n}
@@ -420,7 +420,7 @@ export function Flow() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, amount: 0.1 }}
                 transition={{ delay: 0.1 + i * 0.1, duration: 0.5 }}
-                className="group relative overflow-hidden rounded-lg border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-6 backdrop-blur-sm md:p-8"
+                className="group relative overflow-hidden rounded-lg border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-6 md:p-8"
               >
                 <span
                   aria-hidden
@@ -503,7 +503,7 @@ export function CaseCard({ item, index }: { item: CaseItem; index: number }) {
           {item.metrics.map(([value, label]) => (
             <div
               key={label}
-              className="flex min-w-0 flex-col items-center rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-[color:var(--color-bg-secondary)])] px-2 py-3 text-center backdrop-blur-sm transition group-hover:border-[color:var(--color-accent)]/20 group-hover:bg-[color:var(--color-bg-secondary)]/70"
+              className="flex min-w-0 flex-col items-center rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)] px-2 py-3 text-center transition group-hover:border-[color:var(--color-accent)]/20 group-hover:bg-[color:var(--color-bg-secondary)]"
             >
               <div className="w-full font-display text-[clamp(1.05rem,2.2vw,1.5rem)] font-medium leading-none tabular-nums tracking-[-0.015em] text-[color:var(--color-accent)] [overflow-wrap:anywhere] hyphens-none">
                 {value}
@@ -620,7 +620,7 @@ export function ReviewCard({ r, index = 0 }: { r: Review; index?: number }) {
 export function ReviewsBlock() {
   const items = homeReviews();
   return (
-    <section id="reviews" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-[color:var(--color-bg-secondary)])]/45">
+    <section id="reviews" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
       <Scene blobs={[{ className: "-left-40 top-10", tone: "rose", size: 560 }, { className: "-right-40 bottom-10", tone: "chrome", size: 480 }]} />
       <div className="relative mx-auto max-w-7xl px-5 py-14 md:px-8 md:py-24">
         <SectionLabel n="05">Отзывы</SectionLabel>
@@ -659,7 +659,7 @@ export function ReviewsBlock() {
 
 export function BookSection() {
   return (
-    <section id="book" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-[color:var(--color-bg-secondary)])]/45">
+    <section id="book" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
       <Scene blobs={[{ className: "-right-40 top-0", tone: "rose", size: 560 }, { className: "-left-40 bottom-0", tone: "chrome", size: 480 }]} />
 
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
@@ -735,7 +735,7 @@ export function BookSection() {
                   {["Продуктовая методология", "Извлечение знаний", "Измеримый результат"].map((tag) => (
                     <span
                       key={tag}
-                      className="inline-flex items-center rounded-pill border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-3 py-1.5 text-xs font-medium text-[color:var(--color-text-primary)] backdrop-blur-sm"
+                      className="inline-flex items-center rounded-pill border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-3 py-1.5 text-xs font-medium text-[color:var(--color-text-primary)]"
                     >
                       {tag}
                     </span>
@@ -759,7 +759,7 @@ export function NotFit() {
     "если нужна организация и логистика мероприятия",
   ];
   return (
-    <section id="notfit" className="relative overflow-hidden border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-[color:var(--color-bg-secondary)])]">
+    <section id="notfit" className="relative overflow-hidden border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
       <div className="relative mx-auto max-w-7xl px-4 py-14 md:px-6 md:py-24">
         <SectionLabel n="08">Границы</SectionLabel>
         <RevealHeading className="mt-6 max-w-3xl font-display text-3xl font-medium leading-tight sm:text-4xl md:text-5xl">
@@ -951,7 +951,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                 animate={{ opacity: 1, y: 0 }}
                 className="flex min-h-[420px] flex-col items-start justify-center"
               >
-                <div className="flex h-14 w-14 items-center justify-center rounded-pill border border-[color:var(--color-line-dark)] bg-white/10 text-background backdrop-blur">
+                <div className="flex h-14 w-14 items-center justify-center rounded-pill border border-[color:var(--color-line-dark)] bg-white/10 text-background">
                   <Check className="h-6 w-6" />
                 </div>
                 <h3 className="mt-6 font-display text-3xl font-bold text-background">
@@ -986,7 +986,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                     rows={3}
                     name="about"
                     placeholder="Не обязательно"
-                    className="w-full resize-none rounded-sm border border-[color:var(--color-line-dark)] bg-white/5 px-4 py-3 text-base text-background outline-none backdrop-blur transition placeholder:text-background/35 focus:border-background/40 focus:bg-white/10"
+                    className="w-full resize-none rounded-sm border border-[color:var(--color-line-dark)] bg-white/5 px-4 py-3 text-base text-background outline-none transition placeholder:text-background/35 focus:border-background/40 focus:bg-white/10"
                   />
                 </div>
                 <p className="hidden" aria-hidden="true">
@@ -1026,7 +1026,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                 <button
                   type="submit"
                   disabled={sending}
-                  className="group relative mt-4 inline-flex items-center justify-center gap-3 overflow-hidden rounded-pill border border-[color:var(--color-line-dark)] bg-white/10 px-7 py-4 text-base font-semibold text-background backdrop-blur-xl transition hover:border-background/50 hover:bg-background/20 disabled:cursor-default disabled:opacity-60"
+                  className="group relative mt-4 inline-flex items-center justify-center gap-3 overflow-hidden rounded-pill border border-[color:var(--color-line-dark)] bg-white/10 px-7 py-4 text-base font-semibold text-background transition hover:border-background/50 hover:bg-background/20 disabled:cursor-default disabled:opacity-60"
                 >
                   <span className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/15 to-transparent opacity-60" />
                   <span className="relative">{sending ? "Отправляем…" : "Назначить разбор"}</span>

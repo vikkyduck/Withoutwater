@@ -168,81 +168,56 @@ export function GlassPointer() {
     if (calm) return;
     if (!window.matchMedia?.("(pointer: fine)").matches) return;
 
-    let live: HTMLElement[] = [];
-    const rects = new WeakMap<HTMLElement, DOMRect>();
-    let dirty = true, px = -1e4, py = -1e4, queued = false, raf = 0;
+    const SEL = ".lg, .btn-primary, .btn-secondary, .btn-glass";
+    const bound = new WeakSet<HTMLElement>();
 
-    const io = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((e) => {
-          const el = e.target as HTMLElement;
-          const i = live.indexOf(el);
-          if (e.isIntersecting) {
-            if (i < 0) live.push(el);
-          } else if (i > -1) {
-            live.splice(i, 1);
-            el.style.removeProperty("--lg-glow");
-          }
-        });
-        dirty = true;
-      },
-      { rootMargin: "140px" },
-    );
+    const bind = (el: HTMLElement) => {
+      if (bound.has(el)) return;
+      bound.add(el);
+      let raf = 0;
+      let px = 50;
+      let py = 0;
+      const isBtn = el.classList.contains("btn");
 
-    const selector = ".lg, .btn-primary, .btn-secondary, .btn-glass";
-    document.querySelectorAll<HTMLElement>(selector).forEach((el) => io.observe(el));
+      const apply = () => {
+        raf = 0;
+        el.style.setProperty("--mx", px.toFixed(1) + "%");
+        el.style.setProperty("--my", py.toFixed(1) + "%");
+        /* угол световой полосы идёт за курсором — стекло ловит свет */
+        el.style.setProperty("--sheen", (90 + (px - 50) * 1.1).toFixed(1) + "deg");
+        const dx = px / 100 - 0.5;
+        const dy = py / 100 - 0.5;
+        el.style.setProperty("--tx", (-dy * 1.4).toFixed(2) + "deg");
+        el.style.setProperty("--ty", (dx * 1.4).toFixed(2) + "deg");
+      };
 
-    const frame = () => {
-      queued = false;
-      if (dirty) {
-        live.forEach((el) => rects.set(el, el.getBoundingClientRect()));
-        dirty = false;
-      }
-      live.forEach((el) => {
-        const r = rects.get(el);
-        if (!r || !r.width) return;
-        const fx = (px - r.left) / r.width;
-        const fy = (py - r.top) / r.height;
-        const dx = Math.max(r.left - px, 0, px - r.right);
-        const dy = Math.max(r.top - py, 0, py - r.bottom);
-        const dist = Math.hypot(dx, dy);
-        const near = dist > 260 ? 0 : 1 - dist / 260;
-        el.style.setProperty("--mx", (fx * 100).toFixed(1) + "%");
-        el.style.setProperty("--my", (fy * 100).toFixed(1) + "%");
-        el.style.setProperty("--sheen", (100 + (fx - 0.5) * 110).toFixed(1) + "deg");
-        if (!el.classList.contains("btn")) {
-          el.style.setProperty("--lg-glow", (0.09 + 0.43 * near * near).toFixed(3));
-        }
-        if (dist === 0) {
-          el.style.setProperty("--tx", (-(fy - 0.5) * 3.2).toFixed(2) + "deg");
-          el.style.setProperty("--ty", ((fx - 0.5) * 3.2).toFixed(2) + "deg");
-        } else {
-          el.style.setProperty("--tx", "0deg");
-          el.style.setProperty("--ty", "0deg");
-        }
+      el.addEventListener(
+        "pointermove",
+        (e) => {
+          const r = el.getBoundingClientRect();
+          if (!r.width) return;
+          px = ((e.clientX - r.left) / r.width) * 100;
+          py = ((e.clientY - r.top) / r.height) * 100;
+          el.style.setProperty("--lg-glow", isBtn ? "0.52" : "0.62");
+          if (!raf) raf = requestAnimationFrame(apply);
+        },
+        { passive: true },
+      );
+      el.addEventListener("pointerleave", () => {
+        el.style.setProperty("--lg-glow", isBtn ? "0" : "0.14");
+        el.style.setProperty("--tx", "0deg");
+        el.style.setProperty("--ty", "0deg");
       });
     };
 
-    const onMove = (e: PointerEvent) => {
-      px = e.clientX;
-      py = e.clientY;
-      if (!queued) {
-        queued = true;
-        raf = requestAnimationFrame(frame);
-      }
-    };
-    const onDirty = () => { dirty = true; };
+    const scan = () => document.querySelectorAll<HTMLElement>(SEL).forEach(bind);
+    scan();
 
-    addEventListener("pointermove", onMove, { passive: true });
-    addEventListener("scroll", onDirty, { passive: true });
-    addEventListener("resize", onDirty, { passive: true });
-    return () => {
-      cancelAnimationFrame(raf);
-      io.disconnect();
-      removeEventListener("pointermove", onMove);
-      removeEventListener("scroll", onDirty);
-      removeEventListener("resize", onDirty);
-    };
+    /* React дорисовывает карточки по мере появления в вьюпорте — следим
+       за деревом, иначе часть стекла останется без перелива. */
+    const mo = new MutationObserver(scan);
+    mo.observe(document.body, { childList: true, subtree: true });
+    return () => mo.disconnect();
   }, [calm]);
   return null;
 }
