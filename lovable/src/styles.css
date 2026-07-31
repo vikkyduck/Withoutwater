@@ -41,6 +41,7 @@
   --color-text-secondary: #545860; /* Сталь-текст */
   --color-text-inverse: #F1EFEA;   /* Бумага-на-угле */
   --color-text-inverse-2: #C9CDD4; /* Хром */
+  --color-text-inverse-3: #DFE2E7; /* Текст на тёмном стекле — контраст ≥ 4.5:1 */
 
   /* --- Акценты и материалы --- */
   --color-accent: #A3564B;         /* Пыльная роза — действие */
@@ -82,7 +83,7 @@
   /* --- Контейнеры --- */
   --container: 1200px;
   --container-wide: 1360px;
-  --measure: 680px;
+  --measure: 65ch; /* длина строки чтения */
 
   /* --- Движение --- */
   --duration-fast: 160ms;
@@ -113,7 +114,8 @@
      в системе нет, Unbounded только Medium 500. */
   h1, h2, h3, h4 { font-weight: 500; }
 
-  h1, h2, h3, h4, blockquote { overflow-wrap: break-word; }
+  /* Длинные русские слова переносим по слогам, а не рубим посередине */
+  h1, h2, h3, h4, blockquote { overflow-wrap: break-word; hyphens: auto; }
 
   /* Фактура: мелкое зерно бумаги на всей сцене */
   body::before {
@@ -151,52 +153,33 @@
   line-height: 1;
   letter-spacing: -0.015em;
 }
-@utility t-display {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(2.1rem, 4.4vw, 4rem);
-  line-height: 1.05;
-  letter-spacing: -0.015em;
-}
+/* Три уровня набора: t-h1 (только Hero и заголовки страниц),
+   t-h2 (заголовки секций), t-body (весь текст) + служебные. */
 @utility t-h1 {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.8rem, 3.2vw, 2.85rem);
-  line-height: 1.12;
+  font-size: clamp(1.8rem, 7.2vw, 3.75rem);
+  line-height: 1.06;
   letter-spacing: -0.015em;
 }
 @utility t-h2 {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.45rem, 2.4vw, 2.1rem);
-  line-height: 1.18;
+  font-size: clamp(1.55rem, 2.8vw, 2.45rem);
+  line-height: 1.14;
   letter-spacing: -0.01em;
 }
-@utility t-h3 {
+@utility t-body {
   font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: clamp(1.18rem, 1.7vw, 1.42rem);
-  line-height: 1.28;
+  font-size: 1.0625rem;
+  line-height: 1.72;
 }
-@utility t-h4 {
-  font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: 1.1875rem;
-  line-height: 1.32;
-}
-@utility t-lead {
-  font-family: var(--font-sans);
-  font-weight: 400;
-  font-size: clamp(1.0625rem, 1.5vw, 1.3125rem);
-  line-height: 1.5;
-}
-@utility t-body-lg { font-size: 1.125rem; line-height: 1.58; }
-@utility t-body-sm { font-size: 0.875rem; line-height: 1.5; }
-@utility t-caption { font-size: 0.78125rem; line-height: 1.45; }
+@utility t-caption { font-size: 0.8125rem; line-height: 1.5; }
+@utility t-small  { font-size: 0.75rem; line-height: 1.5; }
 @utility t-eyebrow {
   font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 0.71875rem;
+  font-size: 0.75rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -206,12 +189,6 @@
   font-size: 0.8125rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-}
-@utility t-quote {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(1.25rem, 2vw, 1.6875rem);
-  line-height: 1.35;
 }
 @utility t-number {
   font-family: var(--font-display);
@@ -224,34 +201,41 @@
 /* Строка наборного текста — 45–72 знака */
 @utility measure { max-width: var(--measure); }
 
+/* Логотип: три фиксированных размера вместо произвольных text-[Npx] */
+@utility logo-sm { font-size: 0.8125rem; }
+@utility logo-md { font-size: 1rem; }
+@utility logo-lg { font-size: 1.125rem; }
+
 /* ============================================================================
    Жидкое стекло — основной материал (раздел 7)
    Слои: тинт → размытие → линза по кромке → кромка света → блик и перелив
    ========================================================================== */
 
 @utility lg {
-  --glass-tint: linear-gradient(148deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.26));
+  --glass-tint: linear-gradient(148deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.34));
   position: relative;
   isolation: isolate;
   background: var(--glass-tint);
-  backdrop-filter: blur(22px) saturate(165%) brightness(1.03);
-  -webkit-backdrop-filter: blur(22px) saturate(165%) brightness(1.03);
-  border: 0.5px solid rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(28px) saturate(185%) brightness(1.06);
+  -webkit-backdrop-filter: blur(28px) saturate(185%) brightness(1.06);
+  border: 0.5px solid rgba(255, 255, 255, 0.72);
   box-shadow:
-    var(--shadow-soft),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9),
-    inset 0 -1px 0 rgba(29, 31, 35, 0.07),
-    inset 0 0 0 0.5px rgba(255, 255, 255, 0.28);
+    0 14px 40px rgba(29, 31, 35, 0.10),
+    0 4px 12px rgba(29, 31, 35, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95),
+    inset 0 -1px 0 rgba(29, 31, 35, 0.06),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.36);
   transform: translateZ(0);
   transition: transform 640ms var(--ease-glass), box-shadow 640ms var(--ease-glass);
 }
 
 .lg:hover {
   box-shadow:
-    var(--shadow-float),
-    inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(29, 31, 35, 0.08),
-    inset 0 0 0 0.5px rgba(255, 255, 255, 0.34);
+    0 24px 60px rgba(29, 31, 35, 0.14),
+    0 8px 20px rgba(29, 31, 35, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 1.0),
+    inset 0 -1px 0 rgba(29, 31, 35, 0.07),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.44);
 }
 
 /* Размытие задаётся отдельным правилом: внутри @utility минификатор
@@ -296,6 +280,17 @@
   }
 }
 
+/* Fallback для слабых устройств и calm-режима: SVG-линза заменяется
+   обычным blur() — тот же характер кромки, кратно дешевле по GPU. */
+html[data-lowpower="true"] .lg::before,
+html[data-calm="true"] .lg::before {
+  backdrop-filter: blur(6px) saturate(150%) !important;
+  transform: none !important;
+  opacity: 0.5;
+}
+html[data-calm="true"] .lg::before { display: none; }
+
+
 /* Слои 5–6 — блик под курсором и перелив */
 .lg::after {
   content: "";
@@ -315,12 +310,27 @@
 }
 
 /* Градации плотности */
-@utility lg-thin  { backdrop-filter: blur(10px) saturate(150%); --glass-tint: linear-gradient(148deg, rgba(255,255,255,0.40), rgba(255,255,255,0.16)); }
-@utility lg-thick { backdrop-filter: blur(28px) saturate(180%); --glass-tint: linear-gradient(148deg, rgba(247,245,241,0.86), rgba(247,245,241,0.68)); }
+@utility lg-thin  { backdrop-filter: blur(12px) saturate(150%); --glass-tint: linear-gradient(148deg, rgba(255,255,255,0.46), rgba(255,255,255,0.18)); }
+@utility lg-thick { backdrop-filter: blur(36px) saturate(195%); --glass-tint: linear-gradient(148deg, rgba(247,245,241,0.90), rgba(247,245,241,0.74)); }
+
+/* «Люкс»-плотность: заметное стекло с яркой кромкой и большим размытием */
+@utility lg-strong {
+  backdrop-filter: blur(36px) saturate(195%) brightness(1.08);
+  --glass-tint: linear-gradient(148deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.42));
+  --lg-glow: 0.22;
+  box-shadow:
+    0 24px 64px rgba(29, 31, 35, 0.13),
+    0 8px 22px rgba(29, 31, 35, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 1.0),
+    inset 0 -1px 0 rgba(29, 31, 35, 0.06),
+    inset 0 0 0 0.5px rgba(255, 255, 255, 0.48);
+}
+.lg-strong:hover { --lg-glow: 0.45; }
 
 /* Розовое стекло */
 @utility lg-rose {
-  --glass-tint: linear-gradient(150deg, rgba(233, 196, 189, 0.85), rgba(201, 147, 156, 0.28));
+  --glass-tint: linear-gradient(150deg, rgba(233, 196, 189, 0.92), rgba(201, 147, 156, 0.38));
+  --lg-glow: 0.20;
 }
 
 /* Жидкий хром — металл системы */
@@ -339,15 +349,33 @@
 
 /* На угольной сцене пластина светлее фона — выглядит приподнятой */
 @utility lg-dark {
-  --glass-tint: linear-gradient(148deg, rgba(241, 239, 234, 0.14), rgba(241, 239, 234, 0.06));
-  border-color: rgba(255, 255, 255, 0.16);
+  --glass-tint: linear-gradient(148deg, rgba(241, 239, 234, 0.14), rgba(241, 239, 234, 0.04));
+  border-color: rgba(255, 255, 255, 0.65);
   color: var(--color-text-inverse);
   box-shadow:
-    0 18px 44px rgba(0, 0, 0, 0.45),
-    inset 0 1px 0 rgba(255, 255, 255, 0.34),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+    0 32px 80px rgba(0, 0, 0, 0.58),
+    0 0 120px rgba(233, 196, 189, 0.28),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.92),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.42);
 }
-.lg-dark::after { mix-blend-mode: overlay; }
+/* Тёмное стекло на угольной сцене: подложка должна светиться сквозь пластину,
+   иначе материал читается плоской заплаткой (ср. эталон первого экрана). */
+.lg-dark {
+  backdrop-filter: blur(48px) saturate(190%) brightness(1.45);
+  --lg-glow: 0.42;
+}
+.lg-dark::before {
+  opacity: 1;
+  backdrop-filter: blur(8px) saturate(220%) brightness(1.8) contrast(1.05);
+  -webkit-backdrop-filter: blur(8px) saturate(220%) brightness(1.8) contrast(1.05);
+}
+.lg-dark::after {
+  mix-blend-mode: screen;
+  opacity: var(--lg-glow, 0.62);
+}
+.lg-dark:hover { --lg-glow: 0.82; }
+
+
 
 /* Хромовое кольцо — объект-артефакт первого экрана: жидкий металл,
    свет по кругу. Под текст не кладётся (раздел 3: хром — только объекты). */
@@ -467,8 +495,10 @@
 /* На угольной сцене графитовая кнопка не читается — главное действие
    переворачивается в светлую заливку (Мел на Угле). */
 @utility btn-invert {
-  background: var(--color-surface);
-  color: var(--color-text-primary);
+  /* Светлая кнопка на тёмном: цвет фиксированный, а не через --color-surface,
+     иначе внутри локального sec-dark кнопка становится тёмной на тёмном. */
+  background: var(--color-text-inverse);
+  color: var(--color-coal, #14110F);
   --lg-glow: 0;
 }
 .btn-invert:hover {
@@ -589,9 +619,33 @@
   background: var(--color-bg-dark);
   color: var(--color-text-inverse);
 }
+/* Внутри тёмной секции токены переопределяются, чтобы обычная разметка
+   (линии, поверхности, вторичный текст) читалась без локальных правок */
+.sec-dark {
+  --color-line: var(--color-line-dark);
+  --color-surface: var(--color-surface-dark);
+  --color-bg: var(--color-bg-dark);
+  --color-bg-primary: var(--color-bg-dark);
+  --color-bg-secondary: var(--color-surface-dark);
+  --color-text-primary: var(--color-text-inverse);
+  --color-text-secondary: var(--color-text-inverse-2);
+  --color-foreground: var(--color-text-inverse);
+}
+.sec-dark .text-foreground { color: var(--color-text-inverse); }
+/* Стекло на тёмной секции автоматически берёт тёмную формулу */
+.sec-dark .lg-strong, .sec-dark .lg-rose, .sec-dark .lg:not(.lg-dark) {
+  --glass-tint: linear-gradient(148deg, rgba(241, 239, 234, 0.14), rgba(241, 239, 234, 0.04));
+  border-color: rgba(255, 255, 255, 0.5);
+  color: var(--color-text-inverse);
+  box-shadow:
+    0 32px 80px rgba(0, 0, 0, 0.55),
+    inset 0 1.5px 0 rgba(255, 255, 255, 0.55),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.4);
+}
 .sec-dark .node-divider::before, .sec-dark .node-divider::after { background: var(--color-line-dark); }
 .sec-dark .node-divider i { background: var(--color-text-inverse); }
 .sec-dark .node-divider i:nth-child(2) { background: var(--color-accent-glass); }
+
 
 /* Карточка контента */
 @utility card {
@@ -650,3 +704,423 @@ html[data-calm="true"] .lg::before { display: none; }
   .lg::before, .lg::after { display: none !important; }
   .stage__bg { display: none !important; }
 }
+
+/* ==========================================================================
+   Элементы брендбука: пропил, трафаретные номера, росчерк, тинты-подложки
+   ========================================================================== */
+
+/* Карточка с пропилом — вырез на правом ребре тёмных и стеклянных плашек */
+@utility notch {
+  position: relative;
+}
+.notch::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 auto auto;
+  top: 50%;
+  opacity: 1;
+  mix-blend-mode: normal;
+  filter: none;
+  border: 0;
+  width: 34px;
+  height: 6px;
+  transform: translateY(-50%);
+  background: var(--color-bg-primary);
+  border-radius: 3px 0 0 3px;
+  pointer-events: none;
+  z-index: 3;
+}
+.sec-dark .notch::after,
+.lg-dark.notch::after,
+.lg-ink.notch::after { background: var(--color-text-inverse); }
+
+/* Трафаретная нумерация разделов: активный — Графит, остальные — Сталь */
+@utility stencil {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--color-steel);
+  transition: color 200ms ease;
+}
+.stencil[data-active="true"] { color: var(--color-text-primary); }
+.sec-dark .stencil[data-active="true"] { color: var(--color-text-inverse); }
+
+/* Три допустимых подложки: дымка, стекло, чернила */
+@utility tint-haze { background: var(--color-accent-soft); color: var(--color-text-primary); }
+@utility tint-glass { background: color-mix(in oklab, var(--color-surface) 82%, transparent); color: var(--color-text-primary); }
+@utility tint-ink { background: var(--color-bg-dark); color: var(--color-text-inverse); }
+
+/* Тёмное стекло сохраняет свечение и на мобильном (после общего мобильного .lg) */
+@media (max-width: 767px) {
+  .lg-dark {
+    backdrop-filter: blur(16px) saturate(150%) brightness(1.7);
+    /* Плотная подложка: на мобильном блюр слабее, текст не должен садиться на фон */
+    background-color: rgba(18, 18, 20, 0.52);
+  }
+  /* Контраст ≥ 4.5:1 и читаемый кегль внутри тёмного стекла на телефоне */
+  .lg-dark p,
+  .lg-dark li,
+  .lg-dark .t-body,
+  .surface-dark p,
+  .surface-dark li {
+    color: var(--color-text-inverse);
+    font-size: 1rem;
+    line-height: 1.65;
+  }
+  .lg-dark .t-caption,
+  .surface-dark .t-caption { color: var(--color-text-inverse-3); }
+}
+
+
+/* ==========================================================================
+   Ритм, состояния и аффордансы (правка интерфейса, июль 2026)
+   ========================================================================== */
+
+/* Единый вертикальный ритм секций: одинаковый воздух сверху и снизу */
+@utility sec-pad {
+  padding-top: clamp(56px, 6.5vw, 96px);
+  padding-bottom: clamp(56px, 6.5vw, 96px);
+}
+
+/* Контент сразу под шапкой страницы: воздух только снизу, ритм тот же */
+@utility sec-pad-b {
+  padding-bottom: clamp(56px, 6.5vw, 96px);
+}
+
+/* Hero — единственное исключение из общей сетки: первый экран читается
+   выше, потому что несёт на себе основное действие и визуальную сцену. */
+@utility hero-pad {
+  padding-top: clamp(48px, 5vw, 80px);
+  padding-bottom: clamp(56px, 6vw, 80px);
+}
+
+/* Кликабельная карточка: явная аффорданса и честный фокус с клавиатуры */
+@utility card-link {
+  cursor: pointer;
+  transition: transform var(--duration-base) var(--ease-out),
+              box-shadow var(--duration-base) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
+}
+.card-link:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in oklab, var(--color-accent) 40%, var(--color-line));
+  box-shadow: var(--shadow-soft);
+}
+.card-link:active { transform: translateY(0); }
+.card-link:focus-visible,
+.card-link:focus-within {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+}
+.sec-dark .card-link:focus-visible,
+.sec-dark .card-link:focus-within,
+.stage .card-link:focus-visible,
+.stage .card-link:focus-within { outline-color: var(--color-accent-glass, var(--color-accent)); }
+/* Стрелка кликабельной карточки реагирует одинаково: по наведению и с
+   клавиатуры. Направление задаётся значением data-arrow. */
+.card-link [data-arrow] { transition: transform var(--duration-base) var(--ease-out); }
+.card-link:hover [data-arrow],
+.card-link:focus-visible [data-arrow],
+.card-link:focus-within [data-arrow] { transform: translateX(4px); }
+.card-link:hover [data-arrow="down"],
+.card-link:focus-visible [data-arrow="down"],
+.card-link:focus-within [data-arrow="down"] { transform: translateY(4px); }
+.card-link:hover [data-arrow="diag"],
+.card-link:focus-visible [data-arrow="diag"],
+.card-link:focus-within [data-arrow="diag"] { transform: translate(3px, -3px); }
+
+
+/* Некликабельная карточка: только мягкий отклик, без курсора-руки и фокуса */
+@utility card-static {
+  transition: box-shadow var(--duration-base) var(--ease-out),
+              border-color var(--duration-fast) var(--ease-out);
+}
+.card-static:hover {
+  border-color: color-mix(in oklab, var(--color-accent) 28%, var(--color-line));
+  box-shadow: var(--shadow-soft);
+}
+
+
+/* Указатель прокрутки первого экрана */
+@keyframes scroll-cue {
+  0%   { transform: translateY(0);   opacity: 0; }
+  30%  { opacity: 1; }
+  100% { transform: translateY(9px); opacity: 0; }
+}
+.scroll-cue { animation: scroll-cue 1.8s var(--ease-out) infinite; }
+
+/* ---------------------------------------------------------------------------
+   Единый набор состояний для всех интерактивных элементов:
+   кнопки, ссылки, табы, аккордеоны (<summary> и кнопки-строки), поля.
+   Пишется через :where(), чтобы не спорить с утилитами компонентов.
+   -------------------------------------------------------------------------- */
+
+:where(a, button, summary, label, [role="tab"], [role="button"], input, textarea, select) {
+  transition:
+    color var(--duration-fast) var(--ease-out),
+    background-color var(--duration-fast) var(--ease-out),
+    border-color var(--duration-fast) var(--ease-out),
+    opacity var(--duration-fast) var(--ease-out),
+    transform var(--duration-fast) var(--ease-out);
+}
+
+/* Один фокус с клавиатуры на весь сайт */
+:where(a, button, summary, [role="tab"], [role="button"], input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs, 6px);
+}
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline-offset: 1px;
+}
+.sec-dark :where(a, button, summary, [role="tab"], [role="button"], input, textarea, select, [tabindex]):focus-visible {
+  outline-color: var(--color-accent-glass);
+}
+
+/* Нажатие: один и тот же короткий отклик */
+:where(a, button, summary, [role="tab"], [role="button"]):active {
+  transform: translateY(1px);
+}
+.btn:active, .card-link:active { transform: none; }
+
+/* Аккордеоны: <summary> ведёт себя как строка-кнопка */
+summary { cursor: pointer; list-style: none; }
+summary::-webkit-details-marker { display: none; }
+summary:hover { background: color-mix(in oklab, var(--color-accent) 6%, transparent); }
+summary:focus-visible { outline-offset: -2px; }
+details[open] > summary { color: var(--color-text-primary); }
+/* Маркер раскрытия поворачивается вместе с состоянием */
+details[open] > summary [data-chevron] { transform: rotate(180deg); }
+[data-chevron] { transition: transform var(--duration-base) var(--ease-out); }
+
+/* Табы и строки-аккордеоны с состоянием */
+:where([role="tab"], [data-state]):hover {
+  color: var(--color-text-primary);
+}
+[role="tab"][aria-selected="true"], [data-state="active"] {
+  color: var(--color-text-primary);
+}
+[role="tab"]:focus-visible { outline-offset: -2px; }
+:where(button, a)[aria-expanded="true"] { color: var(--color-text-primary); }
+
+/* Ссылка-стрелка: один отклик на hover, фокус и нажатие */
+.link-arrow:hover [data-arrow],
+.link-arrow:focus-visible [data-arrow] { transform: translateX(4px); }
+[data-arrow] { transition: transform var(--duration-base) var(--ease-out); }
+
+/* Неактивное читается неактивным */
+:where(button, a, input, textarea, select):disabled,
+[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+:where(button, a, [role="tab"]):disabled:active,
+[aria-disabled="true"]:active { transform: none; }
+/* Кнопки в disabled не подсвечиваются и не приподнимаются */
+.btn:disabled, .btn[aria-disabled="true"] {
+  box-shadow: none;
+  --lift: 0px;
+  --lg-glow: 0;
+  filter: saturate(0.6);
+}
+.btn:disabled:hover, .btn[aria-disabled="true"]:hover {
+  box-shadow: none;
+  transform: none;
+}
+/* Поля: единый ввод/ошибка/блокировка */
+:where(input, textarea, select):disabled { background: var(--color-bg-secondary); }
+:where(input, textarea, select)[aria-invalid="true"] {
+  border-color: var(--color-accent);
+}
+:where(input, textarea, select)[aria-invalid="true"]:focus-visible {
+  outline-color: var(--color-accent);
+}
+
+
+/* Спокойный режим не двигает элементы при нажатии */
+html[data-calm="true"] :where(a, button, summary, [role="tab"]):active { transform: none !important; }
+
+/* Спокойный режим глушит всё: свечение, зерно, декоративные пятна, указатель */
+html[data-calm="true"] .stage__bg,
+html[data-calm="true"] .scroll-cue { display: none; }
+html[data-calm="true"] .lg::after { opacity: 0.06 !important; }
+html[data-calm="true"] .grain::after { opacity: 0.2; }
+html[data-calm="true"] .lg-tilt { transform: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-cue { animation: none; }
+
+  /* Тилты, блики и преломление выключены системно — независимо от того,
+     успел ли примениться calm-режим. */
+  html:not([data-calm="false"]) .stage__blob,
+  html:not([data-calm="false"]) .chrome-ring,
+  html:not([data-calm="false"]) .scroll-cue { display: none !important; }
+
+  html:not([data-calm="false"]) .lg,
+  html:not([data-calm="false"]) .lg-tilt,
+  html:not([data-calm="false"]) .lg-interactive,
+  html:not([data-calm="false"]) .btn,
+  html:not([data-calm="false"]) .card,
+  html:not([data-calm="false"]) .card-link {
+    transform: none !important;
+  }
+  html:not([data-calm="false"]) .lg::before { display: none !important; }
+  html:not([data-calm="false"]) .lg::after,
+  html:not([data-calm="false"]) .btn::before,
+  html:not([data-calm="false"]) .btn::after { opacity: 0.06 !important; }
+}
+
+
+/* Абзацы описаний не длиннее строки чтения */
+section p:not(.measure-off),
+section dd:not(.measure-off),
+section li.t-body:not(.measure-off) { max-width: var(--measure); }
+section p.t-eyebrow, section p.t-caption, blockquote p { max-width: none; }
+
+/* Спокойный режим: полная остановка движения. Остаётся только смена цвета. */
+html[data-calm="true"] .stage__blob,
+html[data-calm="true"] .chrome-ring { display: none !important; }
+
+/* Стекло: ни наклона, ни бликов, ни преломления по краям */
+html[data-calm="true"] .lg,
+html[data-calm="true"] .lg-tilt,
+html[data-calm="true"] .lg-interactive,
+html[data-calm="true"] .btn,
+html[data-calm="true"] .card,
+html[data-calm="true"] .card-link,
+html[data-calm="true"] [class*="hover-scale"] {
+  --tx: 0deg !important;
+  --ty: 0deg !important;
+  --lift: 0px !important;
+  --lg-glow: 0 !important;
+  --sheen: 90deg !important;
+  transform: none !important;
+}
+html[data-calm="true"] :where(.lg, .lg-tilt, .lg-interactive, .btn, .card, .card-link, a, button, summary, li, article, [role="tab"], [class*="hover-"]):where(:hover, :focus-within, :active) {
+  transform: none !important;
+  scale: none !important;
+  box-shadow: none !important;
+  --lg-glow: 0 !important;
+  --lift: 0px !important;
+}
+html[data-calm="true"] .lg::before,
+html[data-calm="true"] .lg::after,
+html[data-calm="true"] .btn::before,
+html[data-calm="true"] .btn::after {
+  opacity: 0 !important;
+  animation: none !important;
+}
+/* Единственное, что остаётся живым, — цвет и цвет рамки */
+html[data-calm="true"] * {
+  transition-property: color, background-color, border-color, fill, stroke, opacity, outline-color !important;
+}
+
+
+/* Тёмное стекло: гарантированный контраст текста поверх любой сцены */
+.lg-dark { color: var(--color-text-inverse); }
+.lg-dark p, .lg-dark li { color: var(--color-text-inverse-3); }
+.lg-dark .t-caption, .lg-dark small { color: var(--color-text-inverse-3); }
+
+/* Контраст на мобильном: в тёмных секциях и на тёмном стекле вторичный текст
+   поднимается до #DFE2E7 (≥ 4.5:1 к углю), т.к. хром #C9CDD4 на просвечивающем
+   стекле проседает по контрасту. */
+@media (max-width: 768px) {
+  .sec-dark,
+  .stage-dark,
+  .lg-dark,
+  .surface-dark,
+  .tint-ink {
+    --color-text-inverse-2: #DFE2E7;
+    --color-text-secondary: #DFE2E7;
+  }
+  .lg-dark p, .lg-dark li,
+  .sec-dark .lg p, .sec-dark .lg li,
+  .surface-dark p, .surface-dark li { color: var(--color-text-inverse-3); }
+}
+
+/* Плоские поверхности вместо стекла для декоративных обёрток: тон + одна линия */
+@utility surface-dark {
+  position: relative;
+  background: rgba(241, 239, 234, 0.05);
+  border: 1px solid var(--color-line-dark);
+  color: var(--color-text-inverse);
+  transition: background 240ms ease, border-color 240ms ease;
+}
+.surface-dark:hover { background: rgba(241, 239, 234, 0.08); border-color: rgba(241, 239, 234, 0.28); }
+.surface-dark p, .surface-dark li { color: var(--color-text-inverse-3); }
+
+@utility surface-paper {
+  position: relative;
+  background: color-mix(in srgb, var(--color-bg-primary, #FCFBF8) 88%, transparent);
+  border: 1px solid var(--color-line);
+  transition: background 240ms ease, border-color 240ms ease;
+}
+
+/* Ссылка-стрелка: один и тот же вид и отклик по всему сайту */
+@utility link-arrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 6px;
+  text-decoration-thickness: 1px;
+  text-decoration-color: color-mix(in oklab, var(--color-accent) 35%, transparent);
+}
+.link-arrow svg { transition: transform var(--duration-base) var(--ease-out); }
+.link-arrow:hover { color: var(--color-text-primary); text-decoration-color: currentColor; }
+.link-arrow:hover svg { transform: translateX(3px); }
+.link-arrow:active { transform: none; }
+.sec-dark .link-arrow, .stage-dark .link-arrow { color: var(--color-text-inverse); }
+.sec-dark .link-arrow:hover { color: var(--color-text-inverse-2); }
+
+/* ============================================================================
+   Мобильная оптимизация: тяжёлые сцены и несколько слоёв блюра
+   На узких экранах отключаем вторые слои сцен и уменьшаем радиус размытия.
+   ========================================================================== */
+@media (max-width: 768px) {
+  /* В каждой сцене оставляем только первый блоб; вторые и далее — не рендерим */
+  .stage__bg .stage__blob ~ .stage__blob { display: none !important; }
+
+  /* Уменьшаем радиус блюра жидкого стекла, чтобы не грузить GPU */
+  .lg {
+    backdrop-filter: blur(12px) saturate(145%) brightness(1.03);
+    -webkit-backdrop-filter: blur(12px) saturate(145%) brightness(1.03);
+  }
+  .lg-thick, .lg-strong {
+    backdrop-filter: blur(16px) saturate(160%) brightness(1.05);
+    -webkit-backdrop-filter: blur(16px) saturate(160%) brightness(1.05);
+  }
+  .lg-dark {
+    backdrop-filter: blur(24px) saturate(170%) brightness(1.25);
+    -webkit-backdrop-filter: blur(24px) saturate(170%) brightness(1.25);
+  }
+  .lg-dark::before {
+    backdrop-filter: blur(4px) saturate(180%) brightness(1.4);
+    -webkit-backdrop-filter: blur(4px) saturate(180%) brightness(1.4);
+  }
+  .btn-glass {
+    backdrop-filter: blur(12px) saturate(145%);
+    -webkit-backdrop-filter: blur(12px) saturate(145%);
+  }
+
+  /* В Hero — только один графический слой: убираем второе градиентное пятно,
+     уменьшаем блюр оставшегося светового пятна под плашками */
+  .hero-dust--chrome {
+    background:
+      radial-gradient(120% 90% at 78% 18%, rgba(201,205,212,0.05), transparent 58%) !important;
+  }
+  .hero-spot {
+    filter: blur(28px) !important;
+    opacity: 0.75;
+  }
+
+  /* Приглушаем декоративные пятна в сценах */
+  .stage__blob,
+  .chrome-ring { opacity: 0.75; }
+}
+html[data-calm="true"] [data-arrow] { transform: none !important; }

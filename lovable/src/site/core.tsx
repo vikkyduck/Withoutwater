@@ -17,10 +17,10 @@ import {
   AnimatePresence,
   MotionConfig,
 } from "motion/react";
-import { ArrowUpRight, ArrowRight, Plus, Check, Waves, Sparkles, ExternalLink } from "lucide-react";
+import { ArrowUpRight, ArrowRight, ArrowDown, Plus, Check, Waves, Sparkles, ExternalLink, Calendar } from "lucide-react";
 
 export { motion, AnimatePresence };
-export { ArrowUpRight, ArrowRight, Plus, Check, Waves, Sparkles, ExternalLink };
+export { ArrowUpRight, ArrowRight, ArrowDown, Plus, Check, Waves, Sparkles, ExternalLink, Calendar };
 export { useRef, useState, useEffect };
 export type { ReactNode, CSSProperties };
 
@@ -76,6 +76,20 @@ export function useCalm(): [boolean, (v: boolean) => void] {
   return [value, setCalm];
 }
 
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia(query);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
+    setMatches(mq.matches);
+    mq.addEventListener?.("change", handler);
+    return () => mq.removeEventListener?.("change", handler);
+  }, [query]);
+  return matches;
+}
+
+
 
 /* --------- Активный сценарий: карточки Hero ↔ табы секции Scenarios --------- */
 /* Секция Scenarios регистрирует свой setActive здесь при монтировании.        */
@@ -98,7 +112,7 @@ export function ymGoal(goal: string, params?: Record<string, unknown>) {
 
 export function StencilLogo({ className = "" }: { className?: string }) {
   return (
-    <div className={`inline-flex flex-col leading-none ${className}`}>
+    <div className={`inline-flex flex-col ${className}`}>
       <span className="font-display text-[1.6em] font-medium tracking-[-0.02em]">
         БЕЗ <span className="cut">ВОДЫ</span>
       </span>
@@ -110,15 +124,19 @@ export function StencilLogo({ className = "" }: { className?: string }) {
 }
 
 /* Надзаголовок секции: номер Unbounded, волосяная линия, капитель Golos. */
-export function SectionLabel({ n, children }: { n: string; children: ReactNode }) {
+export function SectionLabel({ n, children }: { n?: string; children: ReactNode }) {
   return (
-    <div className="t-eyebrow flex items-center gap-3 text-[color:var(--color-text-secondary)]">
-      <span className="font-display text-[color:var(--color-accent)] tracking-normal">{n}</span>
+    <div
+      data-seclabel
+      className="t-eyebrow flex items-center gap-3 text-[color:var(--color-text-secondary)]"
+    >
+      <Stencil n={n ?? "00"} active className="text-[color:var(--color-accent)]" />
       <span className="h-px w-10 bg-[color:var(--color-line)]" />
       <span>{children}</span>
     </div>
   );
 }
+
 
 /* ------------------------- Линза преломления ----------------------------- */
 /* Один SVG-фильтр обслуживает элементы любого размера: карта смещения
@@ -146,7 +164,35 @@ const LENS_MAP =
   "<rect width='100' height='100' fill='url(%23y)' style='mix-blend-mode:screen'/>" +
   "</svg>";
 
+/* Определение слабого устройства: мало ядер/памяти, экономия трафика или
+   отсутствие мыши. На таких устройствах SVG-линза (feDisplacementMap на
+   backdrop) стоит слишком дорого — переходим на обычный blur(). */
+export function useLowPower(): boolean {
+  const [low, setLow] = useState(false);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const nav = window.navigator as Navigator & {
+      deviceMemory?: number;
+      connection?: { saveData?: boolean };
+    };
+    const cores = nav.hardwareConcurrency ?? 8;
+    const mem = nav.deviceMemory ?? 8;
+    const coarse = window.matchMedia("(pointer: coarse)").matches;
+    const narrow = window.matchMedia("(max-width: 767px)").matches;
+    const saveData = nav.connection?.saveData === true;
+    const value = cores <= 4 || mem <= 4 || saveData || coarse || narrow;
+    setLow(value);
+    document.documentElement.dataset.lowpower = value ? "true" : "false";
+  }, []);
+  return low;
+}
+
 export function LensFilter() {
+  const lowPower = useLowPower();
+  const [calm] = useCalm();
+  // На слабых устройствах и в calm-режиме линзу не монтируем вовсе:
+  // стекло рендерится через обычный blur() fallback (см. styles.css).
+  if (lowPower || calm) return null;
   return (
     <svg width="0" height="0" style={{ position: "absolute" }} aria-hidden="true">
       <filter id="bv-lens" x="-25%" y="-25%" width="150%" height="150%" colorInterpolationFilters="sRGB">
@@ -157,6 +203,7 @@ export function LensFilter() {
   );
 }
 
+
 /* --------------------------- Движок курсора ------------------------------ */
 /* Один обработчик на страницу: считает положение курсора внутри каждого
    видимого элемента и ставит переменные. Все состояния остаются в стилях.
@@ -164,12 +211,17 @@ export function LensFilter() {
 
 export function GlassPointer() {
   const [calm] = useCalm();
+  const hasPointer = useMediaQuery("(pointer: fine) and (hover: hover)");
   useEffect(() => {
     if (calm) return;
-    if (!window.matchMedia?.("(pointer: fine)").matches) return;
+    // Инициализируем только при наличии мыши: точный указатель + hover.
+    // На touch-устройствах (mobile / планшеты без мыши) эффект не стартует.
+    if (!hasPointer) return;
 
     const SEL = ".lg, .btn-primary, .btn-secondary, .btn-glass, .btn-invert";
     const bound = new WeakSet<HTMLElement>();
+
+
 
     const bind = (el: HTMLElement) => {
       if (bound.has(el)) return;
@@ -218,9 +270,10 @@ export function GlassPointer() {
     const mo = new MutationObserver(scan);
     mo.observe(document.body, { childList: true, subtree: true });
     return () => mo.disconnect();
-  }, [calm]);
+  }, [calm, hasPointer]);
   return null;
 }
+
 
 /* --------------------- Графическая сцена: узлы и блобы -------------------- */
 /* Стекло допустимо только там, где под ним есть что преломлять. Сцена —
@@ -253,6 +306,8 @@ export function NodeScene({
   className?: string;
   opacity?: number;
 }) {
+  const isMobile = useMediaQuery("(max-width: 767px)");
+  if (isMobile) return null;
   return (
     <svg
       className={`pointer-events-none absolute right-[-4%] top-1/2 hidden h-[min(78%,560px)] -translate-y-1/2 md:block ${className}`}
@@ -291,6 +346,7 @@ export function NodeScene({
   );
 }
 
+
 /* Мягкое пятно материала под стеклом: розовое стекло или хром. */
 export function Blob({
   className = "",
@@ -322,15 +378,18 @@ export function Scene({
   blobs?: { className: string; tone?: "rose" | "chrome"; size?: number }[];
   nodeClass?: string;
 }) {
+  const [calm] = useCalm();
   return (
     <div className="stage__bg" aria-hidden>
       {nodes && <NodeScene className={nodeClass} />}
-      {blobs.map((b, i) => (
-        <Blob key={i} className={b.className} tone={b.tone} size={b.size} />
-      ))}
+      {!calm &&
+        blobs.map((b, i) => (
+          <Blob key={i} className={b.className} tone={b.tone} size={b.size} />
+        ))}
     </div>
   );
 }
+
 
 /* ------------------------------ GlassCard -------------------------------- */
 /* Обёртка над материалом .lg. Стекло кладётся только на графическую сцену;
@@ -396,6 +455,289 @@ export function NodeDivider({ className = "" }: { className?: string }) {
   );
 }
 
+/* ==========================================================================
+   Элементы фирменного стиля из брендбука: кот-росчерк, подчерк, стрелка
+   от руки, маркеры-узлы, трафаретная нумерация, линейные иконки.
+   Все графемы рисуются одним росчерком: только контур, скруглённые концы,
+   без заливок и «мультяшности».
+   ========================================================================== */
+
+/* Кот — талисман бюро. Один кот на носитель; только контур 2–3,5 px. */
+export function CatMark({
+  className = "",
+  strokeWidth = 2.2,
+}: {
+  className?: string;
+  strokeWidth?: number;
+}) {
+  return (
+    <svg
+      viewBox="0 0 140 120"
+      fill="none"
+      aria-hidden
+      className={`pointer-events-none ${className}`}
+    >
+      {/* тело: спина, уши, морда, грудь, лапа — одна непрерывная кривая */}
+      <path
+        d="M48 106c-6-22-2-44 26-58l6-22 11 18c13-3 25 7 27 22 1.6 11-3.4 15-7.6 19.6-4 4.4-4 10.4-1 20.4"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M48 106h61.4"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+      />
+      {/* хвост: свободный росчерк с петлёй */}
+      <path
+        d="M48 106c-14 4-30 1-32-10-1.6-9 10-14 15-7 4.6 6.4-1 13.6-8 12"
+        stroke="currentColor"
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+/* Росчерк-подчерк: живая кривая под словом, никогда не прямая линия. */
+export function Swash({
+  children,
+  className = "",
+}: {
+  children: ReactNode;
+  className?: string;
+}) {
+  return (
+    <span className={`relative inline-block ${className}`}>
+      <span className="relative z-[1]">{children}</span>
+      <svg
+        viewBox="0 0 200 12"
+        preserveAspectRatio="none"
+        aria-hidden
+        className="absolute inset-x-0 -bottom-[0.18em] h-[0.28em] w-full text-[color:var(--color-accent)]"
+      >
+        <path
+          d="M2 8.4C34 3.6 72 2.4 104 5.2c30 2.6 62 3.4 94-1.6"
+          stroke="currentColor"
+          strokeWidth="3"
+          strokeLinecap="round"
+          fill="none"
+          vectorEffect="non-scaling-stroke"
+        />
+      </svg>
+    </span>
+  );
+}
+
+/* Стрелка от руки — росчерк с двумя усами. */
+export function HandArrow({ className = "" }: { className?: string }) {
+  return (
+    <svg viewBox="0 0 64 24" fill="none" aria-hidden className={className}>
+      <path
+        d="M2 17.5C14 8.5 34 3.5 60 6.5"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+      />
+      <path
+        d="M50 2.5 60 6.5 53 14"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
+/* Точка-узел вместо буллита: активный узел — Пыльная роза с ореолом. */
+export function NodeBullet({
+  active = false,
+  className = "",
+}: {
+  active?: boolean;
+  className?: string;
+}) {
+  return (
+    <span
+      aria-hidden
+      className={`node-dot ${active ? "node-dot-active" : ""} ${className}`}
+    />
+  );
+}
+
+/* Список с маркерами-узлами — единый приём для всех перечислений. */
+export function NodeList({
+  items,
+  className = "",
+  itemClassName = "",
+  divided = false,
+}: {
+  items: ReactNode[];
+  className?: string;
+  itemClassName?: string;
+  divided?: boolean;
+}) {
+  return (
+    <ul
+      className={`${divided ? "divide-y divide-border border-y border-[color:var(--color-line)]" : "space-y-2.5"} ${className}`}
+    >
+      {items.map((it, i) => (
+        <li
+          key={i}
+          className={`flex items-start gap-3 ${divided ? "py-3.5" : ""} ${itemClassName}`}
+        >
+          <NodeBullet active={i === 0} className="mt-[0.55em]" />
+          <span className="flex-1">{it}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/* Номер-трафарет: Unbounded, без скобок и точек. */
+export function Stencil({
+  n,
+  active = false,
+  className = "",
+}: {
+  n: number | string;
+  active?: boolean;
+  className?: string;
+}) {
+  const label = typeof n === "number" ? String(n).padStart(2, "0") : n;
+  return (
+    <span data-active={active} className={`stencil ${className}`}>
+      {label}
+    </span>
+  );
+}
+
+/* Линейные иконки: один росчерк, петля вместо точки. 20/24/32 px. */
+export type IconName =
+  | "graph"
+  | "checklist"
+  | "term"
+  | "team"
+  | "metric"
+  | "standard"
+  | "process"
+  | "insight"
+  | "quality"
+  | "handoff";
+
+const ICON_PATHS: Record<IconName, ReactNode> = {
+  graph: (
+    <>
+      <path d="M3 17l5-6 4 3 4-8 5 4" />
+      <circle cx="8" cy="11" r="1.3" />
+      <circle cx="16" cy="6" r="1.3" />
+    </>
+  ),
+  checklist: (
+    <>
+      <path d="M4 6h9M4 12h9M4 18h9" />
+      <path d="M17 5.5l1.6 1.6L21.5 4" />
+      <path d="M17 11.5l1.6 1.6L21.5 10" />
+    </>
+  ),
+  term: (
+    <>
+      <circle cx="12" cy="12" r="8.2" />
+      <path d="M12 7v5.4l3.4 2" />
+    </>
+  ),
+  team: (
+    <>
+      <circle cx="9" cy="8.5" r="2.6" />
+      <circle cx="16.5" cy="9.5" r="2" />
+      <path d="M3.8 18c.6-3 2.7-4.6 5.2-4.6s4.6 1.6 5.2 4.6" />
+      <path d="M16.2 13.6c2.1.2 3.5 1.6 4 4.4" />
+    </>
+  ),
+  metric: (
+    <>
+      <path d="M4 4v16h16" />
+      <path d="M7.5 15l3.5-4.5 3 2.5L19 7" />
+      <circle cx="19" cy="7" r="1.2" />
+    </>
+  ),
+  standard: (
+    <>
+      <circle cx="12" cy="12" r="8" />
+      <path d="M12 8.2l1.5 2.7 3 .5-2.2 2.1.5 3-2.8-1.5-2.8 1.5.5-3L7.5 11.4l3-.5z" />
+    </>
+  ),
+  process: (
+    <>
+      <path d="M20 12a8 8 0 1 1-3.2-6.4" />
+      <path d="M20 4.5V9h-4.4" />
+    </>
+  ),
+  insight: (
+    <>
+      <circle cx="10.5" cy="10.5" r="6" />
+      <path d="M15 15l5 5" />
+    </>
+  ),
+  quality: (
+    <>
+      <path d="M12 3.4l7 2.6v6c0 4.4-3 7.6-7 8.6-4-1-7-4.2-7-8.6V6z" />
+      <path d="M9 12.2l2.2 2.2L15.4 10" />
+    </>
+  ),
+  handoff: (
+    <>
+      <path d="M4 17c4-1 6.5-4 8.5-9" />
+      <path d="M13 16l6-6" />
+      <path d="M15.6 8.6H20V13" />
+      <circle cx="4.5" cy="17.2" r="1.3" />
+    </>
+  ),
+};
+
+export function LineIcon({
+  name,
+  className = "h-6 w-6",
+  strokeWidth = 1.7,
+}: {
+  name: IconName;
+  className?: string;
+  strokeWidth?: number;
+}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden
+      stroke="currentColor"
+      strokeWidth={strokeWidth}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={className}
+    >
+      {ICON_PATHS[name]}
+    </svg>
+  );
+}
+
+/* Единый сценарий появления секций: снизу, y 16, 0.45s, stagger 0.05 */
+export const REVEAL_EASE = [0.2, 0.8, 0.2, 1] as const;
+export const REVEAL_VIEWPORT = { once: true, amount: 0.1, margin: "0px 0px -10% 0px" } as const;
+export function reveal(index = 0) {
+  return {
+    initial: { opacity: 0, y: 12 },
+    whileInView: { opacity: 1, y: 0 },
+    viewport: REVEAL_VIEWPORT,
+    transition: { delay: index * 0.04, duration: 0.32, ease: REVEAL_EASE },
+  };
+}
+
 export function RevealHeading({
   children,
   className = "",
@@ -412,10 +754,10 @@ export function RevealHeading({
   }
   return (
     <MotionTag
-      initial={{ opacity: 0, y: 14 }}
+      initial={{ opacity: 0, y: 12 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, amount: 0.1, margin: "0px 0px -10% 0px" }}
-      transition={{ duration: 0.55, ease: [0.2, 0.8, 0.2, 1] }}
+      transition={{ duration: 0.45, ease: REVEAL_EASE }}
       className={className}
     >
       {children}
@@ -429,41 +771,78 @@ export function Field({
   name,
   placeholder,
   dark = false,
+  error,
+  onBlur,
+  onInput,
+  inputRef,
+  required = false,
 }: {
   label: string;
   name: string;
   placeholder: string;
   dark?: boolean;
+  error?: string | null;
+  onBlur?: React.FocusEventHandler<HTMLInputElement>;
+  onInput?: React.FormEventHandler<HTMLInputElement>;
+  inputRef?: React.Ref<HTMLInputElement>;
+  required?: boolean;
 }) {
   /* id с префиксом: без него input name="contact" конфликтовал бы с
      id="contact" у секции формы, и label ссылался бы на секцию. */
   const id = `f-${name}`;
+  const errId = `${id}-error`;
+  const base = dark
+    ? "min-h-11 w-full rounded-sm border bg-white/5 px-4 py-3 text-base text-[color:var(--color-text-inverse)] outline-none transition placeholder:text-[color:var(--color-text-inverse-2)]/50"
+    : "min-h-11 w-full rounded-sm border bg-[color:var(--color-surface)] px-4 py-3 text-base text-[color:var(--color-text-primary)] outline-none transition placeholder:text-[color:var(--color-steel)]";
+  const state = error
+    ? "border-[color:var(--color-accent)] focus:border-[color:var(--color-accent)]"
+    : dark
+      ? "border-[color:var(--color-line-dark)] focus:border-[color:var(--color-accent-glass)]"
+      : "border-[color:var(--color-line)] focus:border-[color:var(--color-accent)]";
   return (
     <div>
       <label
         htmlFor={id}
         className={`t-label mb-2 block ${
-          dark ? "text-background/60" : "text-[color:var(--color-text-secondary)]"
+          dark
+            ? "text-[color:var(--color-text-inverse-2)]"
+            : "text-[color:var(--color-text-secondary)]"
         }`}
       >
         {label}
       </label>
       <input
         id={id}
+        ref={inputRef}
         name={name}
         placeholder={placeholder}
-        className={
-          dark
-            ? "min-h-11 w-full rounded-sm border border-[color:var(--color-line-dark)] bg-white/5 px-4 py-3 text-base text-[color:var(--color-text-inverse)] outline-none transition placeholder:text-[color:var(--color-text-inverse-2)]/50 focus:border-[color:var(--color-accent-glass)]"
-            : "min-h-11 w-full rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-surface)] px-4 py-3 text-base text-[color:var(--color-text-primary)] outline-none transition placeholder:text-[color:var(--color-steel)] focus:border-[color:var(--color-accent)]"
-        }
+        onBlur={onBlur}
+        onInput={onInput}
+        required={required}
+        aria-required={required || undefined}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={error ? errId : undefined}
+        className={`${base} ${state}`}
       />
+      {error && (
+        <p
+          id={errId}
+          role="alert"
+          className={`mt-2 flex items-start gap-1.5 t-caption ${
+            dark ? "text-[color:var(--color-accent-glass)]" : "text-[color:var(--color-accent)]"
+          }`}
+        >
+          <span aria-hidden className="mt-[0.15em] leading-none">•</span>
+          <span>{error}</span>
+        </p>
+      )}
     </div>
   );
 }
+
 /* --------------------------------- Page --------------------------------- */
 
-export function CalmToggle() {
+export function CalmToggle({ className = "" }: { className?: string }) {
   const [calm, set] = useCalm();
   return (
     <button
@@ -472,10 +851,10 @@ export function CalmToggle() {
       aria-pressed={calm}
       aria-label={calm ? "Включить анимации" : "Уменьшить анимации"}
       title={calm ? "Включить анимации" : "Уменьшить анимации"}
-      className="lg group fixed bottom-24 right-4 z-50 inline-flex h-11 w-11 items-center justify-center rounded-pill text-[color:var(--color-text-secondary)] transition-colors duration-[160ms] hover:text-[color:var(--color-text-primary)] md:bottom-6 md:right-6"
-      style={{ boxShadow: "0 8px 24px -12px rgba(4,6,9,0.15)" }}
+      className={`group items-center justify-center gap-2 rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] px-3 py-2 text-[color:var(--color-text-secondary)] transition-colors duration-[160ms] hover:text-[color:var(--color-text-primary)] hover:border-[color:var(--color-steel)] ${className}`}
     >
       {calm ? <Sparkles className="h-4 w-4" /> : <Waves className="h-4 w-4" />}
+      <span className="t-caption hidden xl:inline">Меньше анимаций</span>
     </button>
   );
 }
@@ -483,33 +862,37 @@ export function CalmToggle() {
 
 export function CookieBar() {
   const [show, setShow] = useState(false);
+  const [mounted, setMounted] = useState(false);
   useEffect(() => {
+    setMounted(true);
     try {
       if (!window.localStorage.getItem("bv-cookie-ok")) setShow(true);
     } catch {
       setShow(true);
     }
   }, []);
-  if (!show) return null;
+  const accept = () => {
+    try { window.localStorage.setItem("bv-cookie-ok", "1"); } catch {}
+    setShow(false);
+  };
+  if (!mounted || !show) return null;
   return (
     <div
-      className="lg lg-thick fixed inset-x-3 bottom-24 z-50 mx-auto flex max-w-lg items-center gap-3 rounded-pill py-2 pl-4 pr-2 md:bottom-6 md:left-1/2 md:right-auto md:-translate-x-1/2"
-      style={{ boxShadow: "0 12px 40px -16px rgba(4,6,9,0.25)" }}
+      role="button"
+      data-cookie-bar
+      onClick={accept}
+      className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-center gap-2 border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] px-4 py-2 text-center transition-colors hover:bg-[color:var(--color-bg-secondary)]"
     >
-      <p className="t-body-sm flex-1 text-[color:var(--color-text-secondary)]">
-        Мы используем cookie и Яндекс Метрику ·{" "}
-        <a href="/politics_pd" className="underline underline-offset-2 hover:text-[color:var(--color-text-primary)]">политика</a>
-      </p>
-      <button
-        type="button"
-        onClick={() => {
-          try { window.localStorage.setItem("bv-cookie-ok", "1"); } catch {}
-          setShow(false);
-        }}
-        className="btn btn-primary shrink-0 min-h-11 px-5 py-2 text-[13px]"
-      >
-        Ок
-      </button>
+      <span className="t-caption text-[color:var(--color-text-secondary)]">
+        Cookie и Яндекс Метрика ·{" "}
+        <a
+          href="/politics_pd"
+          onClick={(e) => e.stopPropagation()}
+          className="underline underline-offset-2 hover:text-[color:var(--color-text-primary)]"
+        >
+          политика
+        </a>
+      </span>
     </div>
   );
 }
@@ -520,9 +903,10 @@ export function CookieBar() {
 export const NAV_LINKS: [string, string][] = [
   ["Задачи и решения", "/tasks"],
   ["Кейсы", "/cases"],
-  ["О нас", "/team"],
   ["Как мы работаем", "/how-we-work"],
+  ["О нас", "/team"],
 ];
+
 
 export const CTA_LABEL = "Разбор задачи за 30 минут";
 export const CTA_NOTE = "30 минут онлайн: сверим задачу и определим следующий шаг";
@@ -534,17 +918,25 @@ export function ctaHref(path: string): string {
 
 export function Nav({ path = "/" }: { path?: string }) {
   const [open, setOpen] = useState(false);
+  const [calm, setCalm] = useCalm();
   const [progress, setProgress] = useState(0);
+  /* На главной первый экран уже несёт главную кнопку: в шапке до ухода hero
+     держим вторичный вес, чтобы не было двух primary одновременно. */
+  const [pastHero, setPastHero] = useState(path !== "/");
+  const headRef = useRef<HTMLElement | null>(null);
+  const [navH, setNavH] = useState(64);
 
   useEffect(() => {
     const onScroll = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       setProgress(max > 0 ? Math.min(1, window.scrollY / max) : 0);
+      setPastHero(path !== "/" || window.scrollY > window.innerHeight * 0.6);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  }, [path]);
+
 
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -553,13 +945,21 @@ export function Nav({ path = "/" }: { path?: string }) {
     };
   }, [open]);
 
+  useEffect(() => {
+    const measure = () => setNavH(headRef.current?.getBoundingClientRect().height ?? 64);
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+
   return (
-    <header className="lg lg-thick sticky top-0 z-50 rounded-none border-b border-[color:var(--color-line)]">
+    <header ref={headRef} className="sticky top-0 z-50 border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-5 py-3 md:px-8 md:py-4">
-        <a href="/" className="text-[color:var(--color-text-primary)] shrink-0" aria-label="БЕЗ ВОДЫ — на главную">
-          <StencilLogo className="text-[13px] md:text-[14px]" />
+        <a href="/" className="flex items-center gap-2 text-[color:var(--color-text-primary)] shrink-0" aria-label="БЕЗ ВОДЫ — на главную">
+          <CatMark className="h-6 w-auto md:h-7" />
+          <StencilLogo className="logo-sm" />
         </a>
-        <nav className="hidden items-center gap-0.5 text-[13px] font-medium tracking-[0.005em] md:flex">
+        <nav className="hidden items-center gap-0.5 t-body font-medium tracking-[0.005em] md:flex">
           {NAV_LINKS.map(([label, href]) => {
             const active = path === href;
             return (
@@ -567,7 +967,7 @@ export function Nav({ path = "/" }: { path?: string }) {
                 key={href}
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`group relative rounded-sm px-3.5 py-2 text-[0.9375rem] transition-colors duration-[160ms] ${
+                className={`group relative rounded-sm px-3.5 py-2 t-body transition-colors duration-[160ms] ${
                   active
                     ? "text-[color:var(--color-text-primary)]"
                     : "text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
@@ -584,20 +984,22 @@ export function Nav({ path = "/" }: { path?: string }) {
             );
           })}
         </nav>
-        <div className="flex shrink-0 items-center gap-2">
+        <div className="flex shrink-0 items-center gap-2 md:gap-3">
+          <CalmToggle className="hidden md:inline-flex" />
           <a
             href={ctaHref(path)}
-            className="btn btn-primary group hidden shrink-0 sm:inline-flex"
+            className={`btn group hidden shrink-0 sm:inline-flex ${pastHero ? "btn-primary" : "btn-secondary"}`}
           >
+
             <span>{CTA_LABEL}</span>
-            <ArrowUpRight className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            <ArrowUpRight data-arrow className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </a>
           <button
             type="button"
             aria-label={open ? "Закрыть меню" : "Открыть меню"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-[color:var(--color-line)] text-[color:var(--color-text-primary)] transition-colors hover:bg-[color:var(--color-bg-secondary)] md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-primary)] transition-colors hover:bg-[color:var(--color-bg-secondary)] md:hidden"
           >
             <span className="relative block h-3 w-4">
               <span
@@ -618,26 +1020,47 @@ export function Nav({ path = "/" }: { path?: string }) {
       />
 
       {open && (
-        <nav className="relative z-[2] border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] px-5 pb-6 pt-2 md:hidden">
-          {NAV_LINKS.map(([label, href]) => (
+        <div className="fixed inset-x-0 bottom-0 z-[2] flex flex-col border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] md:hidden" style={{ top: navH }}>
+          <nav className="flex-1 overflow-y-auto overscroll-contain px-5 pb-4 pt-2">
+            {NAV_LINKS.map(([label, href]) => (
+              <a
+                key={href}
+                href={href}
+                onClick={() => setOpen(false)}
+                className="flex min-h-[60px] items-center justify-between border-b border-[color:var(--color-line)] py-4 t-body text-[color:var(--color-text-primary)]"
+              >
+                {label}
+                <ArrowUpRight data-arrow className="h-5 w-5 shrink-0 text-[color:var(--color-text-secondary)]" />
+              </a>
+            ))}
+            <div className="flex items-center justify-between border-b border-[color:var(--color-line)] py-4">
+              <span className="t-body text-[color:var(--color-text-primary)]">Меньше анимаций</span>
+              <button
+                type="button"
+                onClick={() => setCalm(!calm)}
+                aria-pressed={calm}
+                aria-label={calm ? "Включить анимации" : "Уменьшить анимации"}
+                title={calm ? "Включить анимации" : "Уменьшить анимации"}
+                className="inline-flex h-11 w-11 items-center justify-center rounded-pill border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-secondary)] transition-colors duration-[160ms] hover:text-[color:var(--color-text-primary)] hover:border-[color:var(--color-steel)]"
+              >
+                {calm ? <Sparkles className="h-4 w-4" /> : <Waves className="h-4 w-4" />}
+              </button>
+            </div>
+          </nav>
+          <div className="shrink-0 border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4">
             <a
-              key={href}
-              href={href}
-              className="flex min-h-11 items-center justify-between border-b border-[color:var(--color-line)] py-3.5 text-[15px] text-[color:var(--color-text-primary)]"
+              href={ctaHref(path)}
+              onClick={() => setOpen(false)}
+              className="btn btn-primary flex w-full"
             >
-              {label}
-              <ArrowUpRight className="h-4 w-4 text-[color:var(--color-text-secondary)]" />
+              {CTA_LABEL}
+              <ArrowRight data-arrow className="h-4 w-4" />
             </a>
-          ))}
-          <a
-            href={ctaHref(path)}
-            className="btn btn-primary mt-4 flex w-full"
-          >
-            {CTA_LABEL}
-            <ArrowRight className="h-4 w-4" />
-          </a>
-        </nav>
+            <p className="mt-2 text-center t-body text-[color:var(--color-text-secondary)]">{CTA_NOTE}</p>
+          </div>
+        </div>
       )}
+
     </header>
   );
 }
@@ -649,19 +1072,24 @@ export function Footer() {
     ["Задачи и решения", "/tasks"],
     ["Кейсы", "/cases"],
     ["Отзывы", "/reviews"],
-    ["О нас", "/team"],
     ["Как мы работаем", "/how-we-work"],
+    ["О нас", "/team"],
     ["Частые вопросы", "/faq"],
     ["Контакты", "/contacts"],
-    ["Бизнес-эффект от методологии", "/for-your-boss"],
   ];
+
   return (
     <footer className="border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
       <div className="mx-auto max-w-7xl px-6 py-14">
+        {/* Материал для бизнес-заказчика вынесен из футера — теперь это
+            часть CtaBand или отдельной секции на страницах. */}
+
         <div className="grid gap-10 md:grid-cols-[1.2fr_1fr_1fr]">
           <div>
-            <StencilLogo className="text-[16px]" />
-            <p className="mt-5 max-w-sm text-sm leading-relaxed text-[color:var(--color-text-secondary)]">
+            <StencilLogo className="logo-md" />
+            {/* Кот — талисман бюро: один кот на носитель, только контур */}
+            <CatMark className="mt-6 h-20 w-24 text-[color:var(--color-text-primary)]/70" strokeWidth={2} />
+            <p className="mt-5 max-w-sm t-body text-[color:var(--color-text-secondary)]">
               Проектная команда методологов и продактов. Превращаем экспертный
               опыт в применимый продукт.
             </p>
@@ -670,7 +1098,7 @@ export function Footer() {
             <div className="t-eyebrow text-[color:var(--color-text-secondary)]">
               Навигация
             </div>
-            <ul className="mt-4 grid grid-cols-2 gap-y-2 text-sm">
+            <ul className="mt-4 grid grid-cols-2 gap-y-2 t-body">
               {nav.map(([label, href]) => (
                 <li key={href}>
                   <a href={href} className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">
@@ -686,22 +1114,22 @@ export function Footer() {
             </div>
             <a
               href="/contacts"
-              className="mt-4 inline-flex items-center gap-2 font-display text-lg text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]"
+              className="mt-4 inline-flex items-center gap-2 font-display t-body text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]"
             >
               Написать нам
-              <ArrowUpRight className="h-4 w-4" />
+              <ArrowUpRight data-arrow className="h-4 w-4" />
             </a>
-            <div className="mt-2 text-sm text-[color:var(--color-text-secondary)]">
+            <div className="mt-2 t-body text-[color:var(--color-text-secondary)]">
               Ответ в рабочее время в течение 2 часов
             </div>
-            <ul className="mt-4 space-y-1.5 text-sm">
+            <ul className="mt-4 space-y-1.5 t-body">
               <li><a href="tel:+79645842225" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">+7 964 584 22 25</a></li>
               <li><a href="https://t.me/vikki_duck" target="_blank" rel="noreferrer" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">Telegram: @vikki_duck</a></li>
               <li><a href="mailto:vu@withoutwater.ru" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">vu@withoutwater.ru</a></li>
             </ul>
           </div>
         </div>
-        <div className="mt-12 flex flex-col gap-4 border-t border-[color:var(--color-line)] pt-6 text-xs text-[color:var(--color-text-secondary)]">
+        <div className="mt-12 flex flex-col gap-4 border-t border-[color:var(--color-line)] pt-6 t-caption text-[color:var(--color-text-secondary)]">
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             <a href="/politics_pd" className="transition hover:text-[color:var(--color-accent)]">Политика конфиденциальности</a>
             <a href="/consent_pd" className="transition hover:text-[color:var(--color-accent)]">Согласие на обработку персональных данных</a>
@@ -723,6 +1151,30 @@ export function Footer() {
 
 export function PageShell({ path, children }: { path: string; children: ReactNode }) {
   const [calm] = useCalm();
+  /* Липкая мобильная полоса появляется только после первого экрана —
+     на hero действие и так одно и видно. */
+  const [showBar, setShowBar] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setShowBar(window.scrollY > window.innerHeight * 0.6);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  /* Метки секций нумеруются подряд по факту отрисовки страницы:
+     блоки переиспользуются на разных страницах, поэтому статичные
+     номера давали пропуски (03, 06). */
+  useEffect(() => {
+    const renumber = () => {
+      document.querySelectorAll("main [data-seclabel] .stencil").forEach((el, i) => {
+        el.textContent = String(i).padStart(2, "0");
+      });
+    };
+    renumber();
+    const id = window.setTimeout(renumber, 300);
+    return () => window.clearTimeout(id);
+  }, [path]);
+
   return (
     <MotionConfig reducedMotion={calm ? "always" : "user"}>
       {/* Линза кладётся один раз на страницу и обслуживает всё стекло */}
@@ -733,48 +1185,243 @@ export function PageShell({ path, children }: { path: string; children: ReactNod
         <main className="pb-20 md:pb-0">{children}</main>
         <Footer />
 
-        <CalmToggle />
         <CookieBar />
 
-        {/* Mobile sticky CTA */}
-        <div className="lg lg-thick fixed inset-x-0 bottom-0 z-40 rounded-none border-t border-[color:var(--color-line)] px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3 md:hidden">
+        {/* Mobile sticky CTA — плоская FAB, без подписи, в левом нижнем углу.
+            Поднята выше cookie-плашки. */}
+        <div
+          className={`fixed bottom-12 left-4 z-40 md:hidden ${
+            showBar ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-20 opacity-0"
+          }`}
+          aria-hidden={!showBar}
+        >
           <a
             href={ctaHref(path)}
-            className="btn btn-primary flex w-full"
+            className="relative inline-flex h-14 w-14 items-center justify-center rounded-full border border-[color:var(--color-text-primary)] bg-[color:var(--color-text-primary)] text-[color:var(--color-surface)] transition-colors duration-150 hover:bg-[color:var(--color-ink-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent)] focus-visible:ring-offset-2"
+            aria-label={CTA_LABEL}
+            tabIndex={showBar ? 0 : -1}
           >
-            {CTA_LABEL}
-            <ArrowRight className="h-4 w-4" />
+            <Calendar className="h-5 w-5" strokeWidth={1.5} />
           </a>
         </div>
+
       </div>
     </MotionConfig>
   );
 }
 
-/* Заголовок-шапка внутренней страницы. */
+/* Обложка внутренней страницы: угольная сцена, хром, стекло — тот же
+   материал, что и на главной (брендбук, разд. 7). */
+/* Хромовое кольцо как индикатор прогресса чтения страницы.
+   Дуга заполняется по мере скролла, в центре — процент.
+   Клик: вверху — уводит к следующему экрану, дальше — возвращает наверх. */
+export function ScrollRing({ className = "" }: { className?: string }) {
+  const [p, setP] = useState(0);
+
+  useEffect(() => {
+    let raf = 0;
+    const read = () => {
+      raf = 0;
+      const el = document.documentElement;
+      const max = el.scrollHeight - el.clientHeight;
+      setP(max > 8 ? Math.min(1, Math.max(0, el.scrollTop / max)) : 0);
+    };
+    const onScroll = () => {
+      if (!raf) raf = requestAnimationFrame(read);
+    };
+    read();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onScroll);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onScroll);
+    };
+  }, []);
+
+  const pct = Math.round(p * 100);
+  const R = 46;
+  const C = 2 * Math.PI * R;
+  const atTop = p < 0.02;
+
+  const onClick = () => {
+    if (atTop) {
+      window.scrollTo({ top: window.innerHeight * 0.92, behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={atTop ? "Листать дальше" : `Прочитано ${pct}% — наверх`}
+      title={atTop ? "Листать дальше" : "Наверх"}
+      className={`card-link group pointer-events-auto absolute hidden aspect-square rounded-pill md:block ${className}`}
+    >
+      <span
+        className="absolute -inset-[12%] rounded-pill opacity-60"
+        aria-hidden
+        style={{
+          background:
+            "radial-gradient(closest-side, rgba(233,196,189,0.12), rgba(233,196,189,0))",
+          filter: "blur(8px)",
+        }}
+      />
+      <span className="chrome-ring absolute inset-0" aria-hidden />
+
+      <svg
+        viewBox="0 0 100 100"
+        className="absolute inset-0 h-full w-full -rotate-90"
+        role="progressbar"
+        aria-valuemin={0}
+        aria-valuemax={100}
+        aria-valuenow={pct}
+      >
+        <circle
+          cx="50"
+          cy="50"
+          r={R}
+          fill="none"
+          stroke="rgba(241,239,234,0.12)"
+          strokeWidth="1.5"
+        />
+        <circle
+          cx="50"
+          cy="50"
+          r={R}
+          fill="none"
+          stroke="#E9C4BD"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+          strokeDasharray={C}
+          strokeDashoffset={C * (1 - p)}
+          style={{ transition: "stroke-dashoffset 120ms linear" }}
+        />
+      </svg>
+
+      <span className="absolute inset-0 grid place-items-center">
+        <span className="t-caption tabular-nums text-[color:var(--color-text-inverse)]/70">
+          {pct}%
+        </span>
+      </span>
+    </button>
+  );
+}
+
 export function PageHead({
   kicker,
   title,
   lead,
+  chips,
 }: {
   kicker: string;
-  title: ReactNode;
+  title?: ReactNode;
   lead?: ReactNode;
+  chips?: [string, string][];
 }) {
   return (
-    <div className="relative mx-auto max-w-7xl px-5 pb-4 pt-12 md:px-8 md:pt-20">
-      <div className="t-eyebrow flex items-center gap-3 text-[color:var(--color-text-secondary)]">
-        <span className="h-px w-8 bg-[color:var(--color-line)]" />
-        <span>{kicker}</span>
+    <div className="stage sec-dark grain relative -mx-0 border-b border-[color:var(--color-line-dark)]">
+      <div className="stage__bg" aria-hidden>
+        {/* Волосяные колонки 12-й сетки */}
+        <div
+          className="absolute inset-y-0 left-0 right-0 hidden md:block"
+          style={{
+            backgroundImage:
+              "repeating-linear-gradient(to right, rgba(241,239,234,0.055) 0 1px, transparent 1px 8.3333%)",
+            WebkitMaskImage: "linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent)",
+            maskImage: "linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent)",
+          }}
+        />
+        {/* Графитовая пыль */}
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "radial-gradient(120% 90% at 82% 14%, rgba(201,205,212,0.10), transparent 58%)," +
+              "radial-gradient(80% 70% at 8% 100%, rgba(163,86,75,0.18), transparent 62%)",
+          }}
+        />
+        <NodeScene className="text-[color:var(--color-text-inverse-2)]" opacity={0.3} />
+        <NodeScene
+          className="!right-auto !left-[1%] !top-auto !bottom-[-10%] !h-[min(64%,340px)] text-[color:var(--color-text-inverse-2)]"
+          opacity={0.34}
+        />
       </div>
-      <RevealHeading as="h1" className="t-h1 mt-5 max-w-4xl">
-        {title}
-      </RevealHeading>
-      {lead && (
-        <p className="t-lead measure mt-6 text-[color:var(--color-text-secondary)]">
-          {lead}
-        </p>
-      )}
+
+      {/* Хромовое кольцо — индикатор прогресса чтения страницы */}
+      <ScrollRing className="right-[6%] top-[16%] z-20 w-[min(16vw,190px)]" />
+
+      <div className="relative z-10 mx-auto max-w-7xl px-5 pb-14 pt-12 md:px-8 md:pb-20 md:pt-24">
+        <div className="t-eyebrow flex items-center gap-3 text-[color:var(--color-text-inverse-2)]">
+          <span className="tex-chrome h-[2px] w-12 rounded-pill" />
+          <span>{kicker}</span>
+        </div>
+        {title && (
+          <RevealHeading as="h1" className="t-h1 mt-5 max-w-4xl text-[color:var(--color-text-inverse)]">
+            {title}
+          </RevealHeading>
+        )}
+        {lead && (
+          <p className={`t-body measure text-[color:var(--color-text-inverse-2)] ${title ? "mt-6" : "mt-5"}`}>
+            {lead}
+          </p>
+        )}
+        {chips && chips.length > 0 && (
+          <div className="mt-9 grid max-w-3xl gap-4 sm:grid-cols-2 md:mt-12">
+            {chips.map(([label, desc]) => (
+              <div key={label} className="surface-dark rounded-md px-5 py-6 md:px-6">
+                <div className="font-display t-body text-[color:var(--color-text-inverse)]">
+                  {label}
+                </div>
+                <p className="t-body mt-3 text-[color:var(--color-text-inverse-2)]">{desc}</p>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
+  );
+}
+
+
+/* ------------------------------- CtaBand --------------------------------- */
+/* Одинаковый финал каждой внутренней страницы: одно действие, одна подпись. */
+
+export function CtaBand({ path = "/" }: { path?: string }) {
+  return (
+    <section className="stage sec-dark grain border-t border-[color:var(--color-line-dark)]">
+      <Scene blobs={[{ className: "-left-40 top-0", tone: "rose", size: 460 }]} />
+      <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+        <div className="t-eyebrow flex items-center gap-3 text-[color:var(--color-text-inverse-2)]">
+          <span className="tex-chrome h-[2px] w-12 rounded-pill" />
+          <span>Следующий шаг</span>
+        </div>
+        <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
+          Разберём вашу задачу за 30 минут
+        </RevealHeading>
+        <p className="t-body measure mt-5 text-[color:var(--color-text-inverse-2)]">
+          Готовить презентацию и ТЗ не нужно. Сверим задачу и определим
+          следующий шаг — или честно скажем, что не поможем.
+        </p>
+        <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
+          <a href={ctaHref(path)} className="btn btn-invert group w-full sm:w-auto">
+            <span>{CTA_LABEL}</span>
+            <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
+          </a>
+          <span className="t-body text-[color:var(--color-text-inverse-2)]">
+            Ответим в течение двух рабочих часов
+          </span>
+          <a
+            href="/for-your-boss"
+            className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
+          >
+            Материал для бизнес-заказчика
+            <ArrowUpRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+          </a>
+        </div>
+      </div>
+    </section>
   );
 }
