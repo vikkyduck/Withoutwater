@@ -114,8 +114,10 @@
      в системе нет, Unbounded только Medium 500. */
   h1, h2, h3, h4 { font-weight: 500; }
 
-  /* Длинные русские слова переносим по слогам, а не рубим посередине */
-  h1, h2, h3, h4, blockquote { overflow-wrap: break-word; hyphens: auto; }
+  /* В заголовках слово никогда не режем: Chrome не умеет расставлять
+     переносы по слогам для кириллицы (нет словаря), поэтому auto-hyphens
+     ломает слово где попало. Пусть длинное слово целиком уходит на новую строку. */
+  h1, h2, h3, h4, blockquote { overflow-wrap: normal; word-break: normal; hyphens: none; }
 
   /* Фактура: мелкое зерно бумаги на всей сцене */
   body::before {
