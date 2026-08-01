@@ -36,11 +36,15 @@ function readReply(socket) {
   });
 }
 
-async function cmd(socket, line, expect) {
+async function cmd(socket, line, expect, label) {
   if (line !== null) socket.write(line + CRLF);
   const rep = await readReply(socket);
   if (expect && !expect.includes(rep.code)) {
-    throw new Error(`SMTP ${rep.code}: ${rep.text.slice(0, 200)} (на «${String(line).split(' ')[0]}»)`);
+    /* В текст ошибки НИКОГДА не подставляем саму команду: на шагах AUTH это
+       логин и пароль в base64, а ошибка уходит и в журнал, и в уведомление.
+       Показываем только безопасную метку шага. */
+    const step = label || (line === null ? 'приветствие' : String(line).split(' ')[0]);
+    throw new Error(`SMTP ${rep.code} на шаге ${step}: ${rep.text.slice(0, 160)}`);
   }
   return rep;
 }
@@ -81,9 +85,9 @@ export async function sendMail({
       await cmd(sock, `EHLO ${from.split('@')[1] || 'localhost'}`, [250]);
     }
 
-    await cmd(sock, 'AUTH LOGIN', [334]);
-    await cmd(sock, b64(user), [334]);
-    await cmd(sock, b64(pass), [235]);
+    await cmd(sock, 'AUTH LOGIN', [334], 'AUTH');
+    await cmd(sock, b64(user), [334], 'AUTH(логин)');
+    await cmd(sock, b64(pass), [235], 'AUTH(пароль)');
 
     await cmd(sock, `MAIL FROM:<${from}>`, [250]);
     for (const rcpt of String(to).split(',').map((x) => x.trim()).filter(Boolean)) {

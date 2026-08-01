@@ -44,6 +44,7 @@ const SMTP_PORT = Number(process.env.SMTP_PORT || 465);
 const SMTP_USER = (process.env.SMTP_USER || '').trim();
 const SMTP_PASS = (process.env.SMTP_PASS || '').trim();
 const MAIL_TO   = (process.env.MAIL_TO || '').trim();
+const MAIL_ENABLED = Boolean(SMTP_USER && SMTP_PASS && MAIL_TO);
 
 const MAX_BODY = 16 * 1024;
 const MAX_FIELD_LEN = 2000;
@@ -155,12 +156,14 @@ function readBody(req) {
   });
 }
 
-/* ── telegram: уведомление БЕЗ персональных данных (152-ФЗ, трансграничка) ── */
-async function notifyTelegram(id) {
+/* ── telegram: уведомление БЕЗ персональных данных (152-ФЗ, трансграничка) ──
+   Основной канал — письмо на почту владельца. Telegram работает как аварийный:
+   пишет, только если письмо доставить не удалось, либо если почта вообще не
+   настроена. Пока всё исправно — чат молчит. */
+async function notifyTelegram(id, text) {
   if (!TG_BOT_TOKEN || !TG_CHAT_ID) {
     console.warn('[tg] пропуск: токен/чат не заданы'); return;
   }
-  const text = `🖋 Новая заявка №${id} — withoutwater.ru\nОткрыть админку: ${PUBLIC_BASE}/admin`;
   const ctrl = new AbortController();
   const t = setTimeout(() => ctrl.abort(), 8000);
   try {
@@ -211,7 +214,12 @@ async function notifyMail(id, rec) {
     });
     console.log(`[mail] заявка #${id} отправлена на ${MAIL_TO}`);
   } catch (e) {
-    console.error(`[mail] заявка #${id} НЕ отправлена:`, e.message || e);
+    const why = String(e.message || e).slice(0, 300);
+    console.error(`[mail] заявка #${id} НЕ отправлена:`, why);
+    /* Письмо не дошло — поднимаем тревогу в Telegram, иначе заявку заметят
+       только при следующем заходе в админку. Без ПД: только номер и причина. */
+    notifyTelegram(id,
+      `⚠️ Заявка №${id} — письмо НЕ доставлено\nПричина: ${why}\nЗаявка сохранена: ${PUBLIC_BASE}/admin`);
   }
 }
 
@@ -250,7 +258,7 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'GET' && path === '/api/health') {
     const c = db.prepare("SELECT COUNT(*) AS c FROM leads").get().c;
-    return json(res, 200, { ok: true, tg: Boolean(TG_BOT_TOKEN && TG_CHAT_ID), leads: c, admin: Boolean(ADMIN_USER && ADMIN_PASS), mail: Boolean(SMTP_USER && SMTP_PASS && MAIL_TO) });
+    return json(res, 200, { ok: true, tg: Boolean(TG_BOT_TOKEN && TG_CHAT_ID), leads: c, admin: Boolean(ADMIN_USER && ADMIN_PASS), mail: MAIL_ENABLED });
   }
 
   /* ── приём заявки ── */
@@ -317,8 +325,13 @@ const server = http.createServer(async (req, res) => {
       console.error('[jsonl] журнал не записан:', e.message));
 
     console.log(`[lead] #${id} ip=${ip} ads=${rec.consent_ads}`);
-    notifyTelegram(id); // fire-and-forget, без ПД
-    notifyMail(id, rec); // письмо владельцу с содержимым заявки
+    /* Основной канал — письмо. Telegram включается сам, если письмо не ушло
+       (см. notifyMail) или если почта не настроена вовсе. */
+    if (MAIL_ENABLED) {
+      notifyMail(id, rec);
+    } else {
+      notifyTelegram(id, `🖋 Новая заявка №${id} — withoutwater.ru\nОткрыть админку: ${PUBLIC_BASE}/admin`);
+    }
     return json(res, 200, { ok: true, id });
   }
 
