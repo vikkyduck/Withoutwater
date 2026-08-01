@@ -23,6 +23,8 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { DatabaseSync } from 'node:sqlite';
 
+import { sendMail } from './mailer.mjs';
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const PORT = Number(process.env.PORT || 5020);
@@ -36,6 +38,12 @@ const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || 'https://withoutwater.ru';
 const ADMIN_USER = (process.env.ADMIN_USER || '').trim();
 const ADMIN_PASS = (process.env.ADMIN_PASS || '').trim();
 const PUBLIC_BASE = (process.env.PUBLIC_BASE || 'https://withoutwater.ru').replace(/\/+$/, '');
+/* Дублирование заявки на почту владельца. Без SMTP_* блок просто выключен. */
+const SMTP_HOST = (process.env.SMTP_HOST || 'smtp.yandex.ru').trim();
+const SMTP_PORT = Number(process.env.SMTP_PORT || 465);
+const SMTP_USER = (process.env.SMTP_USER || '').trim();
+const SMTP_PASS = (process.env.SMTP_PASS || '').trim();
+const MAIL_TO   = (process.env.MAIL_TO || '').trim();
 
 const MAX_BODY = 16 * 1024;
 const MAX_FIELD_LEN = 2000;
@@ -168,6 +176,45 @@ async function notifyTelegram(id) {
   } finally { clearTimeout(t); }
 }
 
+/* ── почта: письмо владельцу с содержимым заявки ──────────────────────────
+   В Telegram уходит только номер (внешний сервис — без ПД). Письмо идёт на
+   собственный ящик оператора на своём домене (mx.yandex.net, РФ), поэтому в
+   нём можно везти содержимое: это обработка оператором своих же данных, а не
+   передача третьему лицу. */
+async function notifyMail(id, rec) {
+  if (!SMTP_USER || !SMTP_PASS || !MAIL_TO) {
+    console.warn('[mail] пропуск: SMTP_USER/SMTP_PASS/MAIL_TO не заданы');
+    return;
+  }
+  const when = new Date(rec.ts).toLocaleString('ru-RU', { timeZone: 'Europe/Moscow' });
+  const lines = [
+    `Заявка №${id} с сайта withoutwater.ru`,
+    `Время: ${when} (МСК)`,
+    '',
+    `Имя: ${rec.name || '—'}`,
+    `Контакт: ${rec.contact || '—'}`,
+    `Компания и роль: ${rec.company || '—'}`,
+    `Запрос: ${rec.comment || '—'}`,
+    '',
+    `Страница: ${rec.page || '/'}`,
+    `Согласие на обработку ПД: да (версия ${rec.consent_pd_version || '—'})`,
+    `Согласие на рассылку: ${rec.consent_ads ? 'да' : 'нет'}`,
+    '',
+    `Открыть в админке: ${PUBLIC_BASE}/admin`,
+  ];
+  try {
+    await sendMail({
+      host: SMTP_HOST, port: SMTP_PORT, user: SMTP_USER, pass: SMTP_PASS,
+      from: SMTP_USER, to: MAIL_TO,
+      subject: `Заявка №${id} — ${rec.name || 'без имени'}`,
+      text: lines.join('\n'),
+    });
+    console.log(`[mail] заявка #${id} отправлена на ${MAIL_TO}`);
+  } catch (e) {
+    console.error(`[mail] заявка #${id} НЕ отправлена:`, e.message || e);
+  }
+}
+
 /* ── basic auth для /admin ── */
 function adminAuthed(req) {
   if (!ADMIN_USER || !ADMIN_PASS) return false; // без настроенного пароля админка закрыта
@@ -203,7 +250,7 @@ const server = http.createServer(async (req, res) => {
 
   if (req.method === 'GET' && path === '/api/health') {
     const c = db.prepare("SELECT COUNT(*) AS c FROM leads").get().c;
-    return json(res, 200, { ok: true, tg: Boolean(TG_BOT_TOKEN && TG_CHAT_ID), leads: c, admin: Boolean(ADMIN_USER && ADMIN_PASS) });
+    return json(res, 200, { ok: true, tg: Boolean(TG_BOT_TOKEN && TG_CHAT_ID), leads: c, admin: Boolean(ADMIN_USER && ADMIN_PASS), mail: Boolean(SMTP_USER && SMTP_PASS && MAIL_TO) });
   }
 
   /* ── приём заявки ── */
@@ -271,6 +318,7 @@ const server = http.createServer(async (req, res) => {
 
     console.log(`[lead] #${id} ip=${ip} ads=${rec.consent_ads}`);
     notifyTelegram(id); // fire-and-forget, без ПД
+    notifyMail(id, rec); // письмо владельцу с содержимым заявки
     return json(res, 200, { ok: true, id });
   }
 
