@@ -911,6 +911,13 @@ export const NAV_LINKS: [string, string][] = [
 export const CTA_LABEL = "Разбор задачи за 30 минут";
 export const CTA_NOTE = "30 минут онлайн: сверим задачу и определим следующий шаг";
 
+/* Личный кабинет клиента (FinanceDuck). Пока указывает на исторический адрес:
+   после активации app.withoutwater.ru скрипт finance-duck-activate на сервере
+   сам заменит URL в задеплоенном сайте (sed по этой строке-литералу); тогда же
+   поменять и здесь. */
+export const LK_URL = "https://fin-dohod.ru";
+export const LK_LABEL = "Личный кабинет";
+
 /* Ссылка CTA: на главной — якорь формы, на остальных страницах — /contacts. */
 export function ctaHref(path: string): string {
   return path === "/" ? "#contact" : "/contacts#form";
@@ -986,6 +993,15 @@ export function Nav({ path = "/" }: { path?: string }) {
         </nav>
         <div className="flex shrink-0 items-center gap-2 md:gap-3">
           <CalmToggle className="hidden md:inline-flex" />
+          {/* Вход для действующих клиентов — тихая кнопка, не спорит с CTA */}
+          <a
+            href={LK_URL}
+            target="_blank"
+            rel="noopener"
+            className="hidden shrink-0 items-center justify-center rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] px-3.5 py-2 t-body font-medium text-[color:var(--color-text-secondary)] transition-colors duration-[160ms] hover:border-[color:var(--color-steel)] hover:text-[color:var(--color-text-primary)] md:inline-flex"
+          >
+            {LK_LABEL}
+          </a>
           <a
             href={ctaHref(path)}
             className={`btn group hidden shrink-0 sm:inline-flex ${pastHero ? "btn-primary" : "btn-secondary"}`}
@@ -1033,6 +1049,17 @@ export function Nav({ path = "/" }: { path?: string }) {
                 <ArrowUpRight data-arrow className="h-5 w-5 shrink-0 text-[color:var(--color-text-secondary)]" />
               </a>
             ))}
+            {/* Вход для действующих клиентов */}
+            <a
+              href={LK_URL}
+              target="_blank"
+              rel="noopener"
+              onClick={() => setOpen(false)}
+              className="flex min-h-[60px] items-center justify-between border-b border-[color:var(--color-line)] py-4 t-body text-[color:var(--color-text-primary)]"
+            >
+              {LK_LABEL}
+              <ArrowUpRight data-arrow className="h-5 w-5 shrink-0 text-[color:var(--color-text-secondary)]" />
+            </a>
             <div className="flex items-center justify-between border-b border-[color:var(--color-line)] py-4">
               <span className="t-body text-[color:var(--color-text-primary)]">Меньше анимаций</span>
               <button
