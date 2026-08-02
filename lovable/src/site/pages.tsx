@@ -1,8 +1,9 @@
 /* ============================================================================
-   pages.tsx — страницы многостраничника и карта маршрутов (ТЗ v3 от 26.07).
-   Волна 1: главная, аргументы для руководителя, задачи и решения, кейсы,
-   команда, как мы работаем, FAQ, контакты (+ отзывы отдельной страницей —
-   решение Виктории от 26.07).
+   pages.tsx — страницы многостраничника и карта маршрутов (финальная
+   структура от 02.08): главная (облегчённая), хаб /tasks, три продуктовые
+   страницы + три подстраницы эффекта + общий /business-effect (все — в
+   pages-effect.tsx), кейсы, отзывы, команда, как мы работаем, FAQ, контакты.
+   /for-your-boss закрыт: 301 на /business-effect (nginx).
    ========================================================================== */
 import type { ReactElement } from "react";
 import {
@@ -18,6 +19,13 @@ import {
   FaqAccordion,
 } from "./blocks";
 import { FAQ_ITEMS, TEAM, FOUNDER_WORDS, visibleReviews, SITUATIONS } from "./data";
+import {
+  BE,
+  BusinessEffectGeneralPage,
+  InternalExpertsPage, InternalExpertsEffectPage,
+  TeamSubscriptionPage, TeamSubscriptionEffectPage,
+  ExternalExpertsPage, ExternalExpertsEffectPage,
+} from "./pages-effect";
 
 /* -------------------------------- Главная -------------------------------- */
 
@@ -26,7 +34,8 @@ function HomePage() {
     <PageShell path="/">
       <Hero />
       <WhenNeeded />
-      <Flow />
+      {/* «Схема взаимодействия» убрана с главной (финальная структура 02.08),
+          блок остаётся на /how-we-work */}
       <CasesBlock />
       <ReviewsBlock />
       <NumbersBand />
@@ -38,129 +47,12 @@ function HomePage() {
   );
 }
 
-/* --------------------- Бизнес-эффект от методологии ----------------------- */
-/* Не в меню; живёт ссылками с главной, кейсов и из подписи писем.
-   Читатель — внутренний бизнес-заказчик, которому HR/T&D передаёт материал:
-   40 секунд, три вопроса — эффект, риск, стоимость. Обращаемся к нему
-   напрямую на «вы». НЕЛЬЗЯ писать, что страница «для пересылки» и что
-   её читает «руководитель»: читатель узнаёт себя в третьем лице. */
-
-function BusinessEffectPage() {
-  const risks: [string, string][] = [
-    ["Критерии приёмки — до старта", "вы заранее знаете, что считается результатом, и принимаете работу по согласованным критериям"],
-    ["Доработка без доплаты", "если результат этапа не соответствует критериям, дорабатываем за свой счёт"],
-    ["Один договор", "одно контактное лицо, ответственное за результат, и один договор — вся работа с пулом экспертов на нас, для вас процесс бесшовный"],
-    ["Соглашение о неразглашении", "внутренняя кухня компании остаётся внутри компании"],
-  ];
-  return (
-    <PageShell path="/for-your-boss">
-      <section className="stage border-b border-[color:var(--color-line)] print:border-0">
-        <Scene blobs={[{ className: "-right-40 top-[38%]", tone: "chrome", size: 520 }, { className: "-left-40 bottom-0", tone: "rose", size: 460 }]} />
-        <PageHead
-          kicker="Для ЛПР"
-          title={<>Бизнес-эффект от методологии</>}
-          lead="Что меняется в работе компании, когда практика сильных сотрудников становится общим стандартом: результат, сроки, риски и порядок расчёта стоимости."
-          chips={[
-            ["Первый этап", "завершается моделью решения и дорожной картой — материал остаётся у компании"],
-            ["Один договор", "одна проектная команда и одна точка ответственности"],
-          ]}
-        />
-        <div className="relative mx-auto max-w-7xl px-5 sec-pad-b md:px-8">
-
-          {/* Что теряет компания */}
-          <div className="mt-10 max-w-3xl">
-            <h2 className="t-h2">
-              Что компания теряет прямо сейчас
-            </h2>
-            <p className="mt-4 t-body text-[color:var(--color-text-primary)]">
-              Ключевая практика заперта в головах двух-трёх сильных людей. Пока
-              это так, компания платит дважды: результат зависит от их загрузки,
-              а каждый уход — в отпуск, на повышение, к конкуренту — уносит
-              практику вместе с человеком. Новых сотрудников при этом учат
-              «с голоса», каждый раз заново и по-разному.
-            </p>
-          </div>
-
-          {/* Что бизнес получает за первый этап */}
-          <div className="mt-12 max-w-3xl">
-            <h2 className="t-h2">
-              Что вы получаете за первый этап
-            </h2>
-            <p className="mt-4 t-body text-[color:var(--color-text-primary)]">
-              Первый этап завершается самостоятельным результатом: модель решения
-              и дорожная карта. Это готовый рабочий материал — он остаётся у
-              компании и применим даже в том случае, если сотрудничество не
-              продолжится. Продолжать проект с нами или силами своей команды —
-              решение за вами, и оно принимается уже на фактуре, а не на обещаниях.
-            </p>
-          </div>
-
-          {/* Как закрыты риски */}
-          <div className="mt-12">
-            <h2 className="t-h2">
-              Как закрыты риски
-            </h2>
-            <div className="mt-6 grid max-w-4xl items-stretch gap-4 sm:grid-cols-2">
-              {risks.map(([t, d]) => (
-                <PaperCard key={t} className="h-full p-6">
-                  <div className="flex items-start gap-3">
-                    <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--color-accent)]" />
-                    <div>
-                      <div className="font-display t-body font-bold">{t}</div>
-                      <p className="mt-1.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
-                    </div>
-                  </div>
-                </PaperCard>
-              ))}
-            </div>
-          </div>
-
-          {/* Порядок расчёта — черновик формулировки, Виктория поправит */}
-          <PaperCard className="mt-12 max-w-3xl border-l-[3px] border-l-[color:var(--color-accent)] p-6 md:p-7">
-            <h2 className="t-h2">
-              Как считается стоимость
-            </h2>
-
-            <p className="mt-3 t-body text-[color:var(--color-text-primary)]">
-              Стоимость считается по формуле: объём материала × число носителей
-              опыта × глубина проверки знаний × срок. Срочность — отдельным
-              коэффициентом. После 30-минутного разбора вы получаете расчёт под
-              вашу задачу — с фиксацией объёма и критериев приёмки до старта,
-              без «часов по факту».
-            </p>
-          </PaperCard>
-
-          {/* Действия */}
-          <div className="mt-12 flex flex-col items-start gap-4 print:hidden">
-            <button
-              type="button"
-              onClick={() => window.print()}
-              className="btn btn-secondary"
-            >
-              Сохранить в PDF
-            </button>
-            <a
-              href="/contacts#form"
-              className="btn btn-primary group"
-            >
-              Позовите нас на встречу с командой — ответим на вопросы напрямую
-              <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
-            </a>
-          </div>
-        </div>
-      </section>
-      <CtaBand path="/for-your-boss" />
-    </PageShell>
-
-  );
-}
-
 /* --------------------------- Задачи и решения ----------------------------- */
-/* Ситуации, а НЕ роли-адресаты (правка Виктории 26.07): одна и та же
-   ситуация возникает у разных людей, поэтому обращения «директору по
-   персоналу», «руководителю функции» убраны. Карточка ведёт не на кейсы,
-   а на развёрнутое решение ниже по странице. Данные вынесены в data.tsx,
-   чтобы использовать и на главной в блоке WhenNeeded. */
+/* Хаб (финальная структура 02.08): три карточки-входа — заголовок ситуации,
+   текст ситуации, «Как решаем: …» и кнопка «Подробнее» на продуктовую
+   страницу. Ничего больше: развёрнутые решения живут на продуктовых
+   страницах. Старые якоря #practice/#capacity/#external перенаправляются
+   скриптом (main.tsx → TASKS_HASH_REDIRECTS). */
 
 function TasksPage() {
   return (
@@ -177,8 +69,8 @@ function TasksPage() {
           ]}
         />
 
-        {/* Навигатор: ситуация → якорь решения ниже (жидкое стекло на тёмном) */}
-        <div className="sec-dark grain relative border-b border-[color:var(--color-line-dark)]">
+        {/* Три карточки-входа (жидкое стекло на тёмном) */}
+        <div className="sec-dark grain relative">
           <div className="pointer-events-none absolute inset-0" aria-hidden>
             <div
               className="absolute inset-0"
@@ -195,7 +87,7 @@ function TasksPage() {
               {SITUATIONS.map((it, i) => (
                 <motion.a
                   key={it.id}
-                  href={`#${it.id}`}
+                  href={it.href}
                   {...reveal(i)}
                   className="card-link surface-dark group flex h-full flex-col rounded-md p-6 md:p-7"
                 >
@@ -205,85 +97,28 @@ function TasksPage() {
                     </div>
                     <span
                       aria-hidden
-                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-pill border border-[color:var(--color-line-dark)] text-[color:var(--color-text-inverse)] transition-transform duration-300 group-hover:translate-y-1"
+                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-pill border border-[color:var(--color-line-dark)] text-[color:var(--color-text-inverse)]"
                     >
-                      <ArrowDown data-arrow="down" className="h-4 w-4" />
+                      <ArrowRight data-arrow className="h-4 w-4" />
                     </span>
                   </div>
                   <h2 className="t-body mt-3 font-display text-[color:var(--color-text-inverse)] [overflow-wrap:break-word]">
                     {it.situation}
                   </h2>
                   <p className="mt-4 t-body text-[color:var(--color-text-inverse-2)]">{it.detail}</p>
-                  <span className="mt-auto inline-flex items-center gap-2 pt-5 t-body font-semibold text-[color:var(--color-text-inverse)]">
-                    Как решаем
-                    <ArrowDown data-arrow="down" className="h-4 w-4" />
+                  <p className="mt-4 t-body font-semibold text-[color:var(--color-text-inverse)]">
+                    Как решаем: {it.solutionTitle}
+                  </p>
+                  <span className="mt-auto block pt-6">
+                    <span className="btn btn-invert w-max">
+                      Подробнее
+                      <ArrowRight data-arrow className="h-4 w-4" />
+                    </span>
                   </span>
                 </motion.a>
               ))}
             </div>
           </div>
-        </div>
-
-        <div className="relative mx-auto max-w-7xl px-5 sec-pad-b md:px-8">
-
-
-          {/* Развёрнутые решения */}
-          <div className="mt-20 flex flex-col md:mt-24">
-            {SITUATIONS.map((it, i) => (
-              <div
-                key={it.id}
-                id={it.id}
-                className="scroll-mt-28 border-t border-[color:var(--color-line)] pt-10 pb-14 md:pt-12 md:pb-16"
-              >
-                <div className="grid gap-8 md:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] md:gap-12">
-                  <div>
-                    <div className="flex items-center gap-3 t-eyebrow text-[color:var(--color-text-secondary)]">
-                      <span className="font-display text-[color:var(--color-accent)]">0{i + 1}</span>
-                      <span className="h-px w-8 bg-border" />
-                      <span>Решение</span>
-                    </div>
-                    <RevealHeading className="mt-5 font-display t-h2 font-medium">
-                      {it.solutionTitle}
-                    </RevealHeading>
-                    <p className="mt-4 t-body text-[color:var(--color-text-primary)]">
-                      {it.solutionLead}
-                    </p>
-                    <a
-                      href="/cases"
-                      className="link-arrow group mt-6 t-body"
-                    >
-                      Где это уже сработало
-                      <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                    </a>
-                  </div>
-
-                  <div>
-                    <ul className="divide-y divide-border border-y border-[color:var(--color-line)]">
-                      {it.steps.slice(0, 4).map((step) => (
-                        <li key={step} className="flex items-start gap-3 py-3.5 t-body text-[color:var(--color-text-primary)]">
-                          <NodeBullet className="mt-[0.55em]" />
-                          <span>{step}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-
-                {/* Outcome — плоская акцентная панель */}
-                <div className="tint-ink mt-10 rounded-md border-l-2 border-[color:var(--color-accent)] p-6 md:mt-12 md:p-8">
-                  <div className="t-eyebrow text-[color:var(--color-accent-soft,#E9C4BD)]">
-                    Что меняется
-                  </div>
-                  <p className="mt-3 t-h2 text-[color:var(--color-text-inverse)]">
-                    {it.outcome}
-                  </p>
-                </div>
-
-              </div>
-            ))}
-          </div>
-
-
         </div>
       </section>
       <CtaBand path="/tasks" />
@@ -617,11 +452,11 @@ export const ROUTES: RouteDef[] = [
     Component: HomePage,
   },
   {
-    path: "/for-your-boss",
-    title: "Бизнес-эффект от методологии — БЕЗ ВОДЫ",
+    path: BE.general,
+    title: "Бизнес-эффект от сотрудничества — БЕЗ ВОДЫ",
     description:
-      "Что меняется в работе компании, когда практика сильных сотрудников становится общим стандартом: результат первого этапа, закрытые риски и порядок расчёта стоимости.",
-    Component: BusinessEffectPage,
+      "Опыт, на котором держится бизнес, перестает зависеть от того, кто именно сейчас работает в компании: пять принципов, гарантии, стоимость и скорость старта.",
+    Component: BusinessEffectGeneralPage,
   },
   {
     path: "/tasks",
@@ -629,6 +464,48 @@ export const ROUTES: RouteDef[] = [
     description:
       "Три ситуации и решения к ним: результат держится на одном-двух сильных сотрудниках, инициатив больше, чем ресурсов команды, нужна практика, которой нет внутри.",
     Component: TasksPage,
+  },
+  {
+    path: BE.internal,
+    title: "Масштабирование результатов ваших сильных сотрудников — БЕЗ ВОДЫ",
+    description:
+      "Как экспертность сотрудников превращается в масштабируемый актив компании: путь от практики к рабочей системе, форматы и первый шаг — карта экспертности.",
+    Component: InternalExpertsPage,
+  },
+  {
+    path: BE.internalEffect,
+    title: "Бизнес-эффект · Внутренние эксперты — БЕЗ ВОДЫ",
+    description:
+      "Что меняется для бизнеса, когда практика сильных сотрудников становится системой: пример федеральной ювелирной сети и снижение рисков.",
+    Component: InternalExpertsEffectPage,
+  },
+  {
+    path: BE.team,
+    title: "Реализация амбициозных планов по обучению без потери качества — БЕЗ ВОДЫ",
+    description:
+      "План обучения выполняется, а штат не растет: команда производства обучения по подписке, состав из единиц результата и разбор объема на квартал.",
+    Component: TeamSubscriptionPage,
+  },
+  {
+    path: BE.teamEffect,
+    title: "Бизнес-эффект · Команда по подписке — БЕЗ ВОДЫ",
+    description:
+      "Что меняется для бизнеса с командой обучения по подписке: сравнение со стоимостью той же мощности внутри и устройство работы в течение года.",
+    Component: TeamSubscriptionEffectPage,
+  },
+  {
+    path: BE.external,
+    title: "Ускорение запуска новых направлений в бизнесе — БЕЗ ВОДЫ",
+    description:
+      "Практика, которой внутри нет — без долгого поиска и консалтинга: профили экспертов за 72 часа бесплатно, опыт остается у вас по окончании проекта.",
+    Component: ExternalExpertsPage,
+  },
+  {
+    path: BE.externalEffect,
+    title: "Бизнес-эффект · Внешние эксперты — БЕЗ ВОДЫ",
+    description:
+      "Что меняется, когда опыт практика с рынка становится материалами компании: пример B2B-компании и снижение оттока на 16% по данным заказчика.",
+    Component: ExternalExpertsEffectPage,
   },
   {
     path: "/cases",
@@ -682,4 +559,12 @@ export const HASH_REDIRECTS: Record<string, string> = {
   "#firststage": "/how-we-work",
   "#notfit": "/how-we-work",
   "#capital": "/tasks",
+};
+
+/* Якоря бывших развёрнутых решений на /tasks (финальная структура 02.08):
+   разосланные ссылки /tasks#practice и подобные ведут на продуктовые страницы. */
+export const TASKS_HASH_REDIRECTS: Record<string, string> = {
+  "#practice": BE.internal,
+  "#capacity": BE.team,
+  "#external": BE.external,
 };

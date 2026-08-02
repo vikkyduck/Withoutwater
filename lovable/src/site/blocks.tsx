@@ -95,10 +95,10 @@ export function Hero() {
               <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
             </a>
             <a
-              href="/for-your-boss"
+              href="/business-effect"
               className="link-arrow group t-body"
             >
-              Материал для бизнес-заказчика
+              Бизнес-эффект от сотрудничества
               <ArrowUpRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </a>
           </div>
@@ -150,7 +150,7 @@ export function Bricks() {
   return (
     <section className="relative overflow-hidden border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="06">Работали с командами</SectionLabel>
+        <SectionLabel n="05">Работали с командами</SectionLabel>
         <div className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-line)] sm:grid-cols-3">
           {BRICKS.map((b, i) => (
             <motion.a
@@ -197,7 +197,7 @@ export function NumbersBand() {
   return (
     <section className="relative overflow-hidden border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="05">Наш опыт в цифрах</SectionLabel>
+        <SectionLabel n="04">Наш опыт в цифрах</SectionLabel>
         <div className="mt-10 grid gap-10 sm:grid-cols-2 sm:gap-6">
           {items.map(([n, d]) => (
             <div key={n} className="relative pt-6">
@@ -297,7 +297,7 @@ export function WhenNeeded() {
               key={it.id}
               {...reveal(i)}
             >
-              <a href={`/tasks#${it.id}`} className="card-link group block h-full rounded-md">
+              <a href={it.href} className="card-link group block h-full rounded-md">
                 <div className="surface-dark notch flex h-full flex-col rounded-md p-6 transition-transform duration-300 group-hover:-translate-y-1 md:p-8">
                   <div className="flex items-center justify-between">
                     <Stencil n={i + 1} active className="t-body" />
@@ -442,7 +442,8 @@ export function CaseCard({ item, index }: { item: CaseItem; index: number }) {
   return (
     <motion.div
       {...reveal(index)}
-      className="h-full"
+      id={item.slug}
+      className="h-full scroll-mt-28"
     >
       <div className="card-static group flex h-full flex-col overflow-hidden rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-bg)] shadow-none">
         {/* Шапка — матовое чёрное стекло: название кейса лежит на угольной
@@ -532,19 +533,21 @@ export function CaseCard({ item, index }: { item: CaseItem; index: number }) {
         </div>
 
 
-        <div className="space-y-2">
-          <div className="t-eyebrow text-[color:var(--color-text-secondary)]">
-            Что сделано
+        {item.done && item.done.length > 0 && (
+          <div className="space-y-2">
+            <div className="t-eyebrow text-[color:var(--color-text-secondary)]">
+              Что сделано
+            </div>
+            <ul className="space-y-1.5 t-body text-[color:var(--color-text-primary)]">
+              {item.done.map((d) => (
+                <li key={d} className="flex items-start gap-2.5">
+                  <NodeBullet active={false} className="mt-[0.5em] !h-[6px] !w-[6px]" />
+                  <span>{d}</span>
+                </li>
+              ))}
+            </ul>
           </div>
-          <ul className="space-y-1.5 t-body text-[color:var(--color-text-primary)]">
-            {item.done.map((d) => (
-              <li key={d} className="flex items-start gap-2.5">
-                <NodeBullet active={false} className="mt-[0.5em] !h-[6px] !w-[6px]" />
-                <span>{d}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        )}
 
         {item.changed && (
           <div className="rounded-sm border-l-[3px] border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/5 px-4 py-3">
@@ -555,9 +558,18 @@ export function CaseCard({ item, index }: { item: CaseItem; index: number }) {
           </div>
         )}
 
-        <p className="mt-auto t-small italic text-[color:var(--color-text-secondary)]/70">
-          {item.source}
-        </p>
+        {item.effectHref && (
+          <a href={item.effectHref} className="link-arrow group w-max t-body">
+            Бизнес-эффект и цифры
+            <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </a>
+        )}
+
+        {item.source && (
+          <p className="mt-auto t-small italic text-[color:var(--color-text-secondary)]/70">
+            {item.source}
+          </p>
+        )}
         </div>
       </div>
 
@@ -574,7 +586,7 @@ export function CasesBlock({ compactHeader = false }: { compactHeader?: boolean 
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
         {!compactHeader && (
           <>
-            <SectionLabel n="03">Результаты клиентов</SectionLabel>
+            <SectionLabel n="02">Результаты клиентов</SectionLabel>
             <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
               <RevealHeading className="t-h2 max-w-3xl">
                 Кейсы с конкретными метриками
@@ -639,7 +651,7 @@ export function ReviewsBlock() {
     <section id="reviews" className="stage sec-dark grain border-b border-[color:var(--color-line-dark)]">
       <Scene blobs={[{ className: "-left-40 top-10", tone: "rose", size: 560 }, { className: "-right-40 bottom-10", tone: "chrome", size: 480 }]} />
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="04">Отзывы</SectionLabel>
+        <SectionLabel n="03">Отзывы</SectionLabel>
         <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <RevealHeading className="t-h2 max-w-3xl">
             Что говорят клиенты
@@ -677,7 +689,7 @@ export function BookSection() {
   return (
     <section id="book" className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="07">Методология издана</SectionLabel>
+        <SectionLabel n="06">Методология издана</SectionLabel>
         <div className="mt-8">
           <PaperCard className="overflow-hidden p-0">
             <div className="grid items-center gap-0 sm:grid-cols-[168px_1fr]">
@@ -740,7 +752,7 @@ export function NotFit() {
         { className: "-right-40 bottom-0", tone: "rose", size: 420 },
       ]} />
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="08">Границы</SectionLabel>
+        <SectionLabel n="07">Границы</SectionLabel>
         <RevealHeading className="mt-6 t-h2 max-w-3xl">
           Когда нужен другой подрядчик
         </RevealHeading>
@@ -920,7 +932,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
               <span className="tex-chrome h-[2px] w-12 rounded-pill" />
             ) : (
               <>
-                <span className="font-display t-label font-bold tabular-nums text-[color:var(--color-accent)]">09</span>
+                <span className="font-display t-label font-bold tabular-nums text-[color:var(--color-accent)]">08</span>
                 <span className="h-px w-10 bg-[color:var(--color-line)]" />
               </>
             )}

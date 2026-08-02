@@ -1098,6 +1098,7 @@ export function Footer() {
   const nav = [
     ["Задачи и решения", "/tasks"],
     ["Кейсы", "/cases"],
+    ["Бизнес-эффект", "/business-effect"],
     ["Отзывы", "/reviews"],
     ["Как мы работаем", "/how-we-work"],
     ["О нас", "/team"],
@@ -1210,6 +1211,15 @@ export function PageShell({ path, children }: { path: string; children: ReactNod
       <div className="min-h-screen bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-primary)]">
         <Nav path={path} />
         <main className="pb-20 md:pb-0">{children}</main>
+
+        {/* Финал печатной версии: шапка и футер сайта в PDF скрыты, вместо них —
+            подпись бюро (брендбук: кот появляется на финальных страницах PDF) */}
+        <div className="hidden items-center justify-between gap-6 border-t border-[color:var(--color-line)] px-8 py-6 print:flex">
+          <StencilLogo className="logo-md" />
+          <CatMark className="h-14 w-16 text-[color:var(--color-text-primary)]/70" strokeWidth={2} />
+          <span className="t-caption text-[color:var(--color-text-secondary)]">withoutwater.ru</span>
+        </div>
+
         <Footer />
 
         <CookieBar />
@@ -1285,7 +1295,7 @@ export function ScrollRing({ className = "" }: { className?: string }) {
       onClick={onClick}
       aria-label={atTop ? "Листать дальше" : `Прочитано ${pct}% — наверх`}
       title={atTop ? "Листать дальше" : "Наверх"}
-      className={`card-link group pointer-events-auto absolute hidden aspect-square rounded-pill md:block ${className}`}
+      className={`card-link group pointer-events-auto absolute hidden aspect-square rounded-pill md:block print:hidden ${className}`}
     >
       <span
         className="absolute -inset-[12%] rounded-pill opacity-60"
@@ -1342,11 +1352,13 @@ export function PageHead({
   title,
   lead,
   chips,
+  actions,
 }: {
   kicker: string;
   title?: ReactNode;
   lead?: ReactNode;
   chips?: [string, string][];
+  actions?: ReactNode;
 }) {
   return (
     <div className="stage sec-dark grain relative -mx-0 border-b border-[color:var(--color-line-dark)]">
@@ -1395,6 +1407,11 @@ export function PageHead({
             {lead}
           </p>
         )}
+        {actions && (
+          <div className="mt-9 flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-5 print:hidden">
+            {actions}
+          </div>
+        )}
         {chips && chips.length > 0 && (
           <div className="mt-9 grid max-w-3xl gap-4 sm:grid-cols-2 md:mt-12">
             {chips.map(([label, desc]) => (
@@ -1414,9 +1431,31 @@ export function PageHead({
 
 
 /* ------------------------------- CtaBand --------------------------------- */
-/* Одинаковый финал каждой внутренней страницы: одно действие, одна подпись. */
+/* Одинаковый финал каждой внутренней страницы: одно действие, одна подпись.
+   Страницы раздела «Бизнес-эффект» подставляют свои заголовок и подпись из
+   документа текстов (экраны «Следующий шаг»), остальное не меняется. */
 
-export function CtaBand({ path = "/" }: { path?: string }) {
+export function CtaBand({
+  path = "/",
+  title,
+  note,
+  secondary,
+}: {
+  path?: string;
+  title?: ReactNode;
+  note?: ReactNode;
+  /* null — убрать вторую ссылку (на страницах самого «Бизнес-эффекта») */
+  secondary?: ReactNode | null;
+}) {
+  const defaultSecondary = (
+    <a
+      href="/business-effect"
+      className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
+    >
+      Бизнес-эффект от сотрудничества
+      <ArrowUpRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+    </a>
+  );
   return (
     <section className="stage sec-dark grain border-t border-[color:var(--color-line-dark)]">
       <Scene blobs={[{ className: "-left-40 top-0", tone: "rose", size: 460 }]} />
@@ -1426,13 +1465,17 @@ export function CtaBand({ path = "/" }: { path?: string }) {
           <span>Следующий шаг</span>
         </div>
         <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
-          Разберём вашу задачу за 30 минут
+          {title ?? "Разберём вашу задачу за 30 минут"}
         </RevealHeading>
         <p className="t-body measure mt-5 text-[color:var(--color-text-inverse-2)]">
-          Готовить презентацию и ТЗ не нужно. Сверим задачу и определим
-          следующий шаг — или честно скажем, что не поможем.
+          {note ?? (
+            <>
+              Готовить презентацию и ТЗ не нужно. Сверим задачу и определим
+              следующий шаг — или честно скажем, что не поможем.
+            </>
+          )}
         </p>
-        <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
+        <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6 print:hidden">
           <a href={ctaHref(path)} className="btn btn-invert group w-full sm:w-auto">
             <span>{CTA_LABEL}</span>
             <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
@@ -1440,13 +1483,7 @@ export function CtaBand({ path = "/" }: { path?: string }) {
           <span className="t-body text-[color:var(--color-text-inverse-2)]">
             Ответим в течение двух рабочих часов
           </span>
-          <a
-            href="/for-your-boss"
-            className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
-          >
-            Материал для бизнес-заказчика
-            <ArrowUpRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-          </a>
+          {secondary === null ? null : secondary ?? defaultSecondary}
         </div>
       </div>
     </section>

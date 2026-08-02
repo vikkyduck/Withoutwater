@@ -1,6 +1,6 @@
 import { createRoot } from "react-dom/client";
 import "./styles.css";
-import { ROUTES, HASH_REDIRECTS } from "./site/pages";
+import { ROUTES, HASH_REDIRECTS, TASKS_HASH_REDIRECTS } from "./site/pages";
 
 /* Многостраничник без клиентского роутера: каждая страница пререндерена
    в свой dist/<путь>/index.html, бандл один — монтируем компонент по
@@ -12,17 +12,20 @@ const normalize = (p: string) => {
   return path;
 };
 
-/* Редиректы со старых якорей одностраничника (ТЗ п.5): разосланные ссылки
-   вида /#faq должны приводить на новые страницы. */
+/* Редиректы со старых якорей: с главной (/#faq и подобные — ТЗ п.5) и
+   с /tasks#practice на продуктовые страницы (финальная структура 02.08). */
 const hash = window.location.hash;
-const target = normalize(window.location.pathname) === "/" ? HASH_REDIRECTS[hash] : undefined;
+const page = normalize(window.location.pathname);
+const target =
+  page === "/" ? HASH_REDIRECTS[hash]
+  : page === "/tasks" ? TASKS_HASH_REDIRECTS[hash]
+  : undefined;
 if (target) {
   /* сохраняем query: разосланные ссылки вида /?utm_source=…#faq не должны
      терять атрибуцию при редиректе */
   window.location.replace(target + window.location.search);
 } else {
-  const path = normalize(window.location.pathname);
-  const route = ROUTES.find((r) => r.path === path) ?? ROUTES[0];
+  const route = ROUTES.find((r) => r.path === page) ?? ROUTES[0];
   const Page = route.Component;
   createRoot(document.getElementById("root")!).render(<Page />);
 }

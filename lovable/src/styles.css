@@ -694,7 +694,10 @@ html[data-calm="true"] .lg::before { display: none; }
 }
 .tab-fade { animation: tab-fade 300ms var(--ease-out); }
 
-/* Стекла в печати нет — материала там нет (раздел 7) */
+/* Стекла в печати нет — материала там нет (раздел 7). PDF раздела
+   «Бизнес-эффект» собираются из этой же вёрстки печатью A4 (брендбук, 12). */
+@page { size: A4; margin: 0; }
+
 @media print {
   .lg, .btn-glass {
     backdrop-filter: none !important;
@@ -705,6 +708,27 @@ html[data-calm="true"] .lg::before { display: none; }
   }
   .lg::before, .lg::after { display: none !important; }
   .stage__bg { display: none !important; }
+
+  /* Тёмное стекло лежит на угольных сценах — в печати оно тоже плотная
+     поверхность, но тёмная: светлая плашка на угле развалила бы контраст */
+  .sec-dark .lg-dark, .lg-dark {
+    background: var(--color-surface-dark) !important;
+    border-color: var(--color-line-dark) !important;
+  }
+
+  /* Навигация, футер, cookie и плавающие элементы — не для бумаги */
+  header, footer, [data-cookie-bar] { display: none !important; }
+
+  /* Сценарии появления framer прописаны инлайном (opacity/translate/blur):
+     на печати ничего не «появляется», поэтому показываем всё сразу */
+  main [style*="opacity"] {
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+  }
+
+  /* Секции не рвём по страницам посередине карточек */
+  .card, .surface-dark, .notch { break-inside: avoid; }
 }
 
 /* ==========================================================================

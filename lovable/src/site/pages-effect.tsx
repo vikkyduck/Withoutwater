@@ -1,0 +1,1200 @@
+/* ============================================================================
+   pages-effect.tsx — раздел «Бизнес-эффект» (финальная структура от 02.08).
+   Семь страниц: три продуктовые (/tasks/…), три подстраницы эффекта
+   (/tasks/…/business-effect) и общая /business-effect.
+   Тексты — СЛОВО В СЛОВО из документа «Раздел „Бизнес-эффект“ — финальные
+   тексты четырех страниц» (02.08.2026); менять их здесь нельзя, правки —
+   только через Викторию. Раскладка экранов по страницам — по документу
+   «финальная структура сайта» той же даты.
+   ========================================================================== */
+import {
+  motion,
+  ArrowUpRight, ArrowRight, ArrowDown, Check,
+  PageShell, PageHead, SectionLabel, PaperCard, GlassCard, Scene, NodeScene, CtaBand,
+  RevealHeading, NodeBullet, NodeList, Stencil, CatMark, LineIcon,
+  reveal, ctaHref, CTA_LABEL,
+  type ReactNode,
+} from "./core";
+import { SITUATIONS } from "./data";
+
+/* ------------------------------ Адреса и PDF ------------------------------ */
+
+export const BE = {
+  general: "/business-effect",
+  internal: "/tasks/internal-experts",
+  internalEffect: "/tasks/internal-experts/business-effect",
+  team: "/tasks/team-subscription",
+  teamEffect: "/tasks/team-subscription/business-effect",
+  external: "/tasks/external-experts",
+  externalEffect: "/tasks/external-experts/business-effect",
+};
+
+const PDF = {
+  general: "/pdf/bez-vody-business-effect.pdf",
+  internal: "/pdf/bez-vody-internal-experts.pdf",
+  team: "/pdf/bez-vody-team-subscription.pdf",
+  external: "/pdf/bez-vody-external-experts.pdf",
+};
+
+/* --------------------------- Мелкие общие детали -------------------------- */
+
+function CtaButton({ path }: { path: string }) {
+  return (
+    <a href={ctaHref(path)} className="btn btn-invert group w-full sm:w-auto">
+      <span>{CTA_LABEL}</span>
+      <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
+    </a>
+  );
+}
+
+function PdfButton({ file }: { file: string }) {
+  return (
+    <a href={file} download className="btn btn-glass group w-full sm:w-auto print:hidden">
+      <span>Скачать в PDF</span>
+      <ArrowDown data-arrow="down" className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+    </a>
+  );
+}
+
+/* Ссылка «Бизнес-эффект и цифры» (продуктовая → подстраница) и
+   «Как устроена работа» (подстраница → продуктовая) — формулировки из ТЗ. */
+function EffectLink({ href, dark = false }: { href: string; dark?: boolean }) {
+  return (
+    <a
+      href={href}
+      className={`link-arrow group t-body ${dark ? "text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]" : ""}`}
+    >
+      Бизнес-эффект и цифры
+      <ArrowUpRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+    </a>
+  );
+}
+
+function HowLink({ href, dark = false }: { href: string; dark?: boolean }) {
+  return (
+    <a
+      href={href}
+      className={`link-arrow group t-body ${dark ? "text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]" : ""}`}
+    >
+      Как устроена работа
+      <ArrowUpRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+    </a>
+  );
+}
+
+/* Плитки цифр примера — на тёмной сцене, значения Unbounded */
+function MetricTiles({ items }: { items: [string, string][] }) {
+  return (
+    <div className="grid gap-3 sm:grid-cols-3">
+      {items.map(([value, label], i) => (
+        <motion.div key={label} {...reveal(i)} className="surface-dark notch rounded-md px-5 py-6">
+          <div className="font-display t-number font-medium tabular-nums tracking-[-0.02em] text-[color:var(--color-text-inverse)] hyphens-none [overflow-wrap:anywhere]">
+            {value}
+          </div>
+          <p className="mt-3 t-body text-[color:var(--color-text-inverse-2)]">{label}</p>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+/* Карточки «Заголовок. Текст» — общий приём для экранов «Что меняется…» */
+function TitledCards({
+  items,
+  cols = "sm:grid-cols-3",
+}: {
+  items: [string, string][];
+  cols?: string;
+}) {
+  return (
+    <div className={`grid items-stretch gap-4 ${cols}`}>
+      {items.map(([t, d], i) => (
+        <motion.div key={t} {...reveal(i)} className="h-full">
+          <PaperCard className="h-full p-6">
+            <div className="font-display t-body font-bold">{t}</div>
+            <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
+          </PaperCard>
+        </motion.div>
+      ))}
+    </div>
+  );
+}
+
+/* --------------------- Таблица «Сколько стоит внутри» --------------------- */
+/* Одна и та же таблица живёт на /business-effect (экран 5) и на подстранице
+   подписки (экран 4) — различаются только строки вокруг неё. */
+
+const STAFF_ROWS: [string, string][] = [
+  ["Методолог", "120 000 — 150 000 ₽"],
+  ["Руководитель проекта", "180 000 — 250 000 ₽"],
+  ["Дизайнер и сборщик курсов в системе обучения", "90 000 — 120 000 ₽"],
+];
+const STAFF_TOTAL: [string, string] = ["Итого фонд оплаты труда", "390 000 — 520 000 ₽"];
+const STAFF_NOTE =
+  "Сноска: указан только фонд оплаты труда — без страховых взносов, подбора, рабочих мест и обучения. Источник: выборка вакансий hh.ru, Москва, 2 августа 2026 года. Реальные затраты компании выше указанных.";
+
+function StaffCostTable({
+  ourLine,
+  afterLine,
+  extraLine,
+}: {
+  /* «Работа с нами: …» или «Подписка: …» */
+  ourLine: string;
+  afterLine: string;
+  extraLine?: string;
+}) {
+  return (
+    <div className="mt-8 max-w-3xl">
+      <div className="overflow-hidden rounded-sm border border-[color:var(--color-line-dark)]">
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] gap-x-6 border-b border-[color:var(--color-line-dark)] bg-white/[0.04] px-5 py-3">
+          <span className="t-eyebrow text-[color:var(--color-text-inverse-2)]">Роль в штате</span>
+          <span className="t-eyebrow text-[color:var(--color-text-inverse-2)]">В месяц, гросс</span>
+        </div>
+        {STAFF_ROWS.map(([role, cost]) => (
+          <div
+            key={role}
+            className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 border-b border-[color:var(--color-line-dark)] px-5 py-3.5"
+          >
+            <span className="t-body text-[color:var(--color-text-inverse)]">{role}</span>
+            <span className="t-body tabular-nums whitespace-nowrap text-[color:var(--color-text-inverse-2)]">{cost}</span>
+          </div>
+        ))}
+        <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 bg-white/[0.04] px-5 py-3.5">
+          <span className="t-body font-semibold text-[color:var(--color-text-inverse)]">{STAFF_TOTAL[0]}</span>
+          <span className="font-display t-body font-medium tabular-nums whitespace-nowrap text-[color:var(--color-text-inverse)]">{STAFF_TOTAL[1]}</span>
+        </div>
+      </div>
+
+      <div className="tint-ink mt-6 rounded-md border-l-2 border-[color:var(--color-accent)] p-6">
+        <p className="font-display t-body font-medium text-[color:var(--color-text-inverse)]">{ourLine}</p>
+        <p className="mt-2 t-body text-[color:var(--color-text-inverse-3,var(--color-text-inverse-2))]">{afterLine}</p>
+      </div>
+
+      <p className="mt-5 t-caption text-[color:var(--color-text-inverse-2)]">{STAFF_NOTE}</p>
+      {extraLine && (
+        <p className="mt-3 t-body text-[color:var(--color-text-inverse-2)]">{extraLine}</p>
+      )}
+    </div>
+  );
+}
+
+/* ==========================================================================
+   СТРАНИЦА 1 · /business-effect — общий бизнес-эффект, десять экранов
+   ========================================================================== */
+
+export function BusinessEffectGeneralPage() {
+  const principles: [string, string][] = [
+    ["Актив, а не услуга", "Права на созданные материалы остаются у заказчика: программы, сценарии, тренажеры, базы знаний, исходные файлы. Это не доступ к платформе, от которого нельзя отказаться."],
+    ["Вы не привязаны к нам", "Права на материалы у вас, документация передана — программу можно запускать без нашего участия. Так работает программа для Global Broker League. Заказчики продлевают сотрудничество не потому, что не могут уйти, а потому что появляются новые задачи."],
+    ["Одна точка ответственности", "Один договор вместо набора договоров с исполнителями. Сборка команды, подбор, замена и координация — наша зона. Если исполнитель не подошел, меняем за свой счет. Закрывающие документы — на одно юридическое лицо."],
+    ["Договоренность о результате, а не о часах", "Стоимость и критерии приемки фиксируются до начала работ. Оплата привязана к объему работ, а не к календарю. Численность вашей функции не растет: команда собирается под задачу и расходится по ее завершении."],
+    ["Видно, во что инвестируются деньги", "У каждого заказчика личный кабинет: что заказано, что в работе, что принято, каков остаток по пакетам. Движение показано в единицах результата, а не в часах. При изменении состава работ остаток пересчитывается сразу."],
+  ];
+
+  const guarantees: [string, string][] = [
+    ["Результат этапа и критерии приемки фиксируем до начала работ", "Бизнес-показателей, на которые влияет не только обучение: продажи, текучесть, выручка. Мы отвечаем за качество и применимость материалов"],
+    ["Замену исполнителя, если он не подошел, за наш счет", "Результата без участия носителей опыта: если эксперты не выделяют время на интервью, нам нужно будет передоговориться о сроках"],
+    ["Соблюдение согласованных сроков по задачам, зависящим только от нас", "При паузе или форс-мажоре с вашей стороны сроки пересматриваем вместе"],
+    ["Доработку материалов до соответствия согласованным критериям", "При изменении образа результата пересматриваем сроки и критерии приемки"],
+  ];
+
+  const startRows: [string, string][] = [
+    ["2 рабочих часа", "Отвечаем на заявку"],
+    ["30 минут", "Разбираем с вами задачу онлайн"],
+    ["24 часа", "Назначаем команду и проводим стартовую встречу"],
+    ["72 часа", "Представляем профили внешних экспертов, если они нужны. Бесплатно"],
+  ];
+
+  const startFrom: { title: string; step: string; href: string }[] = [
+    { title: "Результаты держатся на нескольких людях", step: "Первый шаг: карта экспертности, 60 000 ₽, 7–14 дней", href: BE.internalEffect },
+    { title: "Задач больше, чем рук", step: "Первый шаг: разбор объема и плана на квартал", href: BE.teamEffect },
+    { title: "Нужной практики внутри нет", step: "Первый шаг: профили практиков за 72 часа, бесплатно", href: BE.externalEffect },
+  ];
+
+  return (
+    <PageShell path={BE.general}>
+      {/* Экран 1. Обещание */}
+      <section className="stage border-b border-[color:var(--color-line)]">
+        <PageHead
+          kicker="Бизнес-эффект"
+          title={<>Бизнес-эффект от сотрудничества с&nbsp;нами</>}
+          lead="Опыт, на котором держится бизнес, перестает зависеть от того, кто именно сейчас работает в компании. Мы переводим его в продукты обучения, которыми компания распоряжается сама."
+          actions={
+            <>
+              <CtaButton path={BE.general} />
+              <PdfButton file={PDF.general} />
+            </>
+          }
+        />
+
+        {/* Экран 2. Три ситуации, один механизм */}
+        <div className="sec-dark grain relative border-b border-[color:var(--color-line-dark)]">
+          <div className="pointer-events-none absolute inset-0" aria-hidden>
+            <NodeScene className="text-[color:var(--color-text-inverse-2)]" opacity={0.3} />
+          </div>
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="01">Три ситуации, один механизм</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
+              Откуда бы ни пришли знание и опыт, оно остается у компании
+            </RevealHeading>
+            <div className="mt-10 grid gap-4 md:grid-cols-3">
+              {SITUATIONS.map((it, i) => (
+                <motion.div key={it.id} {...reveal(i)} className="surface-dark notch flex h-full flex-col rounded-md p-6">
+                  <div className="flex items-center gap-3">
+                    <Stencil n={i + 1} active className="t-body" />
+                    <span className="h-px w-6 bg-[color:var(--color-line-dark)]" />
+                  </div>
+                  <div className="mt-4 font-display t-body font-medium text-[color:var(--color-text-inverse)]">
+                    {it.situation}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Экран 3. 5 принципов */}
+        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+          <SectionLabel n="02">Принципы</SectionLabel>
+          <RevealHeading className="t-h2 mt-6 max-w-3xl">
+            5 принципов, одинаковых для всех наших работ
+          </RevealHeading>
+          <div className="mt-10 grid items-stretch gap-4 sm:grid-cols-2">
+            {principles.slice(0, 4).map(([t, d], i) => (
+              <motion.div key={t} {...reveal(i)} className="h-full">
+                <PaperCard className="h-full p-6 md:p-7">
+                  <div className="flex items-center gap-3">
+                    <Stencil n={i + 1} active className="t-body" />
+                    <span className="h-px w-6 bg-[color:var(--color-line)]" />
+                  </div>
+                  <div className="mt-4 font-display t-body font-bold">{t}</div>
+                  <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
+                </PaperCard>
+              </motion.div>
+            ))}
+            {/* Пятый принцип — с макетом личного кабинета (данные скрыты) */}
+            <motion.div {...reveal(4)} className="h-full sm:col-span-2">
+              <PaperCard className="h-full p-6 md:p-7">
+                <div className="grid items-center gap-8 md:grid-cols-[minmax(0,1.2fr)_minmax(0,1fr)]">
+                  <div>
+                    <div className="flex items-center gap-3">
+                      <Stencil n={5} active className="t-body" />
+                      <span className="h-px w-6 bg-[color:var(--color-line)]" />
+                    </div>
+                    <div className="mt-4 font-display t-body font-bold">{principles[4][0]}</div>
+                    <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">{principles[4][1]}</p>
+                  </div>
+                  {/* Личный кабинет: показываем структурой, данные скрыты */}
+                  <div aria-hidden className="stage relative overflow-hidden rounded-md bg-[color:var(--color-bg-dark)] p-5 md:p-6">
+                    <div className="pointer-events-none absolute inset-0">
+                      <NodeScene className="!right-[-12%] !h-[90%] text-[color:var(--color-text-inverse-2)]" opacity={0.35} />
+                    </div>
+                    <div className="relative space-y-2.5">
+                      {["что заказано", "что в работе", "что принято", "остаток по пакетам"].map((label, i) => (
+                        <div key={label} className="lg lg-dark flex items-center justify-between gap-4 rounded-sm px-4 py-3">
+                          <span className="t-caption text-[color:var(--color-text-inverse-2)]">{label}</span>
+                          <span
+                            className="h-2.5 rounded-pill"
+                            style={{
+                              width: `${34 + i * 14}px`,
+                              background: "rgba(233,196,189,0.4)",
+                              filter: "blur(3px)",
+                            }}
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </PaperCard>
+            </motion.div>
+          </div>
+        </div>
+
+        {/* Экран 4. Что происходит после проекта */}
+        <div className="relative border-t border-[color:var(--color-line)]">
+          <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="03">Что происходит после проекта</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl">
+              Программа устаревает быстрее, чем кажется
+            </RevealHeading>
+            <p className="mt-5 max-w-3xl t-body text-[color:var(--color-text-primary)]">
+              Меняются продукты, регламенты и состав команд — и материалы, которые
+              год назад работали, начинают учить не тому. Устаревшая программа
+              хуже, чем ее отсутствие: сотрудники доверяют ей и действуют по ней.
+            </p>
+            <div className="mt-8 grid max-w-4xl gap-4 sm:grid-cols-2">
+              <PaperCard className="p-6">
+                <div className="font-display t-body font-bold">Поддержание актуальности</div>
+                <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">
+                  регулярный пересмотр материалов под изменения в компании — от 40 000 ₽ в месяц
+                </p>
+              </PaperCard>
+              <PaperCard className="p-6">
+                <div className="font-display t-body font-bold">Расширение готовой программы</div>
+                <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">
+                  на новые команды, регионы и роли — по прайсу разработки
+                </p>
+              </PaperCard>
+            </div>
+            <p className="mt-6 max-w-3xl t-body text-[color:var(--color-text-secondary)]">
+              Обе работы идут без повторного погружения: контекст компании у нас уже есть.
+            </p>
+          </div>
+        </div>
+
+        {/* Экран 5. Сколько стоит та же мощность внутри */}
+        <div className="sec-dark grain relative border-t border-[color:var(--color-line-dark)]">
+          <Scene blobs={[{ className: "-right-40 top-10", tone: "chrome", size: 480 }]} />
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="04">Сколько стоит та же мощность внутри</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
+              Производство обучения — это не один человек
+            </RevealHeading>
+            <p className="mt-5 max-w-3xl t-body text-[color:var(--color-text-inverse-2)]">
+              Чтобы регулярно выпускать программы, нужны минимум трое: методолог,
+              руководитель проекта и специалист, который собирает курс и оформляет
+              его в системе обучения. Внутри компании это ежемесячные оклады
+              независимо от того, сколько программ нужно реализовать.
+            </p>
+            <StaffCostTable
+              ourLine="Работа с нами: от 200 000 ₽ в месяц."
+              afterLine="Объем работ в обоих случаях зависит от задач: у нас он фиксируется в договоре через образ результата, а не через часовые ставки."
+            />
+          </div>
+        </div>
+
+        {/* Экран 6. Безопасность ваших данных */}
+        <div className="relative border-t border-[color:var(--color-line)]">
+          <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="05">Безопасность ваших данных</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl">
+              Материалы компании не уходят в открытые сервисы ИИ
+            </RevealHeading>
+            <div className="mt-8 max-w-3xl">
+              <NodeList
+                divided
+                items={[
+                  "Названия компании, персональные данные и сведения, по которым можно опознать бизнес, удаляются до начала обработки",
+                  "В открытые сервисы искусственного интеллекта передаются только обезличенные данные",
+                  "Работаем в рамках вашей политики безопасности, включая ограничения на такие инструменты: по требованию заказчика ведем проект без них",
+                ]}
+              />
+            </div>
+          </div>
+        </div>
+
+        {/* Экран 7. Гарантии */}
+        <div className="relative border-t border-[color:var(--color-line)]">
+          <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="06">Гарантии</SectionLabel>
+            <div className="mt-8 grid gap-x-4 gap-y-3 md:grid-cols-2">
+              <div className="t-eyebrow px-1 text-[color:var(--color-text-secondary)]">Что гарантируем</div>
+              <div className="t-eyebrow hidden px-1 text-[color:var(--color-text-secondary)] md:block">Чего не гарантируем</div>
+              {guarantees.map(([yes, no], i) => (
+                <motion.div key={yes} {...reveal(i)} className="contents">
+                  <PaperCard className="p-5">
+                    <div className="flex items-start gap-3">
+                      <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--color-accent)]" />
+                      <p className="t-body text-[color:var(--color-text-primary)]">{yes}</p>
+                    </div>
+                  </PaperCard>
+                  <div className="rounded-md border border-dashed border-[color:var(--color-line)] p-5">
+                    <div className="mb-1 t-eyebrow text-[color:var(--color-text-secondary)] md:hidden">Чего не гарантируем</div>
+                    <p className="t-body text-[color:var(--color-text-secondary)]">{no}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Экран 8. Как быстро начинается работа */}
+        <div className="relative border-t border-[color:var(--color-line)]">
+          <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="07">Как быстро начинается работа</SectionLabel>
+            <div className="mt-8 max-w-3xl overflow-hidden rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-surface)]">
+              {startRows.map(([term, what], i) => (
+                <motion.div
+                  key={term}
+                  {...reveal(i)}
+                  className={`flex items-baseline gap-4 px-5 py-3.5 ${i > 0 ? "border-t border-[color:var(--color-line)]" : ""}`}
+                >
+                  <span className="stencil flex-none t-caption tracking-[0.2em] text-[color:var(--color-accent)]">
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="w-32 flex-none font-display t-body font-medium tracking-tight sm:w-40">{term}</span>
+                  <span className="t-body text-[color:var(--color-text-secondary)]">{what}</span>
+                </motion.div>
+              ))}
+            </div>
+            <p className="mt-6 max-w-3xl t-body text-[color:var(--color-text-primary)]">
+              Готовить презентацию и техническое задание не нужно: принимаем вводные в любом виде.
+            </p>
+          </div>
+        </div>
+
+        {/* Экран 9. С какой стороны начать */}
+        <div className="sec-dark grain relative border-t border-[color:var(--color-line-dark)]">
+          <Scene blobs={[{ className: "-left-40 bottom-0", tone: "rose", size: 460 }]} />
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="08">С какой стороны начать</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
+              Три ситуации
+            </RevealHeading>
+            <div className="mt-10 grid gap-5 md:grid-cols-3">
+              {startFrom.map((it, i) => (
+                <motion.a
+                  key={it.href}
+                  href={it.href}
+                  {...reveal(i)}
+                  className="card-link surface-dark group flex h-full flex-col rounded-md p-6 md:p-7"
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <Stencil n={i + 1} active className="t-body" />
+                    <span
+                      aria-hidden
+                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-pill border border-[color:var(--color-line-dark)] text-[color:var(--color-text-inverse)]"
+                    >
+                      <ArrowRight data-arrow className="h-4 w-4" />
+                    </span>
+                  </div>
+                  <div className="mt-3 font-display t-body font-medium text-[color:var(--color-text-inverse)]">
+                    {it.title}
+                  </div>
+                  <p className="mt-auto pt-4 t-body text-[color:var(--color-text-inverse-2)]">{it.step}</p>
+                </motion.a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Экран 10. Следующий шаг */}
+      <CtaBand
+        path={BE.general}
+        title={<>Посчитаем на ваших цифрах</>}
+        note="30 минут онлайн: разбираем задачу, смотрим, какой опыт есть внутри, и оцениваем объем первого этапа."
+        secondary={
+          <a
+            href={PDF.general}
+            download
+            className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)] print:hidden"
+          >
+            Скачать в PDF
+            <ArrowDown data-arrow="down" className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+          </a>
+        }
+      />
+    </PageShell>
+  );
+}
+
+/* ==========================================================================
+   /tasks/internal-experts — продуктовая: внутренние эксперты
+   ========================================================================== */
+
+export function InternalExpertsPage() {
+  const path = BE.internal;
+  const pathSteps = [
+    "Практика сильного сотрудника",
+    "Его логика решений",
+    "Рабочая система",
+    "Применение командой",
+    "Масштабирование результата",
+  ];
+  const formats = [
+    "короткие видеоуроки и авторские разборы ваших экспертов — там, где важна логика рассуждения",
+    "схемы, памятки, алгоритмы и деревья решений — там, где нужен быстрый ответ в моменте",
+    "калькуляторы типовых расчетов с согласованными вводными и контрольными примерами",
+    "сценарии разговоров и карточки для клиентских ролей",
+    "библиотека реальных кейсов: успешных, убыточных, спорных",
+    "тренажеры рабочих диалогов",
+    "ИИ-ассистент, отвечающий на вопросы по базе знаний",
+    "тесты и аттестационные кейсы с защитой решения перед экспертом",
+  ];
+  const usefulWhen: [string, string][] = [
+    ["Компания быстро растет", "Нужно масштабировать опыт быстрее, чем увеличивается нагрузка на сильных специалистов"],
+    ["Есть эксперты, которые создают ключевой результат", "Важно сделать их подход доступным для команды"],
+    ["Запускается новое направление", "Нужно быстро сформировать новую практику внутри компании"],
+    ["Внутренние команды перегружены", "Нужно усилить бизнес без расширения постоянного штата"],
+  ];
+
+  return (
+    <PageShell path={path}>
+      {/* Экран 1. Обещание */}
+      <section className="stage border-b border-[color:var(--color-line)]">
+        <PageHead
+          kicker="Масштабирование результатов ваших сильных сотрудников"
+          title={<>Как экспертность сотрудников превращается в&nbsp;масштабируемый актив компании</>}
+          lead="В каждой организации есть люди, которые создают результат лучше остальных. Мы переводим их способ работы в инструменты, которыми пользуется вся команда."
+          actions={
+            <>
+              <CtaButton path={path} />
+              <EffectLink href={BE.internalEffect} dark />
+            </>
+          }
+        />
+
+        {/* Экран 2. Лучшие практики уже есть внутри */}
+        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+          <SectionLabel n="01">Опора</SectionLabel>
+          <RevealHeading className="t-h2 mt-6 max-w-3xl">
+            Лучшие практики уже есть внутри вашей компании
+          </RevealHeading>
+          <div className="mt-8 grid gap-10 md:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)] md:gap-14">
+            <div>
+              <p className="t-body text-[color:var(--color-text-primary)]">Сильные сотрудники знают:</p>
+              <div className="mt-4">
+                <NodeList
+                  divided
+                  items={[
+                    "какие решения действительно работают",
+                    "какие факторы влияют на результат",
+                    "где возникают риски",
+                    "как действовать в нестандартных ситуациях",
+                  ]}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col gap-4">
+              <p className="t-body text-[color:var(--color-text-primary)]">
+                Это уже является конкурентным преимуществом компании. Задача —
+                сделать так, чтобы результат не зависел от конкретных сотрудников
+                и стал частью системы.
+              </p>
+              <p className="t-body text-[color:var(--color-text-primary)]">
+                «Без Воды» превращает практику ключевых специалистов в рабочие
+                инструменты бизнеса: стандарты принятия решений, алгоритмы работы,
+                базы знаний, программы адаптации, тренажеры, цифровые инструменты.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Экран 4. Как выглядит путь */}
+        <div className="sec-dark grain relative border-t border-[color:var(--color-line-dark)]">
+          <div className="pointer-events-none absolute inset-0" aria-hidden>
+            <NodeScene className="text-[color:var(--color-text-inverse-2)]" opacity={0.28} />
+          </div>
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="02">Как выглядит путь</SectionLabel>
+            <div className="mt-10 grid gap-3 md:grid-cols-5">
+              {pathSteps.map((step, i) => (
+                <motion.div key={step} {...reveal(i)} className="relative">
+                  <div className="surface-dark flex h-full flex-col rounded-md p-5">
+                    <Stencil n={i + 1} active className="t-caption" />
+                    <div className="mt-3 font-display t-body font-medium text-[color:var(--color-text-inverse)]">
+                      {step}
+                    </div>
+                  </div>
+                  {i < pathSteps.length - 1 && (
+                    <span
+                      aria-hidden
+                      className="absolute -right-2.5 top-1/2 z-10 hidden -translate-y-1/2 text-[color:var(--color-accent-glass)] md:block"
+                    >
+                      <ArrowRight className="h-4 w-4" />
+                    </span>
+                  )}
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Экран 6. Форматы после структурирования */}
+        <div className="relative border-t border-[color:var(--color-line)]">
+          <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="03">Форматы</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl">
+              Какие форматы возможны после структурирования
+            </RevealHeading>
+            <p className="mt-5 max-w-3xl t-body text-[color:var(--color-text-primary)]">
+              Один и тот же блок знаний можно упаковать по-разному — выбор зависит
+              от задачи, которую решает сотрудник:
+            </p>
+            <div className="mt-8 grid max-w-5xl gap-x-10 md:grid-cols-2">
+              <NodeList divided items={formats.slice(0, 4)} />
+              <NodeList divided className="max-md:border-t-0" items={formats.slice(4)} />
+            </div>
+          </div>
+        </div>
+
+        {/* Экран 8. Когда такой подход особенно полезен */}
+        <div className="sec-dark grain relative border-t border-[color:var(--color-line-dark)]">
+          <Scene blobs={[{ className: "-right-40 top-10", tone: "rose", size: 460 }]} />
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="04">Когда такой подход особенно полезен</SectionLabel>
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
+              {usefulWhen.map(([t, d], i) => (
+                <motion.div key={t} {...reveal(i)} className="surface-dark notch rounded-md p-6">
+                  <div className="flex items-center gap-3">
+                    <Stencil n={i + 1} active className="t-body" />
+                    <span className="h-px w-6 bg-[color:var(--color-line-dark)]" />
+                    <LineIcon
+                      name={(["metric", "team", "insight", "process"] as const)[i]}
+                      className="h-5 w-5 text-[color:var(--color-accent-glass)]"
+                    />
+                  </div>
+                  <div className="mt-4 font-display t-body font-medium text-[color:var(--color-text-inverse)]">{t}</div>
+                  <p className="mt-2.5 t-body text-[color:var(--color-text-inverse-2)]">{d}</p>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Экран 10. Проверить нас в деле */}
+        <div className="relative border-t border-[color:var(--color-line)]">
+          <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="05">Проверить нас в деле</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl">
+              Структурируем опыт ваших сотрудников за 7–14 дней
+            </RevealHeading>
+            <p className="mt-5 max-w-3xl t-body text-[color:var(--color-text-primary)]">
+              Компания получает структурированную карту знаний и дальше свободна
+              в выборе: продолжать с нами, силами внутренней команды или с другим
+              подрядчиком. Все материалы остаются в вашей собственности.
+            </p>
+            <div className="mt-10 grid gap-10 md:grid-cols-2 md:gap-14">
+              <div>
+                <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Как работаем</div>
+                <div className="mt-4">
+                  <NodeList
+                    divided
+                    items={[
+                      "Проводим интервью и рабочие сессии с носителями экспертности",
+                      "Разбираем реальные результаты: успешные, неуспешные, спорные и несостоявшиеся",
+                      "Выявляем критический минимум знаний, умений и навыков для получения нужного результата",
+                      "Извлекаем не только факты, но и логику решений сильнейших сотрудников",
+                    ]}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="t-eyebrow text-[color:var(--color-text-secondary)]">В результате у вас</div>
+                <div className="mt-4">
+                  <NodeList
+                    divided
+                    items={[
+                      "Карта знаний, разделенная на уровни погружения",
+                      "Карта процесса с перечнем критических решений и точек обязательной эскалации",
+                      "Матрица компетенций: что сотрудник обязан знать и где границы его самостоятельности",
+                      "Рекомендации по формату подачи каждого блока знаний с обоснованием",
+                      "Архитектура базы знаний и техническое задание для разработки материалов",
+                      "Дорожная карта дальнейшей работы с оценкой трудоемкости",
+                    ]}
+                  />
+                </div>
+              </div>
+            </div>
+            <PaperCard className="mt-10 max-w-3xl border-l-[3px] border-l-[color:var(--color-accent)] p-6">
+              <p className="font-display t-body font-medium">
+                Инвестиция: 60 000 ₽ · Срок: 7–14 дней
+              </p>
+            </PaperCard>
+          </div>
+        </div>
+      </section>
+
+      {/* Экран 9. Следующий шаг */}
+      <CtaBand
+        path={path}
+        title={<>Разберем вашу задачу за 30 минут</>}
+        note="Определим, какую экспертизу стоит масштабировать, какой результат нужен бизнесу и подходит ли первый этап под вашу ситуацию. Без подготовки презентации и технического задания."
+        secondary={<EffectLink href={BE.internalEffect} dark />}
+      />
+    </PageShell>
+  );
+}
+
+/* ==========================================================================
+   /tasks/internal-experts/business-effect — эффект: внутренние эксперты
+   ========================================================================== */
+
+export function InternalExpertsEffectPage() {
+  const path = BE.internalEffect;
+  const changes: [string, string][] = [
+    ["Рост становится менее зависимым от отдельных людей", "Сильные сотрудники продолжают создавать новое, а их опыт помогает развивать других."],
+    ["Новые сотрудники быстрее выходят на нужный уровень", "Они получают не только инструкции, но и понимание логики решений."],
+    ["Компания сохраняет и масштабирует собственные практики", "То, что создавалось годами внутри бизнеса, становится доступным более широкой команде."],
+  ];
+  const lowerRisks: [string, string][] = [
+    ["Результат фиксируется до начала работы", "До старта определяем, что создаем, какой результат считается готовым и как проходит приемка."],
+    ["Один партнер отвечает за весь процесс", "«Без Воды» берет на себя организацию проекта, работу с экспертами, методологическую структуру и сборку результата."],
+    ["Компания сохраняет контроль", "Первый этап — самостоятельный результат. Решение о продолжении вы принимаете после того, как понимаете объем задачи, ценность экспертизы и необходимый формат решения."],
+  ];
+
+  return (
+    <PageShell path={path}>
+      <section className="stage border-b border-[color:var(--color-line)]">
+        <PageHead
+          kicker="Бизнес-эффект · Внутренние эксперты"
+          title={<>Что меняется для бизнеса</>}
+          actions={
+            <>
+              <CtaButton path={path} />
+              <PdfButton file={PDF.internal} />
+              <HowLink href={BE.internal} dark />
+            </>
+          }
+        />
+
+        {/* Экран 3. Что меняется для бизнеса */}
+        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+          <TitledCards items={changes} />
+        </div>
+
+        {/* Экран 5. Пример: федеральная ювелирная сеть */}
+        <div className="sec-dark grain relative border-t border-[color:var(--color-line-dark)]">
+          <div className="pointer-events-none absolute inset-0" aria-hidden>
+            <NodeScene className="text-[color:var(--color-text-inverse-2)]" opacity={0.3} />
+          </div>
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="01">Пример</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
+              Федеральная ювелирная сеть
+            </RevealHeading>
+            <p className="mt-4 t-body text-[color:var(--color-text-inverse-2)]">
+              Масштаб: более 230 салонов, более 70 городов, собственное производство, более 30 000 SKU.
+            </p>
+            <p className="mt-2 t-body text-[color:var(--color-text-inverse)]">
+              Система адаптации новых сотрудников на основе лучших практик компании
+            </p>
+
+            <div className="mt-8">
+              <MetricTiles
+                items={[
+                  ["1", "месяц до выхода на KPI"],
+                  ["в 6 раз", "ускорение адаптации"],
+                  [">230", "салонов в контуре внедрения"],
+                ]}
+              />
+            </div>
+
+            <div className="mt-10 grid max-w-5xl gap-6 md:grid-cols-2 md:gap-10">
+              <p className="t-body text-[color:var(--color-text-inverse-2)]">
+                Новые продавцы проходили базовое недельное обучение и сразу
+                отправлялись в торговые залы. Из-за нехватки практических навыков
+                работы со сложным продуктом они выходили на целевые показатели
+                только к 6–8 месяцу. Сотрудники не хотели долго ждать высоких
+                бонусов, выгорали и уходили к конкурентам, а компания запускала
+                бесконечный цикл найма и переобучения.
+              </p>
+              <p className="t-body text-[color:var(--color-text-inverse-2)]">
+                Вместе с командой «Без Воды» компания пересобрала систему
+                наставничества, сделав ставку на выявление и масштабирование
+                подходов самых результативных сотрудников. К новичкам прикрепили
+                лучших продавцов сети, которые на практике передавали свои
+                алгоритмы работы с клиентами. Срок адаптации сократился до одного
+                месяца: новые продавцы стали выходить на уровень продаж опытных
+                специалистов за 30 дней.
+              </p>
+            </div>
+
+            <div className="mt-10 grid max-w-5xl gap-10 md:grid-cols-2 md:gap-14">
+              <div>
+                <div className="t-eyebrow text-[color:var(--color-text-inverse-2)]">Что сделано</div>
+                <div className="mt-4">
+                  <NodeList
+                    divided
+                    items={[
+                      "Оцифрованы экспертные знания и паттерны продаж лучших сотрудников розничной сети",
+                      "Базовое теоретическое обучение заменено на прикладную систему наставничества в торговых залах",
+                      "Внедрены единые стандарты презентации сложного продукта: геммология, материаловедение, кастомное производство",
+                      "Разработана масштабируемая методология передачи опыта, адаптированная под федеральную сеть",
+                    ]}
+                  />
+                </div>
+              </div>
+              <div>
+                <div className="t-eyebrow text-[color:var(--color-text-inverse-2)]">Что изменилось у клиента</div>
+                <div className="mt-4">
+                  <NodeList
+                    divided
+                    items={[
+                      "Срок адаптации новых сотрудников сократился с 6–8 месяцев до 1 месяца",
+                      "Стажеры выходят на плановые показатели конверсии и среднего чека наравне с ведущими специалистами через 30 дней",
+                      "Снижена текучесть на этапе испытательного срока, минимизированы потери от цикличного переобучения",
+                    ]}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <a href="/cases#jewelry-retail" className="link-arrow group mt-8 t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]">
+              Где это уже сработало
+              <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+          </div>
+        </div>
+
+        {/* Экран 7. Почему такой подход снижает риски */}
+        <div className="relative border-t border-[color:var(--color-line)]">
+          <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="02">Риски</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl">
+              Почему такой подход снижает риски
+            </RevealHeading>
+            <div className="mt-8">
+              <TitledCards items={lowerRisks} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <CtaBand path={path} secondary={<HowLink href={BE.internal} dark />} />
+    </PageShell>
+  );
+}
+
+/* ==========================================================================
+   /tasks/team-subscription — продуктовая: команда по подписке
+   ========================================================================== */
+
+export function TeamSubscriptionPage() {
+  const path = BE.team;
+  const units: [string, string | null][] = [
+    ["Разработка и лидирование комплексной программы", "архитектура, работа с экспертами, управление разработкой и сдача работ"],
+    ["Написание курса или дня тренинга", "материалы на 8 часов очного или 4 часа онлайн-обучения"],
+    ["Сессии и модерации", "16 часов работы с группой в месяц, очно или онлайн; подготовка и отчет включены"],
+    ["Проведение обучения по материалам заказчика", null],
+    ["Сборка курса в системе обучения", "готовый материал оформлен и опубликован — от 10 000 ₽"],
+    ["Поддержание актуальности программ", "регулярный пересмотр материалов под изменения в компании"],
+  ];
+
+  return (
+    <PageShell path={path}>
+      {/* Экран 1. Обещание */}
+      <section className="stage border-b border-[color:var(--color-line)]">
+        <PageHead
+          kicker="Реализация амбициозных планов по обучению без потери качества"
+          title={<>План обучения выполняется, а&nbsp;штат не растет</>}
+          lead="Полная команда производства обучения — методолог, руководитель проекта, сборка — работает на ваш согласованный объем за фиксированную сумму в месяц."
+          actions={
+            <>
+              <CtaButton path={path} />
+              <EffectLink href={BE.teamEffect} dark />
+            </>
+          }
+        />
+
+        {/* Экран 3. Что входит в подписку */}
+        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+          <SectionLabel n="01">Что входит в подписку</SectionLabel>
+          <p className="mt-6 max-w-3xl t-body text-[color:var(--color-text-primary)]">
+            Состав собирается под ваши задачи из единиц результата:
+          </p>
+          <div className="mt-8 grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {units.map(([t, d], i) => (
+              <motion.div key={t} {...reveal(i)} className="h-full">
+                <PaperCard className="h-full p-6">
+                  <div className="flex items-center gap-3">
+                    <Stencil n={i + 1} active className="t-body" />
+                    <span className="h-px w-6 bg-[color:var(--color-line)]" />
+                  </div>
+                  <div className="mt-4 font-display t-body font-bold">{t}</div>
+                  {d && <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>}
+                </PaperCard>
+              </motion.div>
+            ))}
+          </div>
+          <p className="mt-8 max-w-3xl t-body text-[color:var(--color-text-primary)]">
+            Состав месяца фиксируется заранее и виден в личном кабинете.
+            Логистика очных выездов — за счет заказчика.
+          </p>
+        </div>
+
+        {/* Экран 6. Первый шаг */}
+        <div className="relative border-t border-[color:var(--color-line)]">
+          <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="02">Первый шаг</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl">
+              Разбор объема и план на квартал
+            </RevealHeading>
+            <p className="mt-5 max-w-3xl t-body text-[color:var(--color-text-primary)]">
+              30 минут онлайн: смотрим ваш план обучения, считаем объем в единицах
+              результата и собираем состав первого месяца. Бесплатно, без
+              презентации и технического задания.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Экран 7. Следующий шаг */}
+      <CtaBand path={path} secondary={<EffectLink href={BE.teamEffect} dark />} />
+    </PageShell>
+  );
+}
+
+/* ==========================================================================
+   /tasks/team-subscription/business-effect — эффект: команда по подписке
+   ========================================================================== */
+
+export function TeamSubscriptionEffectPage() {
+  const path = BE.teamEffect;
+  const changes: [string, string][] = [
+    ["Задачи перестают ждать людей", "Команда назначается в течение 24 часов после согласования — без подбора, адаптации и открытия ставок."],
+    ["Расход становится предсказуемым", "Сумма и состав объема фиксируются в договоре через образ результата. Оплата привязана к объему работ, а не к календарю."],
+    ["Пики перестают быть проблемой", "Объем можно менять от месяца к месяцу: команда масштабируется под задачи, а не наоборот."],
+  ];
+  const yearRules: [string, string][] = [
+    ["Состав работ можно менять", "единицы взаимозаменяемы по согласованию, остаток пересчитывается в кабинете сразу"],
+    ["Годовая оплата возможна", "состав работ уточняется по ходу, картина расходов остается прозрачной"],
+    ["По завершении крупных работ возможно сделать подписку на поддержание актуальности", "материалы не устаревают, контакт с командой сохраняется"],
+  ];
+
+  return (
+    <PageShell path={path}>
+      <section className="stage border-b border-[color:var(--color-line)]">
+        <PageHead
+          kicker="Бизнес-эффект · Команда по подписке"
+          title={<>Что меняется для бизнеса</>}
+          actions={
+            <>
+              <CtaButton path={path} />
+              <PdfButton file={PDF.team} />
+              <HowLink href={BE.team} dark />
+            </>
+          }
+        />
+
+        {/* Экран 2. Что меняется для бизнеса */}
+        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+          <TitledCards items={changes} />
+        </div>
+
+        {/* Экран 4. Сколько стоит та же мощность внутри */}
+        <div className="sec-dark grain relative border-t border-[color:var(--color-line-dark)]">
+          <Scene blobs={[{ className: "-right-40 top-10", tone: "chrome", size: 480 }]} />
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="01">Сколько стоит та же мощность внутри</SectionLabel>
+            <StaffCostTable
+              ourLine="Подписка: от 200 000 ₽ в месяц."
+              afterLine="Мы сравниваем стоимость доступа к команде такого состава. Объем фиксируется в договоре через образ результата, а не через часовые ставки."
+              extraLine="Если задачи ровные и постоянные, их дешевле вести внутри. Подписка нужна там, где нагрузка неравномерная или объем превышает возможности команды."
+            />
+          </div>
+        </div>
+
+        {/* Экран 5. Как это устроено в течение года */}
+        <div className="relative border-t border-[color:var(--color-line)]">
+          <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="02">Как это устроено в течение года</SectionLabel>
+            <div className="mt-8">
+              <TitledCards items={yearRules} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <CtaBand path={path} secondary={<HowLink href={BE.team} dark />} />
+    </PageShell>
+  );
+}
+
+/* ==========================================================================
+   /tasks/external-experts — продуктовая: внешние эксперты
+   ========================================================================== */
+
+export function ExternalExpertsPage() {
+  const path = BE.external;
+  const steps = [
+    "Обсуждаем с вами задачу и договариваемся, какой именно опыт нужен и по каким признакам мы поймем, что человек им обладает",
+    "За 72 часа представляем профили релевантных практиков. Бесплатно",
+    "Вы выбираете, знакомитесь, при необходимости меняем кандидата",
+    "Эксперт работает в вашем контексте вместе с нашим методологом",
+    "Его логика решений фиксируется в ваших материалах: программе, стандарте, базе знаний",
+  ];
+  const priorities = [
+    "За 72 часа у вас в почте — профили экспертов с релевантным опытом",
+    "Если во время реализации не складывается сотрудничество с экспертом, мы меняем его за свой счет",
+    "Права на созданные материалы остаются у вас",
+  ];
+
+  return (
+    <PageShell path={path}>
+      {/* Экран 1. Обещание */}
+      <section className="stage border-b border-[color:var(--color-line)]">
+        <PageHead
+          kicker="Ускорение запуска новых направлений в бизнесе"
+          title={<>Практика, которой внутри нет — без&nbsp;долгого поиска и консалтинга</>}
+          lead="Находим практика с рынка, переводим его опыт в материалы компании — и этот опыт остается у вас по окончании проекта."
+          actions={
+            <>
+              <CtaButton path={path} />
+              <EffectLink href={BE.externalEffect} dark />
+            </>
+          }
+        />
+
+        {/* Экран 3. Как выглядит путь */}
+        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+          <SectionLabel n="01">Как выглядит путь</SectionLabel>
+          <ol className="mt-8 max-w-3xl">
+            {steps.map((step, i) => (
+              <motion.li
+                key={step}
+                {...reveal(i)}
+                className={`flex items-start gap-5 py-5 ${i > 0 ? "border-t border-[color:var(--color-line)]" : ""}`}
+              >
+                <Stencil n={i + 1} active className="mt-0.5 t-body" />
+                <span className="t-body text-[color:var(--color-text-primary)]">{step}</span>
+              </motion.li>
+            ))}
+          </ol>
+        </div>
+
+        {/* Экран 5. Первый шаг */}
+        <div className="sec-dark grain relative border-t border-[color:var(--color-line-dark)]">
+          <Scene blobs={[{ className: "-left-40 top-0", tone: "rose", size: 460 }]} />
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="02">Первый шаг</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
+              Профили экспертов за 72 часа. Бесплатно
+            </RevealHeading>
+            <p className="mt-5 max-w-3xl t-body text-[color:var(--color-text-inverse-2)]">
+              Вы описываете задачу, мы представляем профили практиков с описанием
+              их опыта и того, как он относится к вашей задаче.
+            </p>
+          </div>
+        </div>
+
+        {/* Экран 6. Приоритеты */}
+        <div className="relative border-t border-[color:var(--color-line)]">
+          <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="03">Приоритеты</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl">
+              Скорость решения вашей задачи и ваш комфорт — наши приоритеты
+            </RevealHeading>
+            <div className="mt-8 max-w-3xl">
+              <NodeList divided items={priorities} />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Экран 7. Следующий шаг */}
+      <CtaBand
+        path={path}
+        note="30 минут онлайн: разбираем задачу и определяем, какого именно практика искать."
+        secondary={<EffectLink href={BE.externalEffect} dark />}
+      />
+    </PageShell>
+  );
+}
+
+/* ==========================================================================
+   /tasks/external-experts/business-effect — эффект: внешние эксперты
+   ========================================================================== */
+
+export function ExternalExpertsEffectPage() {
+  const path = BE.externalEffect;
+  const changes = [
+    "Компания начинает работать по методам, которые уже подтвердили свою эффективность на рынке",
+    "Опыт эксперта остается в материалах компании и продолжает работать после окончания проекта",
+    "Вы платите не за присутствие эксперта, а за то, что его способ работы становится вашим",
+  ];
+  const doneSteps = [
+    "Определили признаки нужного опыта: практик, который сам принимал решения о подрядчиках в компании такого типа, и определили формат передачи опыта — 7 часовых вебинаров",
+    "За 72 часа мы представили профили экспертов клиенту",
+    "Перед взаимодействием эксперта с клиентом мы структурировали его ответы так, чтобы каждый час вебинара был концентратом применимого опыта",
+    "Эксперт разобрал принципы работы с подрядчиками на обезличенном материале: основания для сравнения, участники решения, типичные причины отказа. Конфиденциальные данные конкретных компаний не использовались",
+    "Подготовленные материалы вебинаров переданы компании, благодаря чему сотрудники, не участвовавшие в вебинаре, получили к ним доступ",
+  ];
+
+  return (
+    <PageShell path={path}>
+      <section className="stage border-b border-[color:var(--color-line)]">
+        <PageHead
+          kicker="Бизнес-эффект · Внешние эксперты"
+          title={<>Что меняется для вас</>}
+          actions={
+            <>
+              <CtaButton path={path} />
+              <PdfButton file={PDF.external} />
+              <HowLink href={BE.external} dark />
+            </>
+          }
+        />
+
+        {/* Экран 2. Что меняется для вас */}
+        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+          <div className="grid items-stretch gap-4 sm:grid-cols-3">
+            {changes.map((t, i) => (
+              <motion.div key={t} {...reveal(i)} className="h-full">
+                <PaperCard className="flex h-full items-start gap-3 p-6">
+                  <NodeBullet active className="mt-[0.55em]" />
+                  <p className="t-body text-[color:var(--color-text-primary)]">{t}</p>
+                </PaperCard>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Экран 4. Пример: B2B-компания */}
+        <div className="sec-dark grain relative border-t border-[color:var(--color-line-dark)]">
+          <div className="pointer-events-none absolute inset-0" aria-hidden>
+            <NodeScene className="text-[color:var(--color-text-inverse-2)]" opacity={0.3} />
+          </div>
+          <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            <SectionLabel n="01">Пример</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
+              B2B-компания
+            </RevealHeading>
+            <p className="mt-4 t-body text-[color:var(--color-text-inverse-2)]">
+              Разбор логики закупки на стороне клиента с практиком из этой среды
+            </p>
+
+            <div className="mt-8">
+              <MetricTiles
+                items={[
+                  ["7 часов", "итоговый материал для команд заказчика"],
+                  ["16%", "снижение оттока после перестройки предложения"],
+                  ["72 часа", "от запроса до профилей практиков"],
+                ]}
+              />
+            </div>
+
+            <div className="mt-10 max-w-3xl">
+              <div className="t-eyebrow text-[color:var(--color-text-inverse-2)]">Задача</div>
+              <p className="mt-3 t-body text-[color:var(--color-text-inverse-2)]">
+                Компания продавала корпоративным клиентам свои услуги и не
+                понимала, по каким правилам те выбирают подрядчика: с кем
+                сравнивают, на что смотрят в первую очередь, кто участвует в
+                решении. Опросы клиентов не давали необходимой конкретики. Внутри
+                компании такого опыта не было: вся команда знала процесс со
+                стороны продавца.
+              </p>
+            </div>
+
+            <div className="mt-10 max-w-3xl">
+              <div className="t-eyebrow text-[color:var(--color-text-inverse-2)]">Что было сделано</div>
+              <div className="mt-4">
+                <NodeList divided items={doneSteps} />
+              </div>
+            </div>
+
+            <div className="tint-ink mt-10 max-w-3xl rounded-md border-l-2 border-[color:var(--color-accent)] p-6 md:p-7">
+              <div className="t-eyebrow text-[color:var(--color-accent-soft,#E9C4BD)]">Что изменилось</div>
+              <p className="mt-3 t-body text-[color:var(--color-text-inverse)]">
+                Команды перестроили предложение под клиента. В результате отток
+                клиентской базы снизился на 16% — по данным заказчика.
+              </p>
+              <p className="mt-3 t-caption text-[color:var(--color-text-inverse-2)]">
+                Источник данных: внутренняя отчетность заказчика.
+              </p>
+            </div>
+
+            <a href="/cases#b2b-procurement" className="link-arrow group mt-8 t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]">
+              Где это уже сработало
+              <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <CtaBand path={path} secondary={<HowLink href={BE.external} dark />} />
+    </PageShell>
+  );
+}
