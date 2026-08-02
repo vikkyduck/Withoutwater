@@ -284,26 +284,17 @@ export function BusinessEffectGeneralPage() {
                     <div className="mt-4 font-display t-body font-bold">{principles[4][0]}</div>
                     <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">{principles[4][1]}</p>
                   </div>
-                  {/* Личный кабинет: показываем структурой, данные скрыты */}
-                  <div aria-hidden className="stage relative overflow-hidden rounded-md bg-[color:var(--color-bg-dark)] p-5 md:p-6">
-                    <div className="pointer-events-none absolute inset-0">
-                      <NodeScene className="!right-[-12%] !h-[90%] text-[color:var(--color-text-inverse-2)]" opacity={0.35} />
-                    </div>
-                    <div className="relative space-y-2.5">
-                      {["что заказано", "что в работе", "что принято", "остаток по пакетам"].map((label, i) => (
-                        <div key={label} className="lg lg-dark flex items-center justify-between gap-4 rounded-sm px-4 py-3">
-                          <span className="t-caption text-[color:var(--color-text-inverse-2)]">{label}</span>
-                          <span
-                            className="h-2.5 rounded-pill"
-                            style={{
-                              width: `${34 + i * 14}px`,
-                              background: "rgba(233,196,189,0.4)",
-                              filter: "blur(3px)",
-                            }}
-                          />
-                        </div>
-                      ))}
-                    </div>
+                  {/* Экран личного кабинета (скриншот, чувствительные данные размыты) */}
+                  <div className="overflow-hidden rounded-md border border-[color:var(--color-line)] shadow-[var(--shadow-soft)]">
+                    <img
+                      src="/img/lk/lk-finance.webp"
+                      alt="Личный кабинет заказчика: счета, оплаты и остатки по проектам"
+                      loading="lazy"
+                      decoding="async"
+                      width={1800}
+                      height={923}
+                      className="block h-auto w-full"
+                    />
                   </div>
                 </div>
               </PaperCard>
@@ -371,7 +362,7 @@ export function BusinessEffectGeneralPage() {
             <RevealHeading className="t-h2 mt-6 max-w-3xl">
               Материалы компании не уходят в открытые сервисы ИИ
             </RevealHeading>
-            <div className="mt-8 max-w-3xl">
+            <div className="mt-8 grid items-start gap-10 md:grid-cols-[minmax(0,1.1fr)_minmax(0,1fr)] md:gap-14">
               <NodeList
                 divided
                 items={[
@@ -380,6 +371,18 @@ export function BusinessEffectGeneralPage() {
                   "Работаем в рамках вашей политики безопасности, включая ограничения на такие инструменты: по требованию заказчика ведем проект без них",
                 ]}
               />
+              {/* Экран «Безопасность и данные» личного кабинета (данные размыты) */}
+              <div className="overflow-hidden rounded-md border border-[color:var(--color-line)] shadow-[var(--shadow-soft)]">
+                <img
+                  src="/img/lk/lk-security.webp"
+                  alt="Личный кабинет заказчика: раздел безопасности — сессии, доступы, выгрузка данных"
+                  loading="lazy"
+                  decoding="async"
+                  width={1444}
+                  height={1498}
+                  className="block h-auto w-full"
+                />
+              </div>
             </div>
           </div>
         </div>
@@ -903,6 +906,31 @@ export function TeamSubscriptionPage() {
             Состав месяца фиксируется заранее и виден в личном кабинете.
             Логистика очных выездов — за счет заказчика.
           </p>
+          {/* Экраны личного кабинета: затраты по счёту и переписка (данные размыты) */}
+          <div className="mt-8 grid items-start gap-4 md:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+            <div className="overflow-hidden rounded-md border border-[color:var(--color-line)] shadow-[var(--shadow-soft)]">
+              <img
+                src="/img/lk/lk-invoice.webp"
+                alt="Личный кабинет заказчика: затраты по счёту помесячно"
+                loading="lazy"
+                decoding="async"
+                width={1800}
+                height={636}
+                className="block h-auto w-full"
+              />
+            </div>
+            <div className="overflow-hidden rounded-md border border-[color:var(--color-line)] shadow-[var(--shadow-soft)]">
+              <img
+                src="/img/lk/lk-messages.webp"
+                alt="Личный кабинет заказчика: переписка по счетам"
+                loading="lazy"
+                decoding="async"
+                width={1800}
+                height={1464}
+                className="block h-auto w-full"
+              />
+            </div>
+          </div>
         </div>
 
         {/* Экран 6. Первый шаг */}
