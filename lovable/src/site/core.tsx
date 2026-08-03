@@ -17,10 +17,10 @@ import {
   AnimatePresence,
   MotionConfig,
 } from "motion/react";
-import { ArrowUpRight, ArrowRight, ArrowDown, Plus, Check, Waves, Sparkles, ExternalLink, Calendar } from "lucide-react";
+import { ArrowUpRight, ArrowRight, ArrowDown, Plus, Check, ExternalLink, Calendar } from "lucide-react";
 
 export { motion, AnimatePresence };
-export { ArrowUpRight, ArrowRight, ArrowDown, Plus, Check, Waves, Sparkles, ExternalLink, Calendar };
+export { ArrowUpRight, ArrowRight, ArrowDown, Plus, Check, ExternalLink, Calendar };
 export { useRef, useState, useEffect };
 export type { ReactNode, CSSProperties };
 
@@ -780,6 +780,7 @@ export function Field({
   onInput,
   inputRef,
   required = false,
+  autoComplete,
 }: {
   label: string;
   name: string;
@@ -790,6 +791,7 @@ export function Field({
   onInput?: React.FormEventHandler<HTMLInputElement>;
   inputRef?: React.Ref<HTMLInputElement>;
   required?: boolean;
+  autoComplete?: string;
 }) {
   /* id с префиксом: без него input name="contact" конфликтовал бы с
      id="contact" у секции формы, и label ссылался бы на секцию. */
@@ -820,6 +822,7 @@ export function Field({
         ref={inputRef}
         name={name}
         placeholder={placeholder}
+        autoComplete={autoComplete}
         onBlur={onBlur}
         onInput={onInput}
         required={required}

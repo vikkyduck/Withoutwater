@@ -10,7 +10,7 @@ import {
   motion,
   ArrowUpRight, ArrowRight, ArrowDown, Check,
   PageShell, PageHead, SectionLabel, PaperCard, Scene, CtaBand,
-  RevealHeading, NodeBullet, NodeList, NodeScene, Stencil, CatMark, Swash, HandArrow, LineIcon,
+  RevealHeading, NodeBullet, NodeList, Stencil, CatMark, Swash, HandArrow, LineIcon,
   reveal,
 } from "./core";
 import {
@@ -70,19 +70,10 @@ function TasksPage() {
           ]}
         />
 
-        {/* Три карточки-входа (жидкое стекло на тёмном) */}
-        <div className="sec-dark grain relative">
-          <div className="pointer-events-none absolute inset-0" aria-hidden>
-            <div
-              className="absolute inset-0"
-              style={{
-                background:
-                  "radial-gradient(90% 70% at 20% 0%, rgba(233,196,189,0.16), transparent 60%)," +
-                  "radial-gradient(70% 60% at 88% 100%, rgba(201,205,212,0.10), transparent 62%)",
-              }}
-            />
-            <NodeScene className="text-[color:var(--color-text-inverse-2)]" opacity={0.26} />
-          </div>
+        {/* Три карточки-входа — на бумаге (приёмка 03.08): /tasks была
+            единственной страницей, где уголь шёл от шапки до футера без
+            передышки. Чередование секций — правило системы (разд. 3). */}
+        <div className="relative bg-[color:var(--color-bg-primary)]">
           <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
             <div className="grid gap-5 md:grid-cols-3">
               {SITUATIONS.map((it, i) => (
@@ -90,30 +81,30 @@ function TasksPage() {
                   key={it.id}
                   href={it.href}
                   {...reveal(i)}
-                  className="card-link surface-dark group flex h-full flex-col rounded-md p-6 md:p-7"
+                  className="card-link card group flex h-full flex-col rounded-md p-6 md:p-7"
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <div className="font-display t-label font-bold tabular-nums text-[color:var(--color-accent-soft,#E9C4BD)]">
+                    <div className="font-display t-label font-bold tabular-nums text-[color:var(--color-accent)]">
                       0{i + 1}
                     </div>
                     <span
                       aria-hidden
-                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-pill border border-[color:var(--color-line-dark)] text-[color:var(--color-text-inverse)]"
+                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-pill border border-[color:var(--color-line)] text-[color:var(--color-text-primary)]"
                     >
                       <ArrowRight data-arrow className="h-4 w-4" />
                     </span>
                   </div>
-                  <h2 className="t-body mt-3 font-display text-[color:var(--color-text-inverse)] [overflow-wrap:break-word]">
+                  <h2 className="t-body mt-3 font-display text-[color:var(--color-text-primary)] [overflow-wrap:break-word]">
                     {it.situation}
                   </h2>
-                  <p className="mt-4 t-body text-[color:var(--color-text-inverse-2)]">{it.detail}</p>
-                  <p className="mt-4 t-body font-semibold text-[color:var(--color-text-inverse)]">
+                  <p className="mt-4 t-body text-[color:var(--color-text-secondary)]">{it.detail}</p>
+                  <p className="mt-4 t-body font-semibold text-[color:var(--color-text-primary)]">
                     Как решаем: {it.solutionTitle}
                   </p>
                   {/* Не кнопка: залитый пилюль здесь выглядел ровно как
                       «Разбор задачи за 30 минут» — три навигационные ссылки
                       спорили с единственным действием сайта. */}
-                  <span className="link-arrow mt-auto pt-6 t-body text-[color:var(--color-text-inverse)]">
+                  <span className="link-arrow mt-auto pt-6 t-body">
                     Подробнее
                     <ArrowRight data-arrow className="h-4 w-4" />
                   </span>

@@ -5,52 +5,96 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Страница не найдена — БЕЗ ВОДЫ</title>
 <meta name="robots" content="noindex">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%23111114'/%3E%3Ctext x='32' y='43' font-family='Arial,sans-serif' font-size='30' font-weight='800' fill='white' text-anchor='middle'%3EБВ%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="stylesheet" href="/fonts/fonts.css">
 <style>
-  :root{--paper:#FBFAF8;--ink:#040609;--graphite:#45494E;--red:#89293F;--border:#E3E1DD}
+  /* Токены «Сухого остатка» 2.4 — страница живёт вне бандла, поэтому дублирует
+     их локально. Кот — по брендбуку (разд. 9): пустые состояния — его место. */
+  :root{
+    --paper:#F7F5F1;--surface:#FCFBF8;--ink:#1D1F23;--steel:#545860;
+    --rose:#A3564B;--rose-hover:#6C60AE;--line:#DBD7CF
+  }
   *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:"Manrope",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-  .wrap{max-width:1280px;margin:0 auto;padding:0 20px}
-  header{border-bottom:1px solid var(--border);padding:14px 0}
+  body{margin:0;background:var(--paper);color:var(--ink);
+    font-family:"Golos Text",-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+    font-size:16px;line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1200px;margin:0 auto;padding:0 20px}
+  header{border-bottom:1px solid var(--line);padding:14px 0;background:var(--paper)}
   header .wrap{display:flex;align-items:center;justify-content:space-between;gap:16px}
-  .logo{font-family:"Unbounded",system-ui,sans-serif;font-weight:800;font-size:15px;letter-spacing:-.02em;text-decoration:none;color:var(--ink);line-height:1.1}
-  .logo small{display:block;font-size:8px;letter-spacing:.02em}
-  nav{display:flex;gap:18px;flex-wrap:wrap}
-  nav a{font-size:13px;color:var(--graphite);text-decoration:none}
-  nav a:hover{color:var(--red)}
-  .nf{min-height:70vh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:18px;max-width:640px}
-  .code{font-family:"Unbounded",system-ui,sans-serif;font-size:clamp(56px,10vw,110px);font-weight:800;letter-spacing:-.04em;line-height:1}
-  h1{font-family:"Unbounded",system-ui,sans-serif;font-size:clamp(21px,3vw,30px);font-weight:800;letter-spacing:-.02em;margin:0}
-  p{color:var(--graphite);font-size:16px;line-height:1.6;margin:0;max-width:520px}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:var(--ink)}
+  .logo b{font-family:"Unbounded",sans-serif;font-weight:500;font-size:16px;letter-spacing:-.02em;line-height:1.1;display:block}
+  .logo small{display:block;font-family:"Unbounded",sans-serif;font-weight:500;font-size:8px}
+  nav{display:flex;gap:4px;flex-wrap:wrap}
+  nav a{font-size:15px;color:var(--steel);text-decoration:none;padding:8px 12px;border-radius:10px;white-space:nowrap}
+  nav a:hover{color:var(--ink)}
+  main{position:relative;overflow:hidden}
+  .nf{position:relative;z-index:1;min-height:72vh;display:flex;flex-direction:column;justify-content:center;align-items:flex-start;gap:18px;max-width:640px}
+  /* Трафаретный срез — фирменный приём, один на макет */
+  .code{font-family:"Unbounded",sans-serif;font-weight:500;font-size:clamp(64px,10vw,110px);letter-spacing:-.02em;line-height:1;
+    background:linear-gradient(to bottom, var(--ink) 0 46%, transparent 46% 58%, var(--ink) 58% 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent}
+  h1{font-family:"Unbounded",sans-serif;font-weight:500;font-size:clamp(22px,3vw,30px);letter-spacing:-.01em;margin:0}
+  p{color:var(--steel);margin:0;max-width:520px}
   .row{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
-  .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:13px 24px;font-size:14px;font-weight:700;text-decoration:none}
-  .btn-primary{background:var(--red);color:var(--paper)}
-  .btn-ghost{border:1px solid var(--border);color:var(--ink)}
-  footer{border-top:1px solid var(--border);padding:24px 0;font-size:12px;color:var(--graphite)}
+  .btn{display:inline-flex;align-items:center;gap:8px;border-radius:999px;padding:13px 24px;font-size:15px;font-weight:600;text-decoration:none;transition:background .16s,color .16s,border-color .16s}
+  .btn-primary{background:var(--ink);color:var(--paper)}
+  .btn-primary:hover{background:#31353C}
+  .btn-ghost{border:1px solid var(--line);color:var(--ink);background:var(--surface)}
+  .btn-ghost:hover{border-color:var(--steel)}
+  /* Сцена: узловой граф справа, гаснет к тексту */
+  .nodes{position:absolute;right:-4%;top:50%;transform:translateY(-50%);height:min(78%,560px);opacity:.45;
+    -webkit-mask-image:radial-gradient(70% 70% at 62% 50%, #000 30%, transparent 82%);
+    mask-image:radial-gradient(70% 70% at 62% 50%, #000 30%, transparent 82%)}
+  /* Кот — пустое состояние */
+  .cat{height:120px;color:var(--ink);opacity:.75;margin-bottom:-6px}
+  footer{border-top:1px solid var(--line);padding:24px 0;font-size:13px;color:var(--steel)}
+  @media (max-width:720px){nav{display:none}.nodes{display:none}}
 </style>
 </head>
 <body>
 <header>
   <div class="wrap">
-    <a class="logo" href="/">БЕЗ ВОДЫ<small>withoutwater</small></a>
+    <a class="logo" href="/">
+      <svg width="30" height="26" viewBox="0 0 140 120" fill="none" stroke="currentColor" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M48 106c-6-22-2-44 26-58l6-22 11 18c13-3 25 7 27 22 1.6 11-3.4 15-7.6 19.6-4 4.4-4 10.4-1 20.4"/><path d="M48 106h61.4"/><path d="M48 106c-14 4-30 1-32-10-1.6-9 10-14 15-7 4.6 6.4-1 13.6-8 12"/></svg>
+      <span><b>БЕЗ ВОДЫ</b><small>withoutwater</small></span>
+    </a>
     <nav>
       <a href="/tasks/">Задачи и решения</a>
       <a href="/cases/">Кейсы</a>
-      <a href="/team/">О нас</a>
       <a href="/how-we-work/">Как мы работаем</a>
+      <a href="/team/">О нас</a>
     </nav>
   </div>
 </header>
-<main class="wrap">
-  <div class="nf">
-    <div class="code">404</div>
-    <h1>Такой страницы нет</h1>
-    <p>Возможно, адрес устарел или в нём опечатка. Вот главные разделы — оттуда точно найдётся нужное.</p>
-    <div class="row">
-      <a class="btn btn-primary" href="/">На главную</a>
-      <a class="btn btn-ghost" href="/cases/">Смотреть кейсы</a>
-      <a class="btn btn-ghost" href="/contacts/">Написать нам</a>
+<main>
+  <svg class="nodes" viewBox="0 0 100 120" fill="none" aria-hidden="true">
+    <g stroke="#8B9098" stroke-width="0.35" opacity="0.55">
+      <line x1="16" y1="30" x2="42" y2="14"/><line x1="42" y1="14" x2="62" y2="40"/><line x1="62" y1="40" x2="30" y2="62"/>
+      <line x1="30" y1="62" x2="54" y2="84"/><line x1="62" y1="40" x2="82" y2="26"/><line x1="82" y1="26" x2="86" y2="66"/>
+      <line x1="86" y1="66" x2="70" y2="108"/><line x1="54" y1="84" x2="70" y2="108"/><line x1="16" y1="30" x2="30" y2="62"/><line x1="42" y1="14" x2="82" y2="26"/>
+    </g>
+    <g fill="#8B9098" opacity="0.6">
+      <circle cx="16" cy="30" r="1.2"/><circle cx="62" cy="40" r="1.1"/><circle cx="30" cy="62" r="1.3"/>
+      <circle cx="54" cy="84" r="1.1"/><circle cx="82" cy="26" r="1.2"/><circle cx="70" cy="108" r="1.1"/>
+    </g>
+    <circle cx="42" cy="14" r="1.5" fill="#A3564B" opacity="0.85"/><circle cx="86" cy="66" r="1.5" fill="#A3564B" opacity="0.85"/>
+  </svg>
+  <div class="wrap">
+    <div class="nf">
+      <svg class="cat" viewBox="0 0 140 120" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M48 106c-6-22-2-44 26-58l6-22 11 18c13-3 25 7 27 22 1.6 11-3.4 15-7.6 19.6-4 4.4-4 10.4-1 20.4"/>
+        <path d="M48 106h61.4"/>
+        <path d="M48 106c-14 4-30 1-32-10-1.6-9 10-14 15-7 4.6 6.4-1 13.6-8 12"/>
+      </svg>
+      <div class="code">404</div>
+      <h1>Такой страницы нет</h1>
+      <p>Возможно, адрес устарел или в нём опечатка. Вот главные разделы — оттуда точно найдётся нужное.</p>
+      <div class="row">
+        <a class="btn btn-primary" href="/">На главную</a>
+        <a class="btn btn-ghost" href="/cases/">Смотреть кейсы</a>
+        <a class="btn btn-ghost" href="/contacts/">Написать нам</a>
+      </div>
     </div>
   </div>
 </main>

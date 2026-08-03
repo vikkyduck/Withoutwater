@@ -1078,12 +1078,12 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
                 transition={{ duration: 0.32, ease: REVEAL_EASE }}
                 className="flex flex-col gap-5"
               >
-                <Field label="Ваше имя" name="name" placeholder="Ирина" dark required
+                <Field label="Ваше имя" name="name" placeholder="Ирина" dark required autoComplete="name"
                   inputRef={nameRef} error={fieldErr.name} onBlur={checkField("name")} onInput={clearOnInput("name")} />
                 <Field label="Email / Telegram / телефон" name="contact" placeholder="name@company.ru" dark required
                   inputRef={contactRef} error={fieldErr.contact} onBlur={checkField("contact")} onInput={clearOnInput("contact")} />
 
-                <Field label="Компания и роль" name="company" placeholder="Компания, роль" dark />
+                <Field label="Компания и роль" name="company" placeholder="Компания, роль" dark autoComplete="organization" />
                 <div>
                   <label htmlFor="f-about" className="t-label mb-2 block text-[color:var(--color-text-inverse-2)]">
                     Запрос на разбор
