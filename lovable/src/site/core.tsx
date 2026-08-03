@@ -846,21 +846,9 @@ export function Field({
 
 /* --------------------------------- Page --------------------------------- */
 
-export function CalmToggle({ className = "" }: { className?: string }) {
-  const [calm, set] = useCalm();
-  return (
-    <button
-      type="button"
-      onClick={() => set(!calm)}
-      aria-pressed={calm}
-      aria-label={calm ? "Включить анимации" : "Уменьшить анимации"}
-      title={calm ? "Включить анимации" : "Уменьшить анимации"}
-      className={`group h-10 w-10 items-center justify-center rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-secondary)] transition-colors duration-[160ms] hover:text-[color:var(--color-text-primary)] hover:border-[color:var(--color-steel)] ${className}`}
-    >
-      {calm ? <Sparkles className="h-4 w-4" /> : <Waves className="h-4 w-4" />}
-    </button>
-  );
-}
+/* Переключатель «Меньше анимаций» удалён из интерфейса (решение Виктории
+   03.08 — «исторически остался»). Автоматика жива: useCalm стартует от
+   prefers-reduced-motion, calm-режим по-прежнему гасит framer и линзу. */
 
 
 export function CookieBar() {
@@ -935,7 +923,6 @@ export function ctaHref(path: string): string {
 
 export function Nav({ path = "/" }: { path?: string }) {
   const [open, setOpen] = useState(false);
-  const [calm, setCalm] = useCalm();
   const [progress, setProgress] = useState(0);
   /* На главной первый экран уже несёт главную кнопку: в шапке до ухода hero
      держим вторичный вес, чтобы не было двух primary одновременно. */
@@ -1006,19 +993,10 @@ export function Nav({ path = "/" }: { path?: string }) {
           })}
         </nav>
         <div className="flex shrink-0 items-center gap-2 md:gap-3">
-          <CalmToggle className="hidden xl:inline-flex" />
-          {/* Волосяная линия отделяет разделы сайта от зоны аккаунта и действия */}
-          <span aria-hidden className="hidden h-5 w-px bg-[color:var(--color-line)] xl:block" />
-          {/* Вход для действующих клиентов — тихая ссылка: рамка рядом с CTA
-              давала две кнопки подряд и спорила за главное действие */}
-          <a
-            href={LK_URL}
-            target="_blank"
-            rel="noopener"
-            className="hidden shrink-0 items-center justify-center whitespace-nowrap rounded-sm px-2 py-2 t-nav font-medium text-[color:var(--color-text-secondary)] underline-offset-4 transition-colors duration-[160ms] hover:text-[color:var(--color-text-primary)] hover:underline xl:inline-flex"
-          >
-            {LK_LABEL}
-          </a>
+          {/* Шапка первого касания несёт только навигацию и действие
+              (решение Виктории 03.08): «Личный кабинет» уехал в футер и
+              мобильное меню, переключатель анимаций убран совсем —
+              автоматика prefers-reduced-motion осталась. */}
           <a
             href={ctaHref(path)}
             className={`btn group hidden shrink-0 sm:inline-flex ${pastHero ? "btn-primary" : "btn-secondary"}`}
@@ -1077,19 +1055,6 @@ export function Nav({ path = "/" }: { path?: string }) {
               {LK_LABEL}
               <ArrowUpRight data-arrow className="h-5 w-5 shrink-0 text-[color:var(--color-text-secondary)]" />
             </a>
-            <div className="flex items-center justify-between border-b border-[color:var(--color-line)] py-4">
-              <span className="t-body text-[color:var(--color-text-primary)]">Меньше анимаций</span>
-              <button
-                type="button"
-                onClick={() => setCalm(!calm)}
-                aria-pressed={calm}
-                aria-label={calm ? "Включить анимации" : "Уменьшить анимации"}
-                title={calm ? "Включить анимации" : "Уменьшить анимации"}
-                className="inline-flex h-11 w-11 items-center justify-center rounded-pill border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-secondary)] transition-colors duration-[160ms] hover:text-[color:var(--color-text-primary)] hover:border-[color:var(--color-steel)]"
-              >
-                {calm ? <Sparkles className="h-4 w-4" /> : <Waves className="h-4 w-4" />}
-              </button>
-            </div>
           </nav>
           <div className="shrink-0 border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 md:px-8 [&>*]:mx-auto [&>*]:max-w-3xl">
             <a
@@ -1171,6 +1136,8 @@ export function Footer() {
               <li><a href="tel:+79645842225" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">+7 964 584 22 25</a></li>
               <li><a href="https://t.me/vikki_duck" target="_blank" rel="noreferrer" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">Telegram: @vikki_duck</a></li>
               <li><a href="mailto:vu@withoutwater.ru" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">vu@withoutwater.ru</a></li>
+              {/* Вход для действующих клиентов — из шапки в футер (03.08) */}
+              <li><a href={LK_URL} target="_blank" rel="noopener" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">{LK_LABEL}</a></li>
             </ul>
           </div>
         </div>
@@ -1249,13 +1216,16 @@ export function PageShell({ path, children }: { path: string; children: ReactNod
           }`}
           aria-hidden={!showBar}
         >
+          {/* Пилюля с подписью: безымянный кружок с календарём не читался
+              как «оставить заявку» (решение 03.08) */}
           <a
             href={ctaHref(path)}
-            className="relative inline-flex h-14 w-14 items-center justify-center rounded-full border border-[color:var(--color-text-primary)] bg-[color:var(--color-text-primary)] text-[color:var(--color-surface)] transition-colors duration-150 hover:bg-[color:var(--color-ink-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent)] focus-visible:ring-offset-2"
+            className="relative inline-flex h-13 items-center gap-2.5 rounded-pill border border-[color:var(--color-text-primary)] bg-[color:var(--color-text-primary)] px-5 py-3.5 t-body font-semibold text-[color:var(--color-surface)] transition-colors duration-150 hover:bg-[color:var(--color-ink-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[color:var(--color-accent)] focus-visible:ring-offset-2"
             aria-label={CTA_LABEL}
             tabIndex={showBar ? 0 : -1}
           >
-            <Calendar className="h-5 w-5" strokeWidth={1.5} />
+            <Calendar className="h-4.5 w-4.5" strokeWidth={1.5} />
+            Разбор за 30 минут
           </a>
         </div>
 

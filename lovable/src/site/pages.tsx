@@ -14,7 +14,7 @@ import {
   reveal,
 } from "./core";
 import {
-  Hero, Bricks, WhenNeeded, NumbersBand, Flow,
+  Hero, Bricks, WhenNeeded, Flow,
   CasesBlock, ReviewsBlock, ReviewCard, BookSection, NotFit, Contact,
   FaqAccordion,
 } from "./blocks";
@@ -36,9 +36,10 @@ function HomePage() {
       <WhenNeeded />
       {/* «Схема взаимодействия» убрана с главной (финальная структура 02.08),
           блок остаётся на /how-we-work */}
-      <CasesBlock limit={2} moreHref="/cases" />
+      <CasesBlock limit={2} moreHref="/cases" teaser />
       <ReviewsBlock />
-      <NumbersBand />
+      {/* «Наш опыт в цифрах» слит с «Работали с командами» (внутри Bricks):
+          две соседние секции доказывали одно и то же */}
       <Bricks />
       <BookSection />
       <NotFit />

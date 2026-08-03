@@ -58,7 +58,7 @@ function PdfButton({ file }: { file: string }) {
       download
       className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)] print:hidden"
     >
-      Скачать в PDF
+      Скачать эту страницу в PDF
       <ArrowDown data-arrow="down" className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
     </a>
   );
@@ -79,12 +79,14 @@ function EffectLink({ href, dark = false }: { href: string; dark?: boolean }) {
 }
 
 function HowLink({ href, dark = false }: { href: string; dark?: boolean }) {
+  /* Ярлык «Как решаем эту задачу»: прежний «Как устроена работа» почти
+     дублировал пункт меню «Как мы работаем», но вёл в другое место */
   return (
     <a
       href={href}
       className={`link-arrow group t-body ${dark ? "text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]" : ""}`}
     >
-      Как устроена работа
+      Как решаем эту задачу
       <ArrowUpRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
     </a>
   );
@@ -276,30 +278,18 @@ export function BusinessEffectGeneralPage() {
           }
         />
 
-        {/* Экран 2. Три ситуации, один механизм */}
-        <div className="sec-dark grain relative border-b border-[color:var(--color-line-dark)]">
-          <div className="pointer-events-none absolute inset-0" aria-hidden>
-            <NodeScene className="text-[color:var(--color-text-inverse-2)]" opacity={0.3} />
-          </div>
-          <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
-            {/* В документе у экрана 2 только заголовок — тела нет. Карточки с
-                тремя ситуациями, которые тут стояли, были моей добавкой: на
-                странице получалось два набора карточек про одно и то же под
-                разными названиями (второй — экран 9 «Три ситуации»). Оставлен
-                заголовок, как в документе. */}
-            <SectionLabel n="01">Три ситуации, один механизм</SectionLabel>
-            <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
-              Откуда бы ни пришли знание и опыт, оно остается у компании
-            </RevealHeading>
-          </div>
-        </div>
-
-        {/* Экран 3. 5 принципов */}
+        {/* Экраны 2 и 3 склеены (решение 03.08): заголовок экрана 2 после
+            снятия карточек-дублей висел одиноко на тёмной полосе. Теперь он —
+            заголовок секции принципов, а «5 принципов…» — её вводка. Оба
+            текста из документа, дословно. */}
         <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-          <SectionLabel n="02">Принципы</SectionLabel>
+          <SectionLabel n="01">Три ситуации, один механизм</SectionLabel>
           <RevealHeading className="t-h2 mt-6 max-w-3xl">
-            5 принципов, одинаковых для всех наших работ
+            Откуда бы ни пришли знание и опыт, оно остается у компании
           </RevealHeading>
+          <p className="mt-5 max-w-3xl font-display t-body font-medium">
+            5 принципов, одинаковых для всех наших работ
+          </p>
           <div className="mt-10 grid items-stretch gap-4 sm:grid-cols-2">
             {principles.slice(0, 4).map(([t, d], i) => (
               <motion.div key={t} {...reveal(i)} className="h-full">
@@ -527,7 +517,7 @@ export function BusinessEffectGeneralPage() {
             download
             className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)] print:hidden"
           >
-            Скачать в PDF
+            Скачать эту страницу в PDF
             <ArrowDown data-arrow="down" className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
           </a>
         }
@@ -744,13 +734,13 @@ export function InternalExpertsPage() {
       </section>
 
       {/* Экран 9. Следующий шаг */}
-      <OtherSituations current={BE.internal} />
       <CtaBand
         path={path}
         title={<>Разберем вашу задачу за 30 минут</>}
         note="Определим, какую экспертизу стоит масштабировать, какой результат нужен бизнесу и подходит ли первый этап под вашу ситуацию. Без подготовки презентации и технического задания."
-        secondary={<EffectLink href={BE.internalEffect} dark />}
+        secondary={null}
       />
+      <OtherSituations current={BE.internal} />
     </PageShell>
   );
 }
@@ -869,8 +859,8 @@ export function InternalExpertsEffectPage() {
               </div>
             </div>
 
-            <a href="/cases#jewelry-retail" className="link-arrow group mt-8 t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]">
-              Где это уже сработало
+            <a href="/cases" className="link-arrow group mt-8 t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]">
+              Все кейсы
               <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
           </div>
@@ -886,12 +876,23 @@ export function InternalExpertsEffectPage() {
             <div className="mt-8">
               <TitledCards items={lowerRisks} />
             </div>
+            {/* Первый шаг с ценой — на пути с главной эта строка иначе не
+                встречается ни разу (формулировка дословно из /business-effect,
+                экран 9; размещение согласовано 03.08) */}
+            <PaperCard className="mt-10 max-w-3xl border-l-[3px] border-l-[color:var(--color-accent)] p-6">
+              <p className="font-display t-body font-medium">
+                Первый шаг: карта экспертности, 60 000 ₽, 7–14 дней
+              </p>
+              <span className="mt-2 block">
+                <HowLink href={BE.internal} />
+              </span>
+            </PaperCard>
           </div>
         </div>
       </section>
 
+      <CtaBand path={path} secondary={null} />
       <OtherSituations current={BE.internalEffect} />
-      <CtaBand path={path} secondary={<HowLink href={BE.internal} dark />} />
     </PageShell>
   );
 }
@@ -995,8 +996,8 @@ export function TeamSubscriptionPage() {
       </section>
 
       {/* Экран 7. Следующий шаг */}
+      <CtaBand path={path} secondary={null} />
       <OtherSituations current={BE.team} />
-      <CtaBand path={path} secondary={<EffectLink href={BE.teamEffect} dark />} />
     </PageShell>
   );
 }
@@ -1058,12 +1059,21 @@ export function TeamSubscriptionEffectPage() {
             <div className="mt-8">
               <TitledCards items={yearRules} />
             </div>
+            {/* Первый шаг — дословно из /business-effect, экран 9 */}
+            <PaperCard className="mt-10 max-w-3xl border-l-[3px] border-l-[color:var(--color-accent)] p-6">
+              <p className="font-display t-body font-medium">
+                Первый шаг: разбор объема и плана на квартал
+              </p>
+              <span className="mt-2 block">
+                <HowLink href={BE.team} />
+              </span>
+            </PaperCard>
           </div>
         </div>
       </section>
 
+      <CtaBand path={path} secondary={null} />
       <OtherSituations current={BE.teamEffect} />
-      <CtaBand path={path} secondary={<HowLink href={BE.team} dark />} />
     </PageShell>
   );
 }
@@ -1150,12 +1160,12 @@ export function ExternalExpertsPage() {
       </section>
 
       {/* Экран 7. Следующий шаг */}
-      <OtherSituations current={BE.external} />
       <CtaBand
         path={path}
         note="30 минут онлайн: разбираем задачу и определяем, какого именно практика искать."
-        secondary={<EffectLink href={BE.externalEffect} dark />}
+        secondary={null}
       />
+      <OtherSituations current={BE.external} />
     </PageShell>
   );
 }
@@ -1262,16 +1272,26 @@ export function ExternalExpertsEffectPage() {
               </p>
             </div>
 
-            <a href="/cases#b2b-procurement" className="link-arrow group mt-8 t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]">
-              Где это уже сработало
+            <a href="/cases" className="link-arrow group mt-8 t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]">
+              Все кейсы
               <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
+
+            {/* Первый шаг — дословно из /business-effect, экран 9 */}
+            <div className="tint-ink mt-10 max-w-3xl rounded-md border-l-2 border-[color:var(--color-accent)] p-6">
+              <p className="font-display t-body font-medium text-[color:var(--color-text-inverse)]">
+                Первый шаг: профили практиков за 72 часа, бесплатно
+              </p>
+              <span className="mt-2 block">
+                <HowLink href={BE.external} dark />
+              </span>
+            </div>
           </div>
         </div>
       </section>
 
+      <CtaBand path={path} secondary={null} />
       <OtherSituations current={BE.externalEffect} />
-      <CtaBand path={path} secondary={<HowLink href={BE.external} dark />} />
     </PageShell>
   );
 }

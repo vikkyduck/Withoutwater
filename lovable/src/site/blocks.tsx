@@ -70,12 +70,14 @@ export function Hero() {
       {/* Кольцо прогресса убрано (см. комментарий в core.tsx → PageHead) */}
 
       <div className="hero-pad relative z-10 mx-auto max-w-7xl px-5 md:px-8">
-        {/* Один срез на макет — на акцентном слове заголовка */}
+        {/* Фразы поменяны ролями (решение Виктории 03.08): самая прямая —
+            «Ваша внешняя команда по обучению» — стала заголовком, образ
+            «мощностей» ушёл в надзаголовок. Обе формулировки её, дословно. */}
         <div className="mb-6 [--color-text-secondary:var(--color-text-inverse-2)]">
-          <SectionLabel n="00">Ваша внешняя команда по обучению</SectionLabel>
+          <SectionLabel n="00">Дополнительные мощности для вашей T&D-команды</SectionLabel>
         </div>
         <RevealHeading as="h1" className="t-h1 max-w-[900px] text-[color:var(--color-text-inverse)]">
-          Дополнительные мощности для вашей T&D-команды
+          Ваша внешняя команда по обучению
         </RevealHeading>
 
         <p className="t-body measure mt-6 text-[color:var(--color-text-inverse)]/85 md:mt-7">
@@ -144,10 +146,28 @@ export function Hero() {
    Вордмарки текстовые — заменим на файлы логотипов, когда будут согласованы. */
 
 export function Bricks() {
+  /* Цифры опыта переехали сюда из отдельной секции «Наш опыт в цифрах»
+     (решение 03.08): две секции рядом доказывали одно и то же. Тексты
+     дословно из прежней секции. */
+  const numbers: [string, string][] = [
+    ["460+", "разработанных продуктов в портфеле команды"],
+    ["30+", "компаний-клиентов"],
+  ];
   return (
     <section className="relative overflow-hidden border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
         <SectionLabel n="05">Работали с командами</SectionLabel>
+        <div className="mt-8 flex flex-col gap-x-14 gap-y-4 sm:flex-row">
+          {numbers.map(([n, d]) => (
+            <div key={n} className="flex items-baseline gap-3">
+              <span className="font-display t-h2 font-medium tabular-nums tracking-[-0.02em]">{n}</span>
+              <span className="max-w-[240px] t-body text-[color:var(--color-text-secondary)]">{d}</span>
+            </div>
+          ))}
+        </div>
+        <p className="mt-3 t-caption text-[color:var(--color-text-secondary)]">
+          По данным внутреннего учёта проектов команды.
+        </p>
         <div className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-line)] sm:grid-cols-3">
           {BRICKS.map((b, i) => {
             const Tag: any = b.href ? motion.a : motion.div;
@@ -325,6 +345,15 @@ export function WhenNeeded() {
             </motion.div>
           ))}
         </div>
+        {/* Выход для того, кто не узнал себя в трёх карточках: самодиагностика
+            не обязательна — её и обещает сам разбор */}
+        <a
+          href="#contact"
+          className="link-arrow group mt-8 t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
+        >
+          Не уверены, какая ситуация ваша — разберём за 30 минут
+          <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+        </a>
       </div>
     </section>
   );
@@ -442,7 +471,11 @@ export function Flow() {
 /* Карточка кейса из сборки Lovable + обязательная строка «что изменилось
    у клиента» (языком потребности) по ТЗ v3. */
 
-export function CaseCard({ item, index }: { item: CaseItem; index: number }) {
+/* teaser — компактный вывод для главной: клиент, метрики, «что изменилось»
+   и ссылка. Список «Что сделано» не выводится — иначе карточка дословно
+   повторяла страницу эффекта, и ссылка «Бизнес-эффект и цифры» приводила
+   к уже прочитанному. */
+export function CaseCard({ item, index, teaser = false }: { item: CaseItem; index: number; teaser?: boolean }) {
   return (
     <motion.div
       {...reveal(index)}
@@ -537,7 +570,7 @@ export function CaseCard({ item, index }: { item: CaseItem; index: number }) {
         </div>
 
 
-        {item.done && item.done.length > 0 && (
+        {!teaser && item.done && item.done.length > 0 && (
           <div className="space-y-2">
             <div className="t-eyebrow text-[color:var(--color-text-secondary)]">
               Что сделано
@@ -569,7 +602,7 @@ export function CaseCard({ item, index }: { item: CaseItem; index: number }) {
           </a>
         )}
 
-        {item.source && (
+        {!teaser && item.source && (
           <p className="mt-auto t-small italic text-[color:var(--color-text-secondary)]/70">
             {item.source}
           </p>
@@ -588,10 +621,12 @@ export function CasesBlock({
   compactHeader = false,
   limit,
   moreHref,
+  teaser = false,
 }: {
   compactHeader?: boolean;
   limit?: number;
   moreHref?: string;
+  teaser?: boolean;
 }) {
   const all = visibleCases();
   const items = limit ? all.slice(0, limit) : all;
@@ -615,7 +650,7 @@ export function CasesBlock({
         )}
         <div className={`grid items-stretch gap-6 md:grid-cols-2 ${compactHeader ? "" : "mt-14"}`}>
           {items.map((item, i) => (
-            <CaseCard key={item.title} item={item} index={i} />
+            <CaseCard key={item.title} item={item} index={i} teaser={teaser} />
           ))}
         </div>
         {moreHref && all.length > items.length && (
@@ -667,10 +702,13 @@ export function ReviewCard({ r, index = 0 }: { r: Review; index?: number }) {
   );
 }
 
+/* Секция светлая (решение 03.08): на телефоне три тёмных экрана цитат подряд
+   сливались со следующей тёмной секцией. На главной два отзыва — «Все отзывы»
+   теперь ведёт к тому, чего на главной нет. */
 export function ReviewsBlock() {
   const items = homeReviews();
   return (
-    <section id="reviews" className="stage sec-dark grain border-b border-[color:var(--color-line-dark)]">
+    <section id="reviews" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <Scene blobs={[{ className: "-left-40 top-10", tone: "rose", size: 560 }, { className: "-right-40 bottom-10", tone: "chrome", size: 480 }]} />
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
         <SectionLabel n="03">Отзывы</SectionLabel>
@@ -682,7 +720,7 @@ export function ReviewsBlock() {
             О работе методологов «Без Воды» — дословно.
           </p>
         </div>
-        <div className="mt-12 grid items-stretch gap-6 md:grid-cols-3">
+        <div className="mt-12 grid items-stretch gap-6 md:grid-cols-2">
           {items.map((r, i) => (
             <ReviewCard key={r.slug} r={r} index={i} />
           ))}
@@ -1098,7 +1136,9 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
                   disabled={sending}
                   className="btn btn-invert group mt-4 w-full"
                 >
-                  <span>{sending ? "Отправляем…" : "Назначить разбор"}</span>
+                  {/* «Отправить заявку…»: прежний «Назначить разбор» обещал
+                      выбор времени, которого в форме нет */}
+                  <span>{sending ? "Отправляем…" : "Отправить заявку на разбор"}</span>
                   <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
                 </button>
                 <p className="t-caption text-[color:var(--color-text-inverse-2)]">
