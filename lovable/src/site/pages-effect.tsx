@@ -95,7 +95,11 @@ function HowLink({ href, dark = false }: { href: string; dark?: boolean }) {
    другим ситуациям: человек, которому эта ситуация не подошла, уходил с сайта.
    Названия ситуаций берутся из data.tsx — те же, что на главной и в хабе. */
 function OtherSituations({ current }: { current: string }) {
-  const others = SITUATIONS.filter((s) => s.href !== current);
+  /* На страницах эффекта current приходит с суффиксом /business-effect —
+     без среза фильтр не находил родителя, и «Другие ситуации» показывали
+     все три, включая текущую (поймано вторым раундом разбора). */
+  const base = current.replace(/\/business-effect$/, "");
+  const others = SITUATIONS.filter((s) => s.href !== base);
   return (
     <div className="relative border-t border-[color:var(--color-line)]">
       <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">

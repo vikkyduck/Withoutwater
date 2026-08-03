@@ -400,7 +400,7 @@ function ContactsPage() {
           ]}
         />
       </section>
-      <Contact />
+      <Contact numbered={false} />
       <section className="relative border-b border-[color:var(--color-line)]">
 
         <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">

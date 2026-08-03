@@ -840,7 +840,9 @@ export function FaqAccordion({ items }: { items: { q: string; a: string }[] }) {
 
 /* -------------------------------- Contact ------------------------------- */
 
-export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
+/* numbered=false — для /contacts: там секция одна, и порядковый «08»,
+   пришедший с главной, выглядел чужим. */
+export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; numbered?: boolean } = {}) {
   const [sent, setSent] = useState(false);
   const [sentName, setSentName] = useState("");
   const [sending, setSending] = useState(false);
@@ -957,7 +959,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
       <div className="relative mx-auto grid max-w-7xl gap-16 px-5 sec-pad md:px-8 lg:grid-cols-[1fr_1fr]">
         <div>
           <div className="flex items-center gap-4 t-eyebrow text-[color:var(--color-text-secondary)]">
-            {asH1 ? (
+            {asH1 || !numbered ? (
               <span className="tex-chrome h-[2px] w-12 rounded-pill" />
             ) : (
               <>
@@ -1048,12 +1050,15 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                   <label htmlFor="f-about" className="t-label mb-2 block text-[color:var(--color-text-inverse-2)]">
                     Запрос на разбор
                   </label>
+                  {/* Цвета — как у Field dark. Прежний text-background внутри
+                      sec-dark резолвился в уголь: человек печатал запрос
+                      УГЛЁМ ПО УГЛЮ и не видел собственных букв. */}
                   <textarea
                     id="f-about"
                     rows={3}
                     name="about"
                     placeholder="Что должно измениться и к какому сроку"
-                    className="w-full resize-none rounded-sm border border-[color:var(--color-line-dark)] bg-white/5 px-4 py-3 text-base text-background outline-none transition placeholder:text-background/35 focus:border-background/40 focus:bg-white/10"
+                    className="w-full resize-none rounded-sm border border-[color:var(--color-line-dark)] bg-white/5 px-4 py-3 text-base text-[color:var(--color-text-inverse)] outline-none transition placeholder:text-[color:var(--color-text-inverse-2)]/50 focus:border-[color:var(--color-accent-glass)] focus:bg-white/10"
                   />
                 </div>
                 <p className="hidden" aria-hidden="true">
