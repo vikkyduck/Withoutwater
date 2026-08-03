@@ -382,13 +382,16 @@ function ContactsPage() {
     <PageShell path="/contacts">
       <section className="stage border-b border-[color:var(--color-line)]">
         <Scene blobs={[{ className: "-right-40 top-1/4", tone: "rose", size: 520 }]} />
+        {/* Чипы обложки — прямые каналы (решение 03.08): написать или
+            позвонить можно, не докручивая до формы. «2 рабочих часа» здесь
+            был третьим повтором обещания на одной странице. */}
         <PageHead
           kicker="Контакты"
           title={<>Разберём вашу задачу за 30 минут</>}
-          lead="Оставьте заявку или напишите напрямую — готовить презентацию и ТЗ не нужно. Отвечаем в течение двух рабочих часов."
+          lead="Оставьте заявку или напишите напрямую — ответим в течение двух рабочих часов."
           chips={[
-            ["2 рабочих часа", "среднее время ответа на заявку или вопрос"],
-            ["Без обязательств", "разбор задачи ни к чему вас не обязывает"],
+            ["Telegram: @vikki_duck", "если удобнее — напишите напрямую, без формы"],
+            ["+7 964 584 22 25", "или позвоните: разбор задачи ни к чему вас не обязывает"],
           ]}
         />
       </section>
@@ -396,7 +399,9 @@ function ContactsPage() {
       <section className="relative border-b border-[color:var(--color-line)]">
 
         <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
-          <div className="grid gap-8 t-body md:grid-cols-3">
+          {/* Колонка «Обязательство» убрана: «отвечаем в течение двух рабочих
+              часов» читалось на странице третий раз (решение 03.08) */}
+          <div className="grid gap-8 t-body md:grid-cols-2">
             <div>
               <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Напрямую</div>
               <ul className="mt-4 space-y-2">
@@ -410,12 +415,6 @@ function ContactsPage() {
               <p className="mt-4 text-[color:var(--color-text-secondary)]">
                 ИП Уткина Виктория Викторовна<br />
                 ИНН 771586055972
-              </p>
-            </div>
-            <div>
-              <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Обязательство</div>
-              <p className="mt-4 text-[color:var(--color-text-secondary)]">
-                Отвечаем в течение двух рабочих часов.
               </p>
             </div>
           </div>

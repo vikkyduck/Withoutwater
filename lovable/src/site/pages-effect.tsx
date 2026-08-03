@@ -379,10 +379,27 @@ export function BusinessEffectGeneralPage() {
               его в системе обучения. Внутри компании это ежемесячные оклады
               независимо от того, сколько программ нужно реализовать.
             </p>
-            <StaffCostTable
-              ourLine="Работа с нами: от 200 000 ₽ в месяц."
-              afterLine="Объем работ в обоих случаях зависит от задач: у нас он фиксируется в договоре через образ результата, а не через часовые ставки."
-            />
+            {/* Полная таблица окладов живёт в одном месте — на странице
+                эффекта подписки, где принимается решение о цене (решение
+                Виктории 03.08: «посмотри, где будет лучше»). Здесь — суть
+                и ссылка на полный расчёт. */}
+            <div className="tint-ink mt-8 max-w-3xl rounded-md border-l-2 border-[color:var(--color-accent)] p-6">
+              <p className="font-display t-body font-medium text-[color:var(--color-text-inverse)]">
+                Работа с нами: от 200 000 ₽ в месяц.
+              </p>
+              <p className="mt-2 t-body text-[color:var(--color-text-inverse-3,var(--color-text-inverse-2))]">
+                Объем работ в обоих случаях зависит от задач: у нас он
+                фиксируется в договоре через образ результата, а не через
+                часовые ставки.
+              </p>
+            </div>
+            <a
+              href={BE.teamEffect}
+              className="link-arrow group mt-6 t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
+            >
+              Полное сравнение с фондом оплаты труда
+              <ArrowUpRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </a>
           </div>
         </div>
 

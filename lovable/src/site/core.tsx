@@ -1478,6 +1478,18 @@ export function CtaBand({
           </span>
           {secondary === null ? null : secondary ?? defaultSecondary}
         </div>
+        {/* Прямые каналы в каждом финале (решение Виктории 03.08: «нужно,
+            чтобы везде была возможность написать или позвонить») */}
+        <p className="mt-5 t-body text-[color:var(--color-text-inverse-2)]">
+          Или напрямую:{" "}
+          <a href="https://t.me/vikki_duck" target="_blank" rel="noreferrer" className="font-medium text-[color:var(--color-text-inverse)] underline underline-offset-4 transition hover:text-[color:var(--color-accent-glass)]">
+            Telegram @vikki_duck
+          </a>
+          {" · "}
+          <a href="tel:+79645842225" className="font-medium text-[color:var(--color-text-inverse)] underline underline-offset-4 transition hover:text-[color:var(--color-accent-glass)]">
+            +7 964 584 22 25
+          </a>
+        </p>
       </div>
     </section>
   );
