@@ -879,23 +879,30 @@ export function CookieBar() {
     setShow(false);
   };
   if (!mounted || !show) return null;
+  /* Раньше вся полоса была <div role="button"> без tabindex: с клавиатуры её
+     нельзя было закрыть в принципе, а текст не сообщал, что клик = согласие.
+     Теперь полоса — обычный текст со ссылкой, а закрывает её настоящая кнопка. */
   return (
     <div
-      role="button"
       data-cookie-bar
-      onClick={accept}
-      className="fixed inset-x-0 bottom-0 z-40 flex items-center justify-center gap-2 border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] px-4 py-2 text-center transition-colors hover:bg-[color:var(--color-bg-secondary)]"
+      className="fixed inset-x-0 bottom-0 z-40 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] px-4 py-2 text-center"
     >
       <span className="t-caption text-[color:var(--color-text-secondary)]">
         Cookie и Яндекс Метрика ·{" "}
         <a
           href="/politics_pd"
-          onClick={(e) => e.stopPropagation()}
           className="underline underline-offset-2 hover:text-[color:var(--color-text-primary)]"
         >
           политика
         </a>
       </span>
+      <button
+        type="button"
+        onClick={accept}
+        className="rounded-sm border border-[color:var(--color-line)] px-3 py-1 t-caption font-medium text-[color:var(--color-text-primary)] transition-colors duration-[160ms] hover:border-[color:var(--color-steel)] hover:bg-[color:var(--color-bg-secondary)]"
+      >
+        Понятно
+      </button>
     </div>
   );
 }
@@ -1399,8 +1406,11 @@ export function PageHead({
         />
       </div>
 
-      {/* Хромовое кольцо — индикатор прогресса чтения страницы */}
-      <ScrollRing className="right-[6%] top-[16%] z-20 w-[min(16vw,190px)]" />
+      {/* Кольцо-индикатор прогресса убрано (решение Виктории 03.08): оно
+          сообщало процент прочитанного — сведение, которое читателю не нужно,
+          — и из-за конфликта .card-link (position:relative) с классом absolute
+          висело обрезанным за левым краем на всех страницах. Компонент
+          ScrollRing оставлен ниже: вернуть — одна строка. */}
 
       <div className="relative z-10 mx-auto max-w-7xl px-5 pb-14 pt-12 md:px-8 md:pb-20 md:pt-24">
         <div className="t-eyebrow flex items-center gap-3 text-[color:var(--color-text-inverse-2)]">

@@ -90,6 +90,43 @@ function HowLink({ href, dark = false }: { href: string; dark?: boolean }) {
   );
 }
 
+/* Выход из тупика: на продуктовой странице и странице эффекта в тексте было
+   всего 4 ссылки — форма и своя же подстраница. Ни назад в хаб, ни к двум
+   другим ситуациям: человек, которому эта ситуация не подошла, уходил с сайта.
+   Названия ситуаций берутся из data.tsx — те же, что на главной и в хабе. */
+function OtherSituations({ current }: { current: string }) {
+  const others = SITUATIONS.filter((s) => s.href !== current);
+  return (
+    <div className="relative border-t border-[color:var(--color-line)]">
+      <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
+        <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Другие ситуации</div>
+        <div className="mt-6 grid items-stretch gap-4 sm:grid-cols-2">
+          {others.map((s, i) => (
+            <motion.a
+              key={s.id}
+              href={s.href}
+              {...reveal(i)}
+              className="card-link group h-full"
+            >
+              <PaperCard className="flex h-full items-start justify-between gap-4 p-6">
+                <span className="font-display t-body font-medium">{s.situation}</span>
+                <ArrowRight
+                  data-arrow
+                  className="mt-1 h-4 w-4 shrink-0 text-[color:var(--color-text-secondary)] transition-colors duration-300 group-hover:text-[color:var(--color-accent)]"
+                />
+              </PaperCard>
+            </motion.a>
+          ))}
+        </div>
+        <a href="/tasks" className="link-arrow group mt-6 t-body">
+          Все задачи и решения
+          <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+        </a>
+      </div>
+    </div>
+  );
+}
+
 /* Плитки цифр примера — на тёмной сцене, значения Unbounded */
 function MetricTiles({ items }: { items: [string, string][] }) {
   return (
@@ -241,34 +278,15 @@ export function BusinessEffectGeneralPage() {
             <NodeScene className="text-[color:var(--color-text-inverse-2)]" opacity={0.3} />
           </div>
           <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
+            {/* В документе у экрана 2 только заголовок — тела нет. Карточки с
+                тремя ситуациями, которые тут стояли, были моей добавкой: на
+                странице получалось два набора карточек про одно и то же под
+                разными названиями (второй — экран 9 «Три ситуации»). Оставлен
+                заголовок, как в документе. */}
             <SectionLabel n="01">Три ситуации, один механизм</SectionLabel>
             <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
               Откуда бы ни пришли знание и опыт, оно остается у компании
             </RevealHeading>
-            <div className="mt-10 grid gap-4 md:grid-cols-3">
-              {SITUATIONS.map((it, i) => (
-                <motion.a
-                  key={it.id}
-                  href={it.href}
-                  {...reveal(i)}
-                  className="card-link surface-dark notch group flex h-full flex-col rounded-md p-6"
-                >
-                  <div className="flex items-center justify-between gap-3">
-                    <span className="flex items-center gap-3">
-                      <Stencil n={i + 1} active className="t-body" />
-                      <span className="h-px w-6 bg-[color:var(--color-line-dark)]" />
-                    </span>
-                    <ArrowUpRight
-                      data-arrow="diag"
-                      className="h-4 w-4 shrink-0 text-[color:var(--color-text-inverse-2)] transition-colors duration-300 group-hover:text-[color:var(--color-text-inverse)]"
-                    />
-                  </div>
-                  <div className="mt-4 font-display t-body font-medium text-[color:var(--color-text-inverse)]">
-                    {it.situation}
-                  </div>
-                </motion.a>
-              ))}
-            </div>
           </div>
         </div>
 
@@ -722,6 +740,7 @@ export function InternalExpertsPage() {
       </section>
 
       {/* Экран 9. Следующий шаг */}
+      <OtherSituations current={BE.internal} />
       <CtaBand
         path={path}
         title={<>Разберем вашу задачу за 30 минут</>}
@@ -867,6 +886,7 @@ export function InternalExpertsEffectPage() {
         </div>
       </section>
 
+      <OtherSituations current={BE.internalEffect} />
       <CtaBand path={path} secondary={<HowLink href={BE.internal} dark />} />
     </PageShell>
   );
@@ -971,6 +991,7 @@ export function TeamSubscriptionPage() {
       </section>
 
       {/* Экран 7. Следующий шаг */}
+      <OtherSituations current={BE.team} />
       <CtaBand path={path} secondary={<EffectLink href={BE.teamEffect} dark />} />
     </PageShell>
   );
@@ -1037,6 +1058,7 @@ export function TeamSubscriptionEffectPage() {
         </div>
       </section>
 
+      <OtherSituations current={BE.teamEffect} />
       <CtaBand path={path} secondary={<HowLink href={BE.team} dark />} />
     </PageShell>
   );
@@ -1124,6 +1146,7 @@ export function ExternalExpertsPage() {
       </section>
 
       {/* Экран 7. Следующий шаг */}
+      <OtherSituations current={BE.external} />
       <CtaBand
         path={path}
         note="30 минут онлайн: разбираем задачу и определяем, какого именно практика искать."
@@ -1243,6 +1266,7 @@ export function ExternalExpertsEffectPage() {
         </div>
       </section>
 
+      <OtherSituations current={BE.externalEffect} />
       <CtaBand path={path} secondary={<HowLink href={BE.external} dark />} />
     </PageShell>
   );

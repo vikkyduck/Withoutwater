@@ -36,7 +36,7 @@ function HomePage() {
       <WhenNeeded />
       {/* «Схема взаимодействия» убрана с главной (финальная структура 02.08),
           блок остаётся на /how-we-work */}
-      <CasesBlock />
+      <CasesBlock limit={2} moreHref="/cases" />
       <ReviewsBlock />
       <NumbersBand />
       <Bricks />
@@ -109,11 +109,12 @@ function TasksPage() {
                   <p className="mt-4 t-body font-semibold text-[color:var(--color-text-inverse)]">
                     Как решаем: {it.solutionTitle}
                   </p>
-                  <span className="mt-auto block pt-6">
-                    <span className="btn btn-invert w-max">
-                      Подробнее
-                      <ArrowRight data-arrow className="h-4 w-4" />
-                    </span>
+                  {/* Не кнопка: залитый пилюль здесь выглядел ровно как
+                      «Разбор задачи за 30 минут» — три навигационные ссылки
+                      спорили с единственным действием сайта. */}
+                  <span className="link-arrow mt-auto pt-6 t-body text-[color:var(--color-text-inverse)]">
+                    Подробнее
+                    <ArrowRight data-arrow className="h-4 w-4" />
                   </span>
                 </motion.a>
               ))}
@@ -428,8 +429,9 @@ function ContactsPage() {
           </div>
         </div>
       </section>
-      <CtaBand path="/contacts" />
-
+      {/* Финальный блок «Разберём вашу задачу за 30 минут» здесь убран:
+          его заголовок дословно повторял заголовок страницы, а кнопка вела
+          на эту же страницу — человек уже стоит перед формой. */}
     </PageShell>
   );
 }

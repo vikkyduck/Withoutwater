@@ -147,18 +147,20 @@ export const homeReviews = () => REVIEWS.filter((r) => r.home).slice(0, 3);
 export type Brick = {
   name: string;
   year?: string;
-  href: string; // куда ведёт: якорь отзыва на /reviews или сама страница
-  /* стилизованный вордмарк, пока нет файлов логотипов */
-  mark?: string;
+  /* Ссылка только там, где отзыв этой компании действительно опубликован.
+     Раньше подпись «Отзыв клиента» стояла на всех шести плитках, а четыре
+     вели на /reviews, где отзывов этих компаний нет: обещание не выполнялось
+     ровно в блоке, который доказывает надёжность. */
+  href?: string;
 };
 
 export const BRICKS: Brick[] = [
-  { name: "Авито", href: "/reviews" }, // якорь #kvirkeliya вернуть при публикации её отзыва
+  { name: "Авито" }, // ссылку вернуть при публикации отзыва Квиркелии
   { name: "ВкусВилл", href: "/reviews#khmelenko" },
   { name: "Beyond Taylor", href: "/reviews#khmelenko" },
-  { name: "Global Creative Hub", href: "/reviews" },
-  { name: "McDonald's", year: "2021", href: "/reviews" },
-  { name: "World Class", href: "/reviews" },
+  { name: "Global Creative Hub" },
+  { name: "McDonald's", year: "2021" },
+  { name: "World Class" },
 ];
 
 /* -------------------------------- Кейсы ---------------------------------- */

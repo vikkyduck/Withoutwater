@@ -67,10 +67,7 @@ export function Hero() {
         />
       </div>
 
-      {/* Единственный объект первого экрана — кольцо-индикатор прогресса */}
-      <ScrollRing className="right-[5%] top-[12%] z-20 w-[min(14vw,220px)]" />
-
-
+      {/* Кольцо прогресса убрано (см. комментарий в core.tsx → PageHead) */}
 
       <div className="hero-pad relative z-10 mx-auto max-w-7xl px-5 md:px-8">
         {/* Один срез на макет — на акцентном слове заголовка */}
@@ -152,29 +149,36 @@ export function Bricks() {
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
         <SectionLabel n="05">Работали с командами</SectionLabel>
         <div className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-line)] sm:grid-cols-3">
-          {BRICKS.map((b, i) => (
-            <motion.a
-              key={b.name}
-              href={b.href}
-              {...reveal(i)}
-              className="card-link group relative flex min-h-[92px] flex-col justify-between rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-5 transition-colors duration-300 hover:bg-[color:var(--color-bg-primary)] md:min-h-[104px]"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <span className="font-display t-body font-medium tracking-[-0.01em] text-[color:var(--color-text-primary)]">
-                  {b.name}
-                </span>
-                {b.year && (
-                  <span className="t-caption shrink-0 tabular-nums text-[color:var(--color-steel)]">
-                    {b.year}
+          {BRICKS.map((b, i) => {
+            const Tag: any = b.href ? motion.a : motion.div;
+            return (
+              <Tag
+                key={b.name}
+                {...(b.href ? { href: b.href } : {})}
+                {...reveal(i)}
+                className={`group relative flex min-h-[92px] flex-col justify-between rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-5 md:min-h-[104px] ${
+                  b.href ? "card-link transition-colors duration-300 hover:bg-[color:var(--color-bg-primary)]" : ""
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <span className="font-display t-body font-medium tracking-[-0.01em] text-[color:var(--color-text-primary)]">
+                    {b.name}
+                  </span>
+                  {b.year && (
+                    <span className="t-caption shrink-0 tabular-nums text-[color:var(--color-steel)]">
+                      {b.year}
+                    </span>
+                  )}
+                </div>
+                {b.href && (
+                  <span className="mt-3 inline-flex items-center gap-1.5 t-caption font-medium text-[color:var(--color-steel)] transition group-hover:text-[color:var(--color-accent)]">
+                    Отзыв клиента
+                    <ArrowUpRight data-arrow="diag" className="h-3.5 w-3.5" />
                   </span>
                 )}
-              </div>
-              <span className="mt-3 inline-flex items-center gap-1.5 t-caption font-medium text-[color:var(--color-steel)] transition group-hover:text-[color:var(--color-accent)]">
-                Отзыв клиента
-                <ArrowUpRight data-arrow="diag" className="h-3.5 w-3.5" />
-              </span>
-            </motion.a>
-          ))}
+              </Tag>
+            );
+          })}
         </div>
       </div>
 
@@ -577,8 +581,20 @@ export function CaseCard({ item, index }: { item: CaseItem; index: number }) {
   );
 }
 
-export function CasesBlock({ compactHeader = false }: { compactHeader?: boolean }) {
-  const items = visibleCases();
+/* limit — сколько карточек показать. На главной их две: раньше главная
+   повторяла всю страницу /cases слово в слово (36% её длины, 21 экран
+   телефона) и делала /cases бессмысленной. */
+export function CasesBlock({
+  compactHeader = false,
+  limit,
+  moreHref,
+}: {
+  compactHeader?: boolean;
+  limit?: number;
+  moreHref?: string;
+}) {
+  const all = visibleCases();
+  const items = limit ? all.slice(0, limit) : all;
   return (
     <section id="cases" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <Scene blobs={[{ className: "-right-40 top-10", tone: "chrome", size: 600 }, { className: "-left-40 bottom-10", tone: "chrome", size: 520 }]} />
@@ -602,6 +618,12 @@ export function CasesBlock({ compactHeader = false }: { compactHeader?: boolean 
             <CaseCard key={item.title} item={item} index={i} />
           ))}
         </div>
+        {moreHref && all.length > items.length && (
+          <a href={moreHref} className="link-arrow group mt-8 t-body">
+            Все кейсы
+            <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </a>
+        )}
       </div>
     </section>
   );
@@ -830,12 +852,19 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
   const pdRef = useRef<HTMLInputElement>(null);
   const [pd, setPd] = useState(false);
 
+  /* Формат контакта НЕ проверяем. Прежняя проверка отбраковывала живых людей:
+     «t.me/irina», «Telegram: @irina», «напишите в телеграм @irina_hr» — то есть
+     ровно тот формат, которым сайт печатает собственный контакт. Цена ложного
+     отказа (человек уходит) выше цены опечатки: рядом всё равно есть имя,
+     компания и запрос, по которым можно вернуться. Ловим только пустое поле. */
   const validate = (field: "name" | "contact", value: string) => {
     const v = value.trim();
     if (field === "name") return v ? null : "Укажите, как к вам обращаться.";
     if (!v) return "Оставьте email, телефон или Telegram — иначе нам некуда ответить.";
-    const ok = /\S+@\S+\.\S+/.test(v) || /^@?[\w.]{3,}$/.test(v) || /[\d][\d\s()+-]{6,}/.test(v);
-    return ok ? null : "Похоже на опечатку: укажите email, телефон или @telegram.";
+    if (v.length < 3 || !/[\wа-яё]/i.test(v)) {
+      return "Слишком коротко — оставьте email, телефон или Telegram.";
+    }
+    return null;
   };
   const checkField = (field: "name" | "contact") => (e: React.SyntheticEvent<HTMLInputElement>) => {
     const msg = validate(field, e.currentTarget.value);
