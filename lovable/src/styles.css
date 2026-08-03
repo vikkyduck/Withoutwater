@@ -176,6 +176,14 @@
   font-size: 1.0625rem;
   line-height: 1.72;
 }
+/* Навигация — не наборный текст: 15 px. Четыре русских пункта в t-body (17 px)
+   не помещались в строку рядом с логотипом и действием и уезжали на вторую
+   строку. Ниже 14 px в вебе система не опускается (разд. 16). */
+@utility t-nav {
+  font-family: var(--font-sans);
+  font-size: 0.9375rem;
+  line-height: 1.4;
+}
 @utility t-caption { font-size: 0.8125rem; line-height: 1.5; }
 @utility t-small  { font-size: 0.75rem; line-height: 1.5; }
 @utility t-eyebrow {

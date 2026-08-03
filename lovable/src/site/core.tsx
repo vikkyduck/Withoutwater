@@ -855,10 +855,9 @@ export function CalmToggle({ className = "" }: { className?: string }) {
       aria-pressed={calm}
       aria-label={calm ? "Включить анимации" : "Уменьшить анимации"}
       title={calm ? "Включить анимации" : "Уменьшить анимации"}
-      className={`group items-center justify-center gap-2 rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] px-3 py-2 text-[color:var(--color-text-secondary)] transition-colors duration-[160ms] hover:text-[color:var(--color-text-primary)] hover:border-[color:var(--color-steel)] ${className}`}
+      className={`group h-10 w-10 items-center justify-center rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-secondary)] transition-colors duration-[160ms] hover:text-[color:var(--color-text-primary)] hover:border-[color:var(--color-steel)] ${className}`}
     >
       {calm ? <Sparkles className="h-4 w-4" /> : <Waves className="h-4 w-4" />}
-      <span className="t-caption hidden xl:inline">Меньше анимаций</span>
     </button>
   );
 }
@@ -970,7 +969,11 @@ export function Nav({ path = "/" }: { path?: string }) {
           <CatMark className="h-6 w-auto md:h-7" />
           <StencilLogo className="logo-sm" />
         </a>
-        <nav className="hidden items-center gap-0.5 t-body font-medium tracking-[0.005em] md:flex">
+        {/* Пункты меню не переносятся никогда: перенос ломает высоту шапки
+            и рвёт названия («Задачи и / решения»). Полное меню — от 1280 px,
+            ниже его заменяет бургер: четыре русских пункта, вход в кабинет
+            и действие в одну строку уже, чем в 1280 px, не помещаются. */}
+        <nav className="hidden items-center gap-0.5 t-nav font-medium tracking-[0.005em] xl:flex">
           {NAV_LINKS.map(([label, href]) => {
             const active = path === href;
             return (
@@ -978,7 +981,7 @@ export function Nav({ path = "/" }: { path?: string }) {
                 key={href}
                 href={href}
                 aria-current={active ? "page" : undefined}
-                className={`group relative rounded-sm px-3.5 py-2 t-body transition-colors duration-[160ms] ${
+                className={`group relative whitespace-nowrap rounded-sm px-3 py-2 transition-colors duration-[160ms] ${
                   active
                     ? "text-[color:var(--color-text-primary)]"
                     : "text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
@@ -987,7 +990,7 @@ export function Nav({ path = "/" }: { path?: string }) {
                 <span className="relative z-10">{label}</span>
                 <span
                   aria-hidden
-                  className={`absolute inset-x-3.5 -bottom-px h-px bg-[color:var(--color-accent)] transition-opacity duration-[160ms] ${
+                  className={`absolute inset-x-3 -bottom-px h-px bg-[color:var(--color-accent)] transition-opacity duration-[160ms] ${
                     active ? "opacity-100" : "opacity-0 group-hover:opacity-60"
                   }`}
                 />
@@ -996,13 +999,16 @@ export function Nav({ path = "/" }: { path?: string }) {
           })}
         </nav>
         <div className="flex shrink-0 items-center gap-2 md:gap-3">
-          <CalmToggle className="hidden md:inline-flex" />
-          {/* Вход для действующих клиентов — тихая кнопка, не спорит с CTA */}
+          <CalmToggle className="hidden xl:inline-flex" />
+          {/* Волосяная линия отделяет разделы сайта от зоны аккаунта и действия */}
+          <span aria-hidden className="hidden h-5 w-px bg-[color:var(--color-line)] xl:block" />
+          {/* Вход для действующих клиентов — тихая ссылка: рамка рядом с CTA
+              давала две кнопки подряд и спорила за главное действие */}
           <a
             href={LK_URL}
             target="_blank"
             rel="noopener"
-            className="hidden shrink-0 items-center justify-center rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] px-3.5 py-2 t-body font-medium text-[color:var(--color-text-secondary)] transition-colors duration-[160ms] hover:border-[color:var(--color-steel)] hover:text-[color:var(--color-text-primary)] md:inline-flex"
+            className="hidden shrink-0 items-center justify-center whitespace-nowrap rounded-sm px-2 py-2 t-nav font-medium text-[color:var(--color-text-secondary)] underline-offset-4 transition-colors duration-[160ms] hover:text-[color:var(--color-text-primary)] hover:underline xl:inline-flex"
           >
             {LK_LABEL}
           </a>
@@ -1019,7 +1025,7 @@ export function Nav({ path = "/" }: { path?: string }) {
             aria-label={open ? "Закрыть меню" : "Открыть меню"}
             aria-expanded={open}
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-primary)] transition-colors hover:bg-[color:var(--color-bg-secondary)] md:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-primary)] transition-colors hover:bg-[color:var(--color-bg-secondary)] xl:hidden"
           >
             <span className="relative block h-3 w-4">
               <span
@@ -1040,8 +1046,8 @@ export function Nav({ path = "/" }: { path?: string }) {
       />
 
       {open && (
-        <div className="fixed inset-x-0 bottom-0 z-[2] flex flex-col border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] md:hidden" style={{ top: navH }}>
-          <nav className="flex-1 overflow-y-auto overscroll-contain px-5 pb-4 pt-2">
+        <div className="fixed inset-x-0 bottom-0 z-[2] flex flex-col border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] xl:hidden" style={{ top: navH }}>
+          <nav className="mx-auto w-full max-w-3xl flex-1 overflow-y-auto overscroll-contain px-5 pb-4 pt-2 md:px-8">
             {NAV_LINKS.map(([label, href]) => (
               <a
                 key={href}
@@ -1078,7 +1084,7 @@ export function Nav({ path = "/" }: { path?: string }) {
               </button>
             </div>
           </nav>
-          <div className="shrink-0 border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4">
+          <div className="shrink-0 border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 md:px-8 [&>*]:mx-auto [&>*]:max-w-3xl">
             <a
               href={ctaHref(path)}
               onClick={() => setOpen(false)}

@@ -48,10 +48,17 @@ function CtaButton({ path }: { path: string }) {
   );
 }
 
+/* Второе действие на угольной обложке — тихая ссылка, как в hero главной:
+   стеклянная кнопка на малой площади вырождается в серую плашку и читается
+   выключенной. Стрелка вниз оставлена: по ней видно, что это скачивание. */
 function PdfButton({ file }: { file: string }) {
   return (
-    <a href={file} download className="btn btn-glass group w-full sm:w-auto print:hidden">
-      <span>Скачать в PDF</span>
+    <a
+      href={file}
+      download
+      className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)] print:hidden"
+    >
+      Скачать в PDF
       <ArrowDown data-arrow="down" className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
     </a>
   );
