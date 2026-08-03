@@ -577,11 +577,15 @@ export function NodeList({
   className = "",
   itemClassName = "",
   divided = false,
+  accentFirst = true,
 }: {
   items: ReactNode[];
   className?: string;
   itemClassName?: string;
   divided?: boolean;
+  /* false — когда список продолжает соседний (вторая колонка):
+     акцентный узел только у настоящего первого пункта */
+  accentFirst?: boolean;
 }) {
   return (
     <ul
@@ -592,7 +596,7 @@ export function NodeList({
           key={i}
           className={`flex items-start gap-3 ${divided ? "py-3.5" : ""} ${itemClassName}`}
         >
-          <NodeBullet active={i === 0} className="mt-[0.55em]" />
+          <NodeBullet active={accentFirst && i === 0} className="mt-[0.55em]" />
           <span className="flex-1">{it}</span>
         </li>
       ))}

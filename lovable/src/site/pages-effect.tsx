@@ -7,6 +7,7 @@
    только через Викторию. Раскладка экранов по страницам — по документу
    «финальная структура сайта» той же даты.
    ========================================================================== */
+import { Fragment } from "react";
 import {
   motion,
   ArrowUpRight, ArrowRight, ArrowDown, Check,
@@ -239,15 +240,26 @@ export function BusinessEffectGeneralPage() {
             </RevealHeading>
             <div className="mt-10 grid gap-4 md:grid-cols-3">
               {SITUATIONS.map((it, i) => (
-                <motion.div key={it.id} {...reveal(i)} className="surface-dark notch flex h-full flex-col rounded-md p-6">
-                  <div className="flex items-center gap-3">
-                    <Stencil n={i + 1} active className="t-body" />
-                    <span className="h-px w-6 bg-[color:var(--color-line-dark)]" />
+                <motion.a
+                  key={it.id}
+                  href={it.href}
+                  {...reveal(i)}
+                  className="card-link surface-dark notch group flex h-full flex-col rounded-md p-6"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="flex items-center gap-3">
+                      <Stencil n={i + 1} active className="t-body" />
+                      <span className="h-px w-6 bg-[color:var(--color-line-dark)]" />
+                    </span>
+                    <ArrowUpRight
+                      data-arrow="diag"
+                      className="h-4 w-4 shrink-0 text-[color:var(--color-text-inverse-2)] transition-colors duration-300 group-hover:text-[color:var(--color-text-inverse)]"
+                    />
                   </div>
                   <div className="mt-4 font-display t-body font-medium text-[color:var(--color-text-inverse)]">
                     {it.situation}
                   </div>
-                </motion.div>
+                </motion.a>
               ))}
             </div>
           </div>
@@ -379,7 +391,7 @@ export function BusinessEffectGeneralPage() {
                   loading="lazy"
                   decoding="async"
                   width={1444}
-                  height={1498}
+                  height={1424}
                   className="block h-auto w-full"
                 />
               </div>
@@ -395,18 +407,20 @@ export function BusinessEffectGeneralPage() {
               <div className="t-eyebrow px-1 text-[color:var(--color-text-secondary)]">Что гарантируем</div>
               <div className="t-eyebrow hidden px-1 text-[color:var(--color-text-secondary)] md:block">Чего не гарантируем</div>
               {guarantees.map(([yes, no], i) => (
-                <motion.div key={yes} {...reveal(i)} className="contents">
-                  <PaperCard className="p-5">
-                    <div className="flex items-start gap-3">
-                      <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--color-accent)]" />
-                      <p className="t-body text-[color:var(--color-text-primary)]">{yes}</p>
-                    </div>
-                  </PaperCard>
-                  <div className="rounded-md border border-dashed border-[color:var(--color-line)] p-5">
+                <Fragment key={yes}>
+                  <motion.div {...reveal(i)}>
+                    <PaperCard className="h-full p-5">
+                      <div className="flex items-start gap-3">
+                        <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--color-accent)]" />
+                        <p className="t-body text-[color:var(--color-text-primary)]">{yes}</p>
+                      </div>
+                    </PaperCard>
+                  </motion.div>
+                  <motion.div {...reveal(i)} className="rounded-md border border-dashed border-[color:var(--color-line)] p-5">
                     <div className="mb-1 t-eyebrow text-[color:var(--color-text-secondary)] md:hidden">Чего не гарантируем</div>
                     <p className="t-body text-[color:var(--color-text-secondary)]">{no}</p>
-                  </div>
-                </motion.div>
+                  </motion.div>
+                </Fragment>
               ))}
             </div>
           </div>
@@ -618,7 +632,7 @@ export function InternalExpertsPage() {
             </p>
             <div className="mt-8 grid max-w-5xl gap-x-10 md:grid-cols-2">
               <NodeList divided items={formats.slice(0, 4)} />
-              <NodeList divided className="max-md:border-t-0" items={formats.slice(4)} />
+              <NodeList divided accentFirst={false} className="max-md:border-t-0" items={formats.slice(4)} />
             </div>
           </div>
         </div>
