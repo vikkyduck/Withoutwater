@@ -18,7 +18,7 @@ import {
   CasesBlock, ReviewsBlock, ReviewCard, BookSection, NotFit, Contact,
   FaqAccordion,
 } from "./blocks";
-import { FAQ_ITEMS, TEAM, FOUNDER_WORDS, visibleReviews, SITUATIONS } from "./data";
+import { FAQ_ITEMS, TEAM, visibleReviews, SITUATIONS } from "./data";
 import {
   BE,
   BusinessEffectGeneralPage,
@@ -223,11 +223,11 @@ function TeamPage() {
                 </div>
                 <h2 className="mt-2 font-display t-body font-medium">{founder.name}</h2>
                 <p className="mt-1 t-body text-[color:var(--color-text-secondary)]">{founder.role} · {founder.fact}</p>
-                <div className="mt-6 flex flex-col gap-3.5 border-l-[3px] border-[color:var(--color-accent)] pl-4 md:pl-5">
-                  {FOUNDER_WORDS.map((p) => (
-                    <p key={p} className="t-body text-[color:var(--color-text-primary)]">{p}</p>
-                  ))}
-                </div>
+                {/* Слова от первого лица удалены (решение Виктории 04.08):
+                    это был мой черновик от её имени, ушедший на прод без её
+                    вычитки, — с формулировками «бизнес зависит от их отпуска»
+                    и «личное мастерство», против которых она возражает.
+                    Место готово принять её собственный текст, когда напишет. */}
               </div>
             </div>
           </PaperCard>
