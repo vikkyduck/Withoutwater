@@ -104,27 +104,14 @@ export function Hero() {
         </div>
 
         {/* Три аргумента — легче H1: ниже по макету, приглушённое стекло.
-            Цена добавлена 04.08 по решению Виктории; «перечень» ведёт на
-            блок «Что входит в подписку» — состав пакета собирается там. */}
+            Цена добавлена 04.08 по решению Виктории; ссылку на перечень
+            работ она сняла в тот же день — плашка только заявляет цену. */}
         <div className="relative mt-12 grid max-w-4xl gap-3 sm:grid-cols-3 md:mt-16">
           {[
-            { label: "Без ТЗ", desc: <>Принимаем вводные в любом виде и собираем из них архитектуру решения и план работ</> },
-            { label: "24 часа", desc: <>После согласования назначаем команду и проводим стартовую встречу</> },
-            {
-              label: "от 200 000 ₽",
-              desc: (
-                <>
-                  Подписка на команду, задачи ставите вы —{" "}
-                  <a
-                    href="/tasks/team-subscription#units"
-                    className="underline decoration-[color:var(--color-text-inverse-2)]/50 underline-offset-4 transition-colors hover:text-[color:var(--color-text-inverse)] hover:decoration-[color:var(--color-text-inverse)]"
-                  >
-                    перечень
-                  </a>
-                </>
-              ),
-            },
-          ].map(({ label, desc }) => (
+            ["Без ТЗ", "Принимаем вводные в любом виде и собираем из них архитектуру решения и план работ"],
+            ["24 часа", "После согласования назначаем команду и проводим стартовую встречу"],
+            ["от 200 000 ₽", "Подписка на команду, задачи ставите вы"],
+          ].map(([label, desc]) => (
             <GlassCard key={label} dark interactive className="px-4 py-4 md:px-5 md:py-5">
               <div className="font-display t-body font-medium text-[color:var(--color-text-inverse)]">
                 {label}
