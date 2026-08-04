@@ -114,7 +114,7 @@ export function Hero() {
               label: "от 200 000 ₽",
               desc: (
                 <>
-                  Пакет работ, состав выбираете вы —{" "}
+                  Подписка на команду, задачи ставите вы —{" "}
                   <a
                     href="/tasks/team-subscription#units"
                     className="underline decoration-[color:var(--color-text-inverse-2)]/50 underline-offset-4 transition-colors hover:text-[color:var(--color-text-inverse)] hover:decoration-[color:var(--color-text-inverse)]"
