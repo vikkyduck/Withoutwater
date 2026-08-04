@@ -396,7 +396,7 @@ function ContactsPage() {
           title={<>Разберём вашу задачу за 30 минут</>}
           lead="Оставьте заявку или напишите напрямую — ответим в течение двух рабочих часов."
           chips={[
-            ["Telegram: @vikki_duck", "если удобнее — напишите напрямую, без формы"],
+            ["Telegram: @vikky_duck", "если удобнее — напишите напрямую, без формы"],
             ["+7 964 584 22 25", "или позвоните: разбор задачи ни к чему вас не обязывает"],
           ]}
         />
@@ -412,7 +412,7 @@ function ContactsPage() {
               <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Напрямую</div>
               <ul className="mt-4 space-y-2">
                 <li><a href="tel:+79645842225" className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">+7 964 584 22 25</a></li>
-                <li><a href="https://t.me/vikki_duck" target="_blank" rel="noreferrer" className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">Telegram: @vikki_duck</a></li>
+                <li><a href="https://t.me/vikky_duck" target="_blank" rel="noreferrer" className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">Telegram: @vikky_duck</a></li>
                 <li><a href="mailto:vu@withoutwater.ru" className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">vu@withoutwater.ru</a></li>
               </ul>
             </div>

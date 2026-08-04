@@ -1137,7 +1137,7 @@ export function Footer() {
             </div>
             <ul className="mt-4 space-y-1.5 t-body">
               <li><a href="tel:+79645842225" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">+7 964 584 22 25</a></li>
-              <li><a href="https://t.me/vikki_duck" target="_blank" rel="noreferrer" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">Telegram: @vikki_duck</a></li>
+              <li><a href="https://t.me/vikky_duck" target="_blank" rel="noreferrer" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">Telegram: @vikky_duck</a></li>
               <li><a href="mailto:vu@withoutwater.ru" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">vu@withoutwater.ru</a></li>
               {/* Вход для действующих клиентов — из шапки в футер (03.08) */}
               <li><a href={LK_URL} target="_blank" rel="noopener" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">{LK_LABEL}</a></li>
@@ -1482,8 +1482,8 @@ export function CtaBand({
             чтобы везде была возможность написать или позвонить») */}
         <p className="mt-5 t-body text-[color:var(--color-text-inverse-2)]">
           Или напрямую:{" "}
-          <a href="https://t.me/vikki_duck" target="_blank" rel="noreferrer" className="font-medium text-[color:var(--color-text-inverse)] underline underline-offset-4 transition hover:text-[color:var(--color-accent-glass)]">
-            Telegram @vikki_duck
+          <a href="https://t.me/vikky_duck" target="_blank" rel="noreferrer" className="font-medium text-[color:var(--color-text-inverse)] underline underline-offset-4 transition hover:text-[color:var(--color-accent-glass)]">
+            Telegram @vikky_duck
           </a>
           {" · "}
           <a href="tel:+79645842225" className="font-medium text-[color:var(--color-text-inverse)] underline underline-offset-4 transition hover:text-[color:var(--color-accent-glass)]">

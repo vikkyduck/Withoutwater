@@ -1082,7 +1082,7 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
       setSent(true);
       ymGoal("lead_sent");
     } catch {
-      setErr("Заявка не отправилась. Попробуйте ещё раз или напишите в Telegram: @vikki_duck.");
+      setErr("Заявка не отправилась. Попробуйте ещё раз или напишите в Telegram: @vikky_duck.");
     } finally {
       setSending(false);
     }
