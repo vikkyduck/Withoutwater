@@ -222,7 +222,7 @@ function TeamPage() {
               </div>
               <div className="p-7 md:p-10">
                 <div className="t-eyebrow text-[color:var(--color-accent)]">
-                  Основатель
+                  Владелица агентства
                 </div>
                 <h2 className="mt-2 font-display t-body font-medium">{founder.name}</h2>
                 <p className="mt-1 t-body text-[color:var(--color-text-secondary)]">{founder.role} · {founder.fact}</p>

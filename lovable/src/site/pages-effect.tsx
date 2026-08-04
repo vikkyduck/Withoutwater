@@ -945,8 +945,9 @@ export function TeamSubscriptionPage() {
           }
         />
 
-        {/* Экран 3. Что входит в подписку */}
-        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+        {/* Экран 3. Что входит в подписку. Якорь #units — на него ведёт
+            «перечень» из плашки с ценой на первом экране главной. */}
+        <div id="units" className="relative mx-auto max-w-7xl px-5 sec-pad scroll-mt-28 md:px-8">
           <SectionLabel n="01">Что входит в подписку</SectionLabel>
           <p className="mt-6 max-w-3xl t-body text-[color:var(--color-text-primary)]">
             Состав собирается под ваши задачи из единиц результата:
