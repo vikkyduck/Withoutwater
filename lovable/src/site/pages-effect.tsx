@@ -988,6 +988,28 @@ export function TeamSubscriptionPage() {
             Все работы выполняет команда «Без Воды» на своей стороне и своими средствами.
           </p>
 
+          {/* Три готовых набора — по разбору 04.08: без якоря «состав
+              выбираете вы» читалось как «цена договорная». Составы
+              продиктованы Викторией. */}
+          <div className="mt-8 grid items-stretch gap-4 md:grid-cols-3">
+            {[
+              ["Пакет 1", "Разработка и лидирование комплексной программы + координатор проекта"],
+              ["Пакет 2", "Сборка 5 LMS-курсов и разработка онлайн-курса от 10 модулей"],
+              ["Пакет 3", "2 дня модерации сессий и 5 дней ведения тренингов — 40 часов"],
+            ].map(([label, desc], i) => (
+              <motion.div key={label} {...reveal(i)} className="h-full">
+                <PaperCard className="h-full border-l-[3px] border-l-[color:var(--color-accent)] p-6">
+                  <div className="t-label text-[color:var(--color-text-secondary)]">{label}</div>
+                  <p className="mt-2 t-body text-[color:var(--color-text-primary)]">{desc}</p>
+                </PaperCard>
+              </motion.div>
+            ))}
+          </div>
+          <p className="mt-5 max-w-3xl t-body text-[color:var(--color-text-secondary)]">
+            Так выглядит месяц за 200 000 ₽. Набор собирается под вашу задачу
+            из позиций ниже.
+          </p>
+
           {packs.map((pack) => (
             <div key={pack.title} className="mt-12">
               <div className="t-eyebrow text-[color:var(--color-accent)]">{pack.title}</div>

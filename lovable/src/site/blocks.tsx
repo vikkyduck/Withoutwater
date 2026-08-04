@@ -103,13 +103,15 @@ export function Hero() {
           </div>
         </div>
 
-        {/* Три аргумента — легче H1: ниже по макету, приглушённое стекло.
-            Цена добавлена 04.08 по решению Виктории; ссылку на перечень
-            работ она сняла в тот же день — плашка только заявляет цену. */}
-        <div className="relative mt-12 grid max-w-4xl gap-3 sm:grid-cols-3 md:mt-16">
+        {/* Четыре аргумента — легче H1: ниже по макету, приглушённое стекло.
+            Цена добавлена 04.08 по решению Виктории. «1 час эксперта» поднят
+            туда же из FAQ (разбор 04.08): для HR это главный барьер — сколько
+            времени проекта съест их носитель опыта. */}
+        <div className="relative mt-12 grid max-w-5xl gap-3 sm:grid-cols-2 lg:grid-cols-4 md:mt-16">
           {[
             ["Без ТЗ", "Принимаем вводные в любом виде и собираем из них архитектуру решения и план работ"],
             ["24 часа", "После согласования назначаем команду и проводим стартовую встречу"],
+            ["1 час эксперта", "30 минут на старте и 30 на финальной сверке. Остальное — работа методолога"],
             ["от 200 000 ₽", "Подписка на команду, задачи ставите вы"],
           ].map(([label, desc]) => (
             <GlassCard key={label} dark interactive className="px-4 py-4 md:px-5 md:py-5">
@@ -170,6 +172,13 @@ export function Bricks() {
         </div>
         <p className="mt-3 t-caption text-[color:var(--color-text-secondary)]">
           По данным внутреннего учёта проектов команды.
+        </p>
+        {/* Разбор 04.08: между плитками клиентов и кейсами был провал —
+            логотипы крупные, а кейсы анонимные, и читатель достраивал
+            связь сам. Подпись закрывает разрыв. */}
+        <p className="mt-6 max-w-2xl t-body text-[color:var(--color-text-secondary)]">
+          Проекты этих компаний под NDA — показываем обезличенно. Там, где
+          клиент дал согласие, плитка ведёт на его отзыв.
         </p>
         <div className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-line)] sm:grid-cols-3">
           {BRICKS.map((b, i) => {
@@ -556,6 +565,8 @@ export function CaseCard({ item, index, teaser = false }: { item: CaseItem; inde
         <div className="flex flex-1 flex-col gap-5 p-5 sm:p-6 md:p-7">
 
 
+        <div className="space-y-2">
+        <div className="t-label text-[color:var(--color-text-secondary)]">Цифры проекта</div>
         <div className={`grid grid-cols-2 gap-2 sm:gap-2.5 ${item.metrics.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
           {item.metrics.slice(0, 3).map(([value, label]) => (
             <div
@@ -570,6 +581,7 @@ export function CaseCard({ item, index, teaser = false }: { item: CaseItem; inde
               </div>
             </div>
           ))}
+        </div>
         </div>
 
 
@@ -595,6 +607,13 @@ export function CaseCard({ item, index, teaser = false }: { item: CaseItem; inde
               Что изменилось у клиента
             </div>
             <p className="mt-1 t-body font-medium text-foreground/90">{item.changed}</p>
+            {/* Разбор 04.08: метрики кейса и гарантии противоречили друг
+                другу — в кейсах мы мерили себя оттоком и выручкой, а в
+                гарантиях от бизнес-показателей открещивались. Атрибуция
+                снимает противоречие, не убирая цифры. */}
+            <p className="mt-2 t-small text-[color:var(--color-text-secondary)]/80">
+              По данным заказчика. Обучение — один из факторов, влияющих на эти показатели.
+            </p>
           </div>
         )}
 
