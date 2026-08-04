@@ -16,7 +16,7 @@ import {
   REVEAL_EASE,
 } from "./core";
 import {
-  BRICKS, visibleCases, homeReviews, SITUATIONS,
+  BRICKS, visibleCases, homeReviews, SITUATIONS, TEAM,
   type CaseItem, type Review,
 } from "./data";
 
@@ -308,7 +308,7 @@ export function WhenNeeded() {
         ]}
       />
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="01">Когда мы нужны</SectionLabel>
+        <SectionLabel n="02">Когда мы нужны</SectionLabel>
         <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
           Когда нужна команда «Без Воды»
         </RevealHeading>
@@ -637,7 +637,7 @@ export function CasesBlock({
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
         {!compactHeader && (
           <>
-            <SectionLabel n="02">Результаты клиентов</SectionLabel>
+            <SectionLabel n="03">Результаты клиентов</SectionLabel>
             <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
               <RevealHeading className="t-h2 max-w-3xl">
                 Кейсы с конкретными метриками
@@ -659,6 +659,81 @@ export function CasesBlock({
             <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </a>
         )}
+      </div>
+    </section>
+  );
+}
+
+/* -------------------------------- Команда --------------------------------- */
+/* Обратная связь клиентов 04.08: на главной не хватало лиц — до /team люди
+   просто не доходили. Экран команды продублирован сюда 1:1 (карточка
+   владелицы + три лица), тексты и вёрстка — те же, что на /team, дальше
+   кнопка «Подробнее» ведёт на «О нас». */
+
+export function TeamBlock() {
+  const founder = TEAM.find((p) => p.founder)!;
+  const others = TEAM.filter((p) => !p.founder);
+  return (
+    <section id="team" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
+      <Scene blobs={[{ className: "-right-40 top-10", tone: "rose", size: 520 }]} />
+
+      <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+        <SectionLabel n="01">О нас</SectionLabel>
+        <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+          <RevealHeading className="t-h2 max-w-3xl">
+            Команда и сеть экспертов
+          </RevealHeading>
+          <p className="max-w-md text-[color:var(--color-text-secondary)]">
+            Люди, которые отвечают за результат вашего проекта, и профессиональная сеть практиков за ними.
+          </p>
+        </div>
+
+        <PaperCard className="mt-12 overflow-hidden p-0">
+          <div className="grid items-stretch md:grid-cols-[320px_1fr]">
+            <div className="relative min-h-[320px] bg-[color:var(--color-chrome)]/10 md:min-h-0">
+              <img
+                src={founder.photo}
+                alt={founder.name}
+                loading="lazy"
+                className="absolute inset-0 h-full w-full object-cover object-top grayscale"
+              />
+            </div>
+            <div className="p-7 md:p-10">
+              <div className="t-eyebrow text-[color:var(--color-accent)]">
+                Основатель
+              </div>
+              <h3 className="mt-2 font-display t-body font-medium">{founder.name}</h3>
+              <p className="mt-1 t-body text-[color:var(--color-text-secondary)]">{founder.role} · {founder.fact}</p>
+            </div>
+          </div>
+        </PaperCard>
+
+        <div className="mt-6 grid items-stretch gap-5 sm:grid-cols-3">
+          {others.map((p, i) => (
+            <motion.div key={p.slug} {...reveal(i)} className="h-full">
+              <PaperCard className="flex h-full flex-col overflow-hidden p-0">
+                <div className="aspect-[4/3] w-full overflow-hidden bg-[color:var(--color-bg-secondary)]">
+                  <img
+                    src={p.photo}
+                    alt={p.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover object-top grayscale transition duration-500 hover:grayscale-0"
+                  />
+                </div>
+                <div className="p-6">
+                  <div className="font-display t-body font-bold">{p.name}</div>
+                  <p className="mt-1 t-caption font-medium uppercase tracking-wide text-[color:var(--color-text-secondary)]">{p.role}</p>
+                  <p className="mt-3 t-body text-[color:var(--color-text-primary)]">{p.fact}</p>
+                </div>
+              </PaperCard>
+            </motion.div>
+          ))}
+        </div>
+
+        <a href="/team" className="btn btn-secondary group mt-8">
+          <span>Подробнее</span>
+          <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+        </a>
       </div>
     </section>
   );
@@ -711,7 +786,7 @@ export function ReviewsBlock() {
     <section id="reviews" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <Scene blobs={[{ className: "-left-40 top-10", tone: "rose", size: 560 }, { className: "-right-40 bottom-10", tone: "chrome", size: 480 }]} />
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="03">Отзывы</SectionLabel>
+        <SectionLabel n="04">Отзывы</SectionLabel>
         <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <RevealHeading className="t-h2 max-w-3xl">
             Что говорят клиенты

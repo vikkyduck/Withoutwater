@@ -14,7 +14,7 @@ import {
   reveal,
 } from "./core";
 import {
-  Hero, Bricks, WhenNeeded, Flow,
+  Hero, Bricks, WhenNeeded, Flow, TeamBlock,
   CasesBlock, ReviewsBlock, ReviewCard, BookSection, NotFit, Contact,
   FaqAccordion,
 } from "./blocks";
@@ -33,6 +33,9 @@ function HomePage() {
   return (
     <PageShell path="/">
       <Hero />
+      {/* Команда сразу под первым экраном: по обратной связи клиентов
+          (04.08) на главной не хватало лиц — до /team не доходили */}
+      <TeamBlock />
       <WhenNeeded />
       {/* «Схема взаимодействия» убрана с главной (финальная структура 02.08),
           блок остаётся на /how-we-work */}
