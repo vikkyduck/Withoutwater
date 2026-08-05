@@ -61,6 +61,15 @@ for (const route of mod.ROUTES) {
     .replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${url}$2`)
     .replace(MARKER, `<div id="root">${rep(appHtml)}</div>`);
 
+  // Страницы вне сайта (route.noindex): не индексируем и не пускаем по ссылкам.
+  // Ссылку на такую страницу отправляют клиенту напрямую — см. /constructor.
+  if (route.noindex) {
+    html = html.replace(
+      /<link rel="canonical"[^>]*>/,
+      '<meta name="robots" content="noindex, nofollow" />',
+    );
+  }
+
   const outDir = route.path === "/" ? DIST : resolve(DIST, route.path.slice(1));
   mkdirSync(outDir, { recursive: true });
   writeFileSync(resolve(outDir, "index.html"), html, "utf8");
@@ -72,7 +81,7 @@ for (const route of mod.ROUTES) {
 const today = new Date().toISOString().slice(0, 10);
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${mod.ROUTES.map((r) => `  <url><loc>${ORIGIN}${r.path === "/" ? "/" : r.path + "/"}</loc><lastmod>${today}</lastmod></url>`).join("\n")}
+${mod.ROUTES.filter((r) => !r.noindex).map((r) => `  <url><loc>${ORIGIN}${r.path === "/" ? "/" : r.path + "/"}</loc><lastmod>${today}</lastmod></url>`).join("\n")}
   <url><loc>${ORIGIN}/politics_pd/</loc><lastmod>${today}</lastmod></url>
   <url><loc>${ORIGIN}/consent_pd/</loc><lastmod>${today}</lastmod></url>
   <url><loc>${ORIGIN}/pub_oferta/</loc><lastmod>${today}</lastmod></url>

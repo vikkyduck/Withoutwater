@@ -19,6 +19,7 @@ import {
   FaqAccordion,
 } from "./blocks";
 import { FAQ_ITEMS, TEAM, FOUNDER_QUOTE, visibleReviews, SITUATIONS } from "./data";
+import { ConstructorPage } from "./pages-constructor";
 import {
   BE,
   BusinessEffectGeneralPage,
@@ -440,6 +441,10 @@ export type RouteDef = {
   title: string;
   description: string;
   Component: () => ReactElement;
+  /* Страница собирается и живёт на домене, но не индексируется и не попадает
+     в sitemap: prerender.mjs ставит ей robots noindex,nofollow. Так сделан
+     /constructor — ссылку отправляют клиенту напрямую. */
+  noindex?: boolean;
 };
 
 export const ROUTES: RouteDef[] = [
@@ -546,6 +551,17 @@ export const ROUTES: RouteDef[] = [
     description:
       "Форма заявки, телефон, Telegram и почта. Отвечаем в течение двух рабочих часов.",
     Component: ContactsPage,
+  },
+  /* НЕ ПРИКРЕПЛЁН К САЙТУ (решение Виктории 05.08.2026): ссылки на
+     /constructor нет ни в шапке, ни в подвале, ни в sitemap; noindex.
+     Страница существует только чтобы отправлять ссылку клиенту. */
+  {
+    path: "/constructor",
+    title: "Конструктор задач — БЕЗ ВОДЫ",
+    description:
+      "Единицы результата команды по подписке и разовые продукты с ценами: отметьте нужное и получите сумму.",
+    Component: ConstructorPage,
+    noindex: true,
   },
 ];
 
