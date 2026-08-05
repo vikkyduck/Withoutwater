@@ -113,10 +113,12 @@ export function ymGoal(goal: string, params?: Record<string, unknown>) {
 export function StencilLogo({ className = "" }: { className?: string }) {
   return (
     <div className={`inline-flex flex-col ${className}`}>
-      <span className="font-display text-[1.6em] font-medium tracking-[-0.02em]">
+      {/* Логотип остаётся на Unbounded даже после перевода типографики
+          на новостной строй 05.08.2026: это знак, а не набор. */}
+      <span className="font-logo text-[1.6em] font-medium tracking-[-0.02em]">
         БЕЗ <span className="cut">ВОДЫ</span>
       </span>
-      <span className="font-display text-[0.52em] font-medium tracking-[-0.01em] mt-1.5">
+      <span className="font-logo text-[0.52em] font-medium tracking-[-0.01em] mt-1.5">
         withoutwater
       </span>
     </div>

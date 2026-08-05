@@ -17,3 +17,21 @@ npm-debug.log*
 
 # отложенный контент: фото, ждущие согласования публикации (см. lovable/src/site/data-pending.txt)
 lovable/assets-pending/
+
+# Рабочие материалы и старые зеркала Тильды — на диске нужны, в репо не идут.
+# ВЕДУЩИЙ СЛЕШ ОБЯЗАТЕЛЕН: без него `site/` совпадает с любой вложенной папкой
+# с таким именем, в том числе lovable/src/site — а Tailwind не сканирует
+# игнорируемые файлы и молча выбрасывает из CSS все утилиты сайта.
+/site/
+/site-new/
+/assets-src/
+/design-directions/
+/content-experts.txt
+/build-experts.py
+/brief.md
+/design-brief.md
+/legal-map.md
+/otzyvy.md
+/qa-report.md
+/reference-board.md
+/structure.md

@@ -1,9 +1,16 @@
-/* Шрифты дизайн-системы «Сухой остаток» 2.4 — Unbounded 500 (дисплей) и
-   Golos Text 400/600 (наборный). Хостим локально: внешние CDN исключены
-   (данные посетителей не должны уходить за пределы РФ).
-   Golos Text вариативный: один файл на оба начертания. */
+/* Шрифты. Хостим локально: внешние CDN исключены (данные посетителей
+   не должны уходить за пределы РФ).
 
-/* ---------- Unbounded 500 Medium — Display, H1, H2, числа, цитаты ---------- */
+   05.08.2026 по решению Виктории типографика переведена на новостной строй
+   (референс — статьи РБК): один наборный гротеск Golos Text во всех
+   заголовках и тексте, вес даёт начертание, а не гарнитура. Диапазон
+   вариативной оси открыт до 900 — жирные начертания были в файле изначально,
+   их просто закрывал CSS. Unbounded остался только логотипу и трафаретным
+   номерам разделов: это айдентика, не типографика текста.
+   NB: это отменяет раздел брендбука «Сухой остаток» 2.4 о том, что жирных
+   начертаний нет. */
+
+/* ---------- Unbounded 500 Medium — только логотип и номера разделов ---------- */
 @font-face {
   font-family: 'Unbounded';
   font-style: normal;
@@ -27,7 +34,7 @@
 @font-face {
   font-family: 'Golos Text';
   font-style: normal;
-  font-weight: 400 600;
+  font-weight: 400 900;
   font-display: swap;
   src: url('/fonts/golos-cyrillic.woff2') format('woff2-variations'),
        url('/fonts/golos-cyrillic.woff2') format('woff2');
@@ -36,7 +43,7 @@
 @font-face {
   font-family: 'Golos Text';
   font-style: normal;
-  font-weight: 400 600;
+  font-weight: 400 900;
   font-display: swap;
   src: url('/fonts/golos-latin.woff2') format('woff2-variations'),
        url('/fonts/golos-latin.woff2') format('woff2');
