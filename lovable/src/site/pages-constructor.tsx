@@ -13,13 +13,17 @@
    ни «бизнес кейсах», ни «100$». Это не опечатки для нас — это её текст.
    Никаких своих пояснений, вводок и приписок на странице тоже быть не должно.
    ========================================================================== */
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
   motion,
   PageShell, PaperCard, Scene,
   RevealHeading, NodeList, Check,
-  reveal, ctaHref, CTA_LABEL,
+  reveal,
 } from "./core";
+
+/* Минимальный пакет: пока набрано меньше — кнопка «Отправить» не активна
+   (требование Виктории 05.08.2026). */
+const MIN_TOTAL = 200000;
 
 type Unit = {
   id: string;
@@ -221,12 +225,61 @@ export function ConstructorPage() {
   const [picked, setPicked] = useState<Record<string, boolean>>({});
   const toggle = (id: string) => setPicked((p) => ({ ...p, [id]: !p[id] }));
 
-  const { monthly, once, count } = useMemo(() => {
+  const [contact, setContact] = useState("");
+  const [pd, setPd] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [sent, setSent] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const contactRef = useRef<HTMLInputElement>(null);
+  const hpRef = useRef<HTMLInputElement>(null);
+
+  const { monthly, once, count, chosen } = useMemo(() => {
     const sum = (list: Unit[]) =>
       list.reduce((acc, u) => (picked[u.id] ? acc + u.price : acc), 0);
-    const picks = [...SUBSCRIPTION, ...PRODUCTS].filter((u) => picked[u.id]).length;
-    return { monthly: sum(SUBSCRIPTION), once: sum(PRODUCTS), count: picks };
+    const picks = [...SUBSCRIPTION, ...PRODUCTS].filter((u) => picked[u.id]);
+    return { monthly: sum(SUBSCRIPTION), once: sum(PRODUCTS), count: picks.length, chosen: picks };
   }, [picked]);
+
+  const total = monthly + once;
+  const enough = total >= MIN_TOTAL;
+  const canSend = enough && contact.trim().length > 1 && pd && !sending;
+
+  const send = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    if (!canSend) return;
+    setErr(null);
+    setSending(true);
+    try {
+      const lines = chosen.map(
+        (u) => `${u.title} — ${money(u.price)}${SUBSCRIPTION.includes(u) ? " / мес" : ""}`,
+      );
+      const r = await fetch("/api/lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "",
+          contact: contact.trim(),
+          company: "",
+          comment: [
+            "Заявка из конструктора.",
+            ...lines,
+            `Итого: ${money(monthly)} / мес + ${money(once)} разово.`,
+          ].join("\n"),
+          consent_pd: true,
+          consent_pd_version: "1.0-2026-07-14",
+          consent_ads: false,
+          website: hpRef.current?.value || "",
+          page: "/constructor",
+        }),
+      });
+      if (!r.ok) throw new Error(String(r.status));
+      setSent(true);
+    } catch {
+      setErr("Заявка не отправилась. Попробуйте ещё раз или напишите в Telegram: @vikky_duck.");
+    } finally {
+      setSending(false);
+    }
+  };
 
   return (
     <PageShell path="/constructor">
@@ -235,12 +288,13 @@ export function ConstructorPage() {
 
         <div className="relative mx-auto max-w-7xl px-5 pt-14 md:px-8 md:pt-20">
           <RevealHeading as="h1" className="t-h1 max-w-4xl">
-            Команда по подписке (конструктор задач)
+            Команда по подписке: конструктор
           </RevealHeading>
-          <div className="mt-8 t-label text-[color:var(--color-text-secondary)]">
-            Единица результата · Цена · Что заказчик получает за месяц
-          </div>
-          <div className="mt-6 grid items-stretch gap-4 lg:grid-cols-2">
+          <p className="measure mt-6 t-body text-[color:var(--color-text-primary)]">
+            Выберите задачи и нажмите на кнопку «Отправить», когда соберете пакет
+            услуг, мы напишем вам в течение рабочего дня.
+          </p>
+          <div className="mt-10 grid items-stretch gap-4 lg:grid-cols-2">
             {SUBSCRIPTION.map((u, i) => (
               <UnitCard
                 key={u.id}
@@ -256,10 +310,7 @@ export function ConstructorPage() {
 
         <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
           <RevealHeading className="t-h2 max-w-3xl">Продукты</RevealHeading>
-          <div className="mt-8 t-label text-[color:var(--color-text-secondary)]">
-            Единица результата · Цена · Что считается сданным
-          </div>
-          <div className="mt-6 grid items-stretch gap-4 lg:grid-cols-2">
+          <div className="mt-8 grid items-stretch gap-4 lg:grid-cols-2">
             {PRODUCTS.map((u, i) => (
               <UnitCard
                 key={u.id}
@@ -274,25 +325,80 @@ export function ConstructorPage() {
         </div>
       </section>
 
-      {/* Итог — интерфейс конструктора, не текст страницы. На десктопе липкая
-          полоса; на мобильном обычный блок в конце: там уже висят плавающая
-          кнопка PageShell и cookie-бар, три слоя друг на друге не помещались. */}
+      {/* Итог и отправка. На десктопе полоса липкая; на мобильном обычный блок
+          в конце — внизу уже висят кнопка PageShell и cookie-бар. */}
       <div className="pointer-events-none px-3 pb-3 md:sticky md:bottom-0 md:z-40 md:px-6 md:pb-6">
-        <div className="pointer-events-auto mx-auto flex max-w-3xl flex-col gap-3 rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-bg-dark)] px-5 py-4 text-[color:var(--color-text-inverse)] shadow-[var(--shadow-soft)] sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
-            <span className="t-label text-[color:var(--color-text-inverse-2)]">
-              Выбрано: {count}
-            </span>
-            <span className="font-display t-body font-medium tabular-nums">
-              {money(monthly)} / мес
-            </span>
-            <span className="font-display t-body font-medium tabular-nums">
-              {money(once)} разово
-            </span>
-          </div>
-          <a href={ctaHref("/constructor")} className="btn btn-invert shrink-0">
-            <span>{CTA_LABEL}</span>
-          </a>
+        <div className="pointer-events-auto mx-auto max-w-3xl rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-bg-dark)] px-5 py-4 text-[color:var(--color-text-inverse)] shadow-[var(--shadow-soft)]">
+          {sent ? (
+            <p className="t-body">
+              Заявка отправлена. Мы напишем вам в течение рабочего дня.
+            </p>
+          ) : (
+            <form onSubmit={send} noValidate className="flex flex-col gap-3">
+              <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
+                <span className="t-label text-[color:var(--color-text-inverse-2)]">
+                  Выбрано: {count}
+                </span>
+                <span className="font-display t-body font-medium tabular-nums">
+                  {money(monthly)} / мес
+                </span>
+                <span className="font-display t-body font-medium tabular-nums">
+                  {money(once)} разово
+                </span>
+              </div>
+
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <input
+                  ref={contactRef}
+                  type="text"
+                  value={contact}
+                  onChange={(e) => setContact(e.target.value)}
+                  placeholder="Телефон, Telegram или почта"
+                  autoComplete="off"
+                  className="w-full rounded-sm border border-[color:var(--color-line-dark)] bg-white/5 px-4 py-3 text-base text-[color:var(--color-text-inverse)] outline-none transition placeholder:text-[color:var(--color-text-inverse-2)]/50 focus:border-[color:var(--color-accent-glass)] focus:bg-white/10"
+                />
+                <button
+                  type="submit"
+                  disabled={!canSend}
+                  className="btn btn-invert shrink-0 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  <span>{sending ? "Отправляем…" : "Отправить"}</span>
+                </button>
+              </div>
+
+              <p className="hidden" aria-hidden="true">
+                <label>
+                  Не заполняйте это поле
+                  <input ref={hpRef} type="text" tabIndex={-1} autoComplete="off" />
+                </label>
+              </p>
+
+              <label className="flex cursor-pointer items-start gap-3 t-caption text-[color:var(--color-text-inverse-2)]">
+                <input
+                  type="checkbox"
+                  checked={pd}
+                  onChange={(e) => setPd(e.target.checked)}
+                  className="mt-0.5 h-4 w-4 shrink-0 accent-[color:var(--color-accent)]"
+                />
+                <span>
+                  Согласен(а) на обработку персональных данных —{" "}
+                  <a href="/consent_pd" target="_blank" rel="noreferrer" className="underline underline-offset-2">условия</a>{" "}
+                  и{" "}
+                  <a href="/politics_pd" target="_blank" rel="noreferrer" className="underline underline-offset-2">политика</a>
+                </span>
+              </label>
+
+              {!enough && (
+                <p className="t-caption text-[color:var(--color-text-inverse-2)]">
+                  Минимальный пакет — {money(MIN_TOTAL)}.
+                </p>
+              )}
+
+              {err && (
+                <p role="alert" className="t-caption text-[color:var(--color-accent-glass)]">{err}</p>
+              )}
+            </form>
+          )}
         </div>
       </div>
     </PageShell>
