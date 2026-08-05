@@ -157,9 +157,10 @@ function readBody(req) {
 }
 
 /* ── telegram: уведомление БЕЗ персональных данных (152-ФЗ, трансграничка) ──
-   Основной канал — письмо на почту владельца. Telegram работает как аварийный:
-   пишет, только если письмо доставить не удалось, либо если почта вообще не
-   настроена. Пока всё исправно — чат молчит. */
+   С 05.08.2026 идёт на КАЖДУЮ заявку параллельно письму (раньше был только
+   аварийным и при живой почте молчал). В сообщении — один номер заявки:
+   Telegram зарубежный, персональные данные туда не уходят, состав заявки
+   смотрят в письме или в админке. */
 async function notifyTelegram(id, text) {
   if (!TG_BOT_TOKEN || !TG_CHAT_ID) {
     console.warn('[tg] пропуск: токен/чат не заданы'); return;
@@ -174,6 +175,8 @@ async function notifyTelegram(id, text) {
       signal: ctrl.signal,
     });
     if (!r.ok) console.error(`[tg] HTTP ${r.status}: ${(await r.text().catch(() => '')).slice(0, 200)}`);
+    /* Логируем и успех: иначе по журналу не отличить «ушло» от «молча не сработало» */
+    else console.log(`[tg] уведомление о заявке #${id} отправлено`);
   } catch (e) {
     console.error('[tg] сбой:', e.message || e);
   } finally { clearTimeout(t); }
@@ -325,13 +328,14 @@ const server = http.createServer(async (req, res) => {
       console.error('[jsonl] журнал не записан:', e.message));
 
     console.log(`[lead] #${id} ip=${ip} ads=${rec.consent_ads}`);
-    /* Основной канал — письмо. Telegram включается сам, если письмо не ушло
-       (см. notifyMail) или если почта не настроена вовсе. */
-    if (MAIL_ENABLED) {
-      notifyMail(id, rec);
-    } else {
-      notifyTelegram(id, `🖋 Новая заявка №${id} — withoutwater.ru\nОткрыть админку: ${PUBLIC_BASE}/admin`);
-    }
+    /* Два канала сразу (решение Виктории 05.08.2026): письмо с полным составом
+       заявки на почту владельца и короткое уведомление в Telegram. Раньше
+       Telegram был только аварийным — при работающей почте не срабатывал
+       вовсе, и заявки замечались с задержкой.
+       В Telegram по-прежнему уходит ТОЛЬКО номер заявки: это зарубежный
+       сервис, персональные данные туда не передаются (152-ФЗ). */
+    if (MAIL_ENABLED) notifyMail(id, rec);
+    notifyTelegram(id, `🖋 Новая заявка №${id} — withoutwater.ru\nОткрыть админку: ${PUBLIC_BASE}/admin`);
     return json(res, 200, { ok: true, id });
   }
 
