@@ -34,55 +34,61 @@
 
 :root {
   /* --- Фоны и поверхности --- */
-  --color-bg-primary: #F7F5F1;    /* Бумага */
-  --color-bg-secondary: #EDEAE4;  /* Галерея */
-  --color-surface: #FCFBF8;       /* Мел */
+  /* 05.08.2026: «зебра» убрана — сцена всегда угольная, светлых секций нет. */
+  --color-bg-primary: #131417;    /* Уголь */
+  --color-bg-secondary: #1A1C21;  /* Уголь-галерея */
+  --color-surface: #22242A;       /* Уголь-поверхность */
   --color-bg-dark: #131417;       /* Уголь */
   --color-surface-dark: #22242A;  /* Уголь-поверхность */
 
-  /* --- Текст --- */
-  --color-text-primary: #1D1F23;   /* Графит */
-  --color-text-secondary: #545860; /* Сталь-текст */
-  --color-text-inverse: #F1EFEA;   /* Бумага-на-угле */
-  --color-text-inverse-2: #C9CDD4; /* Хром */
-  --color-text-inverse-3: #DFE2E7; /* Текст на тёмном стекле — контраст ≥ 4.5:1 */
+  /* --- Текст: ровно три ступени --- */
+  --color-text-primary: #EEF2F8;   /* Бумага-на-угле */
+  --color-text-secondary: #A7ADB8; /* Хром — вторичный текст */
+  --color-text-muted: #7C828C;     /* Третья и последняя ступень серого */
+  --color-text-inverse: var(--color-text-primary);
+  --color-text-inverse-2: var(--color-text-secondary);
+  --color-text-inverse-3: var(--color-text-primary);
 
-  /* --- Акценты и материалы --- */
-  --color-accent: #A3564B;         /* Пыльная роза — действие */
-  --color-accent-hover: #6C60AE;   /* Лаванда — наведение */
-  --color-accent-glass: #E9C4BD;   /* Розовое стекло */
-  --color-accent-soft: #F5E4E1;    /* Розовая дымка */
-  --color-chrome: #C9CDD4;
-  --color-steel: #8B9098;
-  --color-ink-hover: #31353C;
-  --color-line: #DBD7CF;           /* Штрих */
-  --color-line-dark: rgba(241, 239, 234, 0.16);
+  /* --- Акцент: один розовый, три состояния --- */
+  --color-accent: #E4A9CE;         /* Розовый — единственный акцент */
+  --color-accent-hover: #F2CCE6;   /* Светлее при наведении */
+  --color-accent-glass: var(--color-accent);
+  --color-accent-soft: rgba(228, 169, 206, 0.12); /* Розовая дымка — только фон */
+  --color-accent-text: var(--color-accent);
+  --color-chrome: var(--color-text-secondary);
+  --color-steel: var(--color-text-secondary);
+  --color-ink-hover: #FFFFFF;
+  --color-line: rgba(232, 238, 247, 0.14);  /* Штрих */
+  --color-line-dark: rgba(232, 238, 247, 0.14);
+
 
   /* --- Статусы: приглушённые, не «светофор» --- */
-  --color-success: #456E60;      --color-success-soft: #DEEDE6;
-  --color-error: #8E3B54;        --color-error-soft: #F2DCE5;
+  --color-success: #8FB4A8;      --color-success-soft: rgba(143, 180, 168, 0.12);
+  --color-error: var(--color-accent);  --color-error-soft: var(--color-accent-soft);
 
   /* --- Единственный допустимый градиент --- */
-  --gradient-glass: linear-gradient(165deg, #F3DBD7, #E9C4BD);
+  --gradient-glass: linear-gradient(165deg, rgba(228,169,206,0.9), rgba(228,169,206,0.55));
 
-  /* --- Жидкое стекло --- */
-  --lg-tint: rgba(252, 251, 248, 0.28);
+
+  /* --- Жидкое стекло (на угольной сцене — светлая плёнка) --- */
+  --lg-tint: rgba(238, 244, 252, 0.07);
   --lg-blur: 3px;      /* 1.5 тонкое · 3 основное · 16 плотное */
   --lg-sat: 1.65;
   --lg-light: 0.35;
   --lg-glow: 0.13;
   --sheen: 100deg;
   --lg-rim:
-    inset 0 1.5px 1px rgba(255, 255, 255, 0.88),
-    inset 0 -1.5px 1px rgba(29, 31, 35, 0.10),
-    inset 1.5px 0 1px rgba(255, 255, 255, 0.45),
-    inset -1.5px 0 1px rgba(29, 31, 35, 0.05);
+    inset 0 1.5px 1px rgba(255, 255, 255, 0.24),
+    inset 0 -1.5px 1px rgba(0, 0, 0, 0.28),
+    inset 1.5px 0 1px rgba(255, 255, 255, 0.12),
+    inset -1.5px 0 1px rgba(0, 0, 0, 0.18);
 
   /* --- Тени: высота слоя, а не украшение --- */
-  --shadow-hairline: 0 1px 2px rgba(29, 31, 35, 0.05), 0 2px 6px rgba(29, 31, 35, 0.04);
-  --shadow-soft: 0 6px 18px rgba(29, 31, 35, 0.07), 0 2px 6px rgba(29, 31, 35, 0.05);
-  --shadow-float: 0 18px 44px rgba(29, 31, 35, 0.13), 0 6px 14px rgba(29, 31, 35, 0.07);
-  --shadow-inner: inset 0 1px 3px rgba(29, 31, 35, 0.10), inset 0 -1px 1px rgba(255, 255, 255, 0.65);
+  --shadow-hairline: 0 1px 2px rgba(0, 0, 0, 0.35), 0 2px 6px rgba(0, 0, 0, 0.25);
+  --shadow-soft: 0 6px 18px rgba(0, 0, 0, 0.40), 0 2px 6px rgba(0, 0, 0, 0.28);
+  --shadow-float: 0 18px 44px rgba(0, 0, 0, 0.55), 0 6px 14px rgba(0, 0, 0, 0.35);
+  --shadow-inner: inset 0 1px 3px rgba(0, 0, 0, 0.45), inset 0 -1px 1px rgba(255, 255, 255, 0.08);
+
 
   /* --- Контейнеры --- */
   --container: 1200px;
@@ -132,9 +138,9 @@
     pointer-events: none;
     z-index: 0;
     opacity: 0.5;
-    background-image: radial-gradient(rgba(29, 31, 35, 0.055) 0.5px, transparent 0.5px);
+    background-image: radial-gradient(rgba(232, 238, 247, 0.045) 0.5px, transparent 0.5px);
     background-size: 3px 3px;
-    mix-blend-mode: multiply;
+    mix-blend-mode: screen;
   }
 
   ::selection {
@@ -188,11 +194,15 @@
    строку. Ниже 14 px в вебе система не опускается (разд. 16). */
 @utility t-nav {
   font-family: var(--font-sans);
-  font-size: 0.9375rem;
+  font-size: 1.0625rem;
+  font-weight: 400;
   line-height: 1.4;
 }
-@utility t-caption { font-size: 0.8125rem; line-height: 1.5; }
-@utility t-small  { font-size: 0.75rem; line-height: 1.5; }
+/* Единая система: наборный текст всегда 17/400, служебная метка всегда
+   12/600 uppercase. t-caption и t-label оставлены как алиасы, чтобы не
+   плодить третий и четвёртый уровень серого. */
+@utility t-caption { font-size: 1.0625rem; font-weight: 400; line-height: 1.6; letter-spacing: 0; text-transform: none; }
+@utility t-small  { font-size: 0.75rem; font-weight: 600; line-height: 1.5; letter-spacing: 0.14em; text-transform: uppercase; }
 @utility t-eyebrow {
   font-family: var(--font-sans);
   font-weight: 600;
@@ -203,8 +213,8 @@
 @utility t-label {
   font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 0.8125rem;
-  letter-spacing: 0.08em;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 @utility t-number {
@@ -214,6 +224,40 @@
   line-height: 1;
   font-variant-numeric: tabular-nums;
   letter-spacing: -0.02em;
+}
+
+/* Кейсы: один крупный уровень для розовых заголовков/цифр и один наборный
+   уровень для ВСЕГО серого текста. Серый нельзя дробить кеглем, весом или
+   трекингом — роль уже объясняется расположением в карточке. */
+@utility case-title {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: 0;
+}
+@utility case-body {
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+@utility case-meta {
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+/* Служебная метка (NDA, кикеры) — единственная вторая серая роль */
+@utility case-label {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 /* Строка наборного текста — 45–72 знака */
 @utility measure { max-width: var(--measure); }
@@ -229,18 +273,18 @@
    ========================================================================== */
 
 @utility lg {
-  --glass-tint: linear-gradient(148deg, rgba(255, 255, 255, 0.78), rgba(255, 255, 255, 0.34));
+  --glass-tint: linear-gradient(148deg, rgba(232, 238, 247, 0.14), rgba(232, 238, 247, 0.04));
   position: relative;
   isolation: isolate;
   background: var(--glass-tint);
   backdrop-filter: blur(28px) saturate(185%) brightness(1.06);
   -webkit-backdrop-filter: blur(28px) saturate(185%) brightness(1.06);
-  border: 0.5px solid rgba(255, 255, 255, 0.72);
+  border: 0.5px solid rgba(255, 255, 255, 0.22);
   box-shadow:
-    0 14px 40px rgba(29, 31, 35, 0.10),
-    0 4px 12px rgba(29, 31, 35, 0.06),
+    0 14px 40px rgba(0, 0, 0, 0.10),
+    0 4px 12px rgba(0, 0, 0, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.95),
-    inset 0 -1px 0 rgba(29, 31, 35, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
     inset 0 0 0 0.5px rgba(255, 255, 255, 0.36);
   transform: translateZ(0);
   transition: transform 640ms var(--ease-glass), box-shadow 640ms var(--ease-glass);
@@ -248,10 +292,10 @@
 
 .lg:hover {
   box-shadow:
-    0 24px 60px rgba(29, 31, 35, 0.14),
-    0 8px 20px rgba(29, 31, 35, 0.08),
+    0 24px 60px rgba(0, 0, 0, 0.14),
+    0 8px 20px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 1.0),
-    inset 0 -1px 0 rgba(29, 31, 35, 0.07),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.07),
     inset 0 0 0 0.5px rgba(255, 255, 255, 0.44);
 }
 
@@ -327,32 +371,32 @@ html[data-calm="true"] .lg::before { display: none; }
 }
 
 /* Градации плотности */
-@utility lg-thin  { backdrop-filter: blur(12px) saturate(150%); --glass-tint: linear-gradient(148deg, rgba(255,255,255,0.46), rgba(255,255,255,0.18)); }
-@utility lg-thick { backdrop-filter: blur(36px) saturate(195%); --glass-tint: linear-gradient(148deg, rgba(247,245,241,0.90), rgba(247,245,241,0.74)); }
+@utility lg-thin  { backdrop-filter: blur(12px) saturate(150%); --glass-tint: linear-gradient(148deg, rgba(241,239,234,0.09), rgba(241,239,234,0.03)); }
+@utility lg-thick { backdrop-filter: blur(36px) saturate(195%); --glass-tint: linear-gradient(148deg, rgba(34,36,42,0.92), rgba(19,20,23,0.80)); }
 
 /* «Люкс»-плотность: заметное стекло с яркой кромкой и большим размытием */
 @utility lg-strong {
   backdrop-filter: blur(36px) saturate(195%) brightness(1.08);
-  --glass-tint: linear-gradient(148deg, rgba(255, 255, 255, 0.86), rgba(255, 255, 255, 0.42));
+  --glass-tint: linear-gradient(148deg, rgba(232, 238, 247, 0.18), rgba(232, 238, 247, 0.06));
   --lg-glow: 0.22;
   box-shadow:
-    0 24px 64px rgba(29, 31, 35, 0.13),
-    0 8px 22px rgba(29, 31, 35, 0.08),
+    0 24px 64px rgba(0, 0, 0, 0.13),
+    0 8px 22px rgba(0, 0, 0, 0.08),
     inset 0 1px 0 rgba(255, 255, 255, 1.0),
-    inset 0 -1px 0 rgba(29, 31, 35, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
     inset 0 0 0 0.5px rgba(255, 255, 255, 0.48);
 }
 .lg-strong:hover { --lg-glow: 0.45; }
 
 /* Розовое стекло */
 @utility lg-rose {
-  --glass-tint: linear-gradient(150deg, rgba(233, 196, 189, 0.92), rgba(201, 147, 156, 0.38));
+  --glass-tint: linear-gradient(150deg, rgba(126, 92, 158, 0.42), rgba(228, 169, 206, 0.12));
   --lg-glow: 0.20;
 }
 
 /* Жидкий хром — металл системы */
 @utility lg-chrome {
-  --glass-tint: linear-gradient(150deg, rgba(205, 209, 214, 0.8), rgba(169, 174, 181, 0.35) 40%, rgba(250, 249, 248, 0.75));
+  --glass-tint: linear-gradient(150deg, rgba(201, 205, 212, 0.22), rgba(139, 144, 152, 0.10) 40%, rgba(232, 238, 247, 0.16));
 }
 
 /* Чернильное стекло: тёмная пластина на светлой сцене */
@@ -366,12 +410,12 @@ html[data-calm="true"] .lg::before { display: none; }
 
 /* На угольной сцене пластина светлее фона — выглядит приподнятой */
 @utility lg-dark {
-  --glass-tint: linear-gradient(148deg, rgba(241, 239, 234, 0.14), rgba(241, 239, 234, 0.04));
+  --glass-tint: linear-gradient(148deg, rgba(232, 238, 247, 0.14), rgba(232, 238, 247, 0.04));
   border-color: rgba(255, 255, 255, 0.65);
   color: var(--color-text-inverse);
   box-shadow:
     0 32px 80px rgba(0, 0, 0, 0.58),
-    0 0 120px rgba(233, 196, 189, 0.28),
+    0 0 120px rgba(228, 169, 206, 0.28),
     inset 0 1.5px 0 rgba(255, 255, 255, 0.92),
     inset 0 -1px 0 rgba(0, 0, 0, 0.42);
 }
@@ -515,7 +559,7 @@ html[data-calm="true"] .lg::before { display: none; }
   /* Светлая кнопка на тёмном: цвет фиксированный, а не через --color-surface,
      иначе внутри локального sec-dark кнопка становится тёмной на тёмном. */
   background: var(--color-text-inverse);
-  color: var(--color-coal, #14110F);
+  color: var(--color-coal, #131417);
   --lg-glow: 0;
 }
 .btn-invert:hover {
@@ -586,7 +630,7 @@ html[data-calm="true"] .lg::before { display: none; }
 }
 @utility node-dot-active {
   background: var(--color-accent);
-  box-shadow: 0 0 0 4px rgba(163, 86, 75, 0.14);
+  box-shadow: 0 0 0 4px rgba(126, 92, 158, 0.14);
 }
 
 /* Парадный разделитель с двумя узлами — не чаще одного на экран */
@@ -616,7 +660,7 @@ html[data-calm="true"] .lg::before { display: none; }
 .stage > *:not(.stage__bg) { position: relative; z-index: 1; }
 
 .stage__blob { position: absolute; border-radius: 50%; filter: blur(4px); }
-.stage__blob--rose { background: radial-gradient(closest-side, rgba(233, 196, 189, 0.75), rgba(233, 196, 189, 0)); }
+.stage__blob--rose { background: radial-gradient(closest-side, rgba(228, 169, 206, 0.75), rgba(228, 169, 206, 0)); }
 .stage__blob--chrome { background: radial-gradient(closest-side, rgba(160, 168, 180, 0.5), rgba(160, 168, 180, 0)); }
 
 /* Бумажное зерно — фактура-компаньон, не громче 5% */
@@ -650,8 +694,8 @@ html[data-calm="true"] .lg::before { display: none; }
 }
 .sec-dark .text-foreground { color: var(--color-text-inverse); }
 /* Стекло на тёмной секции автоматически берёт тёмную формулу */
-.sec-dark .lg-strong, .sec-dark .lg-rose, .sec-dark .lg:not(.lg-dark) {
-  --glass-tint: linear-gradient(148deg, rgba(241, 239, 234, 0.14), rgba(241, 239, 234, 0.04));
+.lg-strong, .lg-rose, .lg:not(.lg-dark) {
+  --glass-tint: linear-gradient(148deg, rgba(232, 238, 247, 0.14), rgba(232, 238, 247, 0.04));
   border-color: rgba(255, 255, 255, 0.5);
   color: var(--color-text-inverse);
   box-shadow:
@@ -778,7 +822,7 @@ html[data-calm="true"] .lg::before { display: none; }
 /* Трафаретная нумерация разделов: активный — Графит, остальные — Сталь */
 @utility stencil {
   font-family: var(--font-logo), sans-serif;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
   color: var(--color-steel);
@@ -828,6 +872,12 @@ html[data-calm="true"] .lg::before { display: none; }
 @utility sec-pad-b {
   padding-bottom: clamp(56px, 6.5vw, 96px);
 }
+
+/* Начало объединённой полосы: воздух только сверху */
+@utility sec-pad-t {
+  padding-top: clamp(56px, 6.5vw, 96px);
+}
+
 
 /* Hero — единственное исключение из общей сетки: первый экран читается
    выше, потому что несёт на себе основное действие и визуальную сцену. */
@@ -1065,37 +1115,29 @@ html[data-calm="true"] * {
 .lg-dark p, .lg-dark li { color: var(--color-text-inverse-3); }
 .lg-dark .t-caption, .lg-dark small { color: var(--color-text-inverse-3); }
 
-/* Контраст на мобильном: в тёмных секциях и на тёмном стекле вторичный текст
-   поднимается до #DFE2E7 (≥ 4.5:1 к углю), т.к. хром #C9CDD4 на просвечивающем
-   стекле проседает по контрасту. */
+/* Мобильный: на просвечивающем стекле абзацы идут основным тоном —
+   отдельной серой ступени не заводим. */
 @media (max-width: 768px) {
-  .sec-dark,
-  .stage-dark,
-  .lg-dark,
-  .surface-dark,
-  .tint-ink {
-    --color-text-inverse-2: #DFE2E7;
-    --color-text-secondary: #DFE2E7;
-  }
   .lg-dark p, .lg-dark li,
   .sec-dark .lg p, .sec-dark .lg li,
-  .surface-dark p, .surface-dark li { color: var(--color-text-inverse-3); }
+  .surface-dark p, .surface-dark li { color: var(--color-text-primary); }
 }
+
 
 /* Плоские поверхности вместо стекла для декоративных обёрток: тон + одна линия */
 @utility surface-dark {
   position: relative;
-  background: rgba(241, 239, 234, 0.05);
+  background: rgba(232, 238, 247, 0.05);
   border: 1px solid var(--color-line-dark);
   color: var(--color-text-inverse);
   transition: background 240ms ease, border-color 240ms ease;
 }
-.surface-dark:hover { background: rgba(241, 239, 234, 0.08); border-color: rgba(241, 239, 234, 0.28); }
+.surface-dark:hover { background: rgba(232, 238, 247, 0.08); border-color: rgba(232, 238, 247, 0.28); }
 .surface-dark p, .surface-dark li { color: var(--color-text-inverse-3); }
 
 @utility surface-paper {
   position: relative;
-  background: color-mix(in srgb, var(--color-bg-primary, #FCFBF8) 88%, transparent);
+  background: color-mix(in srgb, var(--color-bg-primary, #EEF4FC) 88%, transparent);
   border: 1px solid var(--color-line);
   transition: background 240ms ease, border-color 240ms ease;
 }
@@ -1165,3 +1207,10 @@ html[data-calm="true"] * {
   .chrome-ring { opacity: 0.75; }
 }
 html[data-calm="true"] [data-arrow] { transform: none !important; }
+
+/* Cookie-плашка фиксирована внизу: резервируем под неё место, чтобы на
+   мобильном она не перекрывала последнюю строку карточек кейсов. */
+html[data-cookie-open] body { padding-bottom: 4.5rem; }
+@media (min-width: 640px) {
+  html[data-cookie-open] body { padding-bottom: 3.25rem; }
+}

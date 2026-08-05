@@ -14,7 +14,7 @@ import {
   reveal,
 } from "./core";
 import {
-  Hero, Bricks, WhenNeeded, Flow, TeamBlock,
+  Hero, Bricks, WhenNeeded, Flow, WorkRhythm, TeamBlock,
   CasesBlock, ReviewsBlock, ReviewCard, BookSection, NotFit, Contact,
   FaqAccordion,
 } from "./blocks";
@@ -28,26 +28,39 @@ import {
   ExternalExpertsPage, ExternalExpertsEffectPage,
 } from "./pages-effect";
 
+/* Следующий логичный шаг страницы — одна ссылка в финальной полосе
+   (приёмка, п. 6). Ставится вместо дефолтной «Бизнес-эффект». */
+function NextLink({ href, children }: { href: string; children: string }) {
+  return (
+    <a
+      href={href}
+      className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
+    >
+      {children}
+      <ArrowUpRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+    </a>
+  );
+}
+
 /* -------------------------------- Главная -------------------------------- */
 
 function HomePage() {
   return (
     <PageShell path="/">
       <Hero />
-      {/* Команда сразу под первым экраном: по обратной связи клиентов
-          (04.08) на главной не хватало лиц — до /team не доходили */}
-      <TeamBlock />
+      {/* Порядок приёмки 05.08: сначала зачем мы нужны и доказательства,
+          лица — после. Кейсы и отзывы — одна полоса доказательств. */}
       <WhenNeeded />
-      {/* «Схема взаимодействия» убрана с главной (финальная структура 02.08),
-          блок остаётся на /how-we-work */}
-      <CasesBlock limit={2} moreHref="/cases" teaser />
-      <ReviewsBlock />
+      <CasesBlock limit={2} moreHref="/cases" teaser proofHeader />
+      <ReviewsBlock bare />
+      <TeamBlock />
       {/* «Наш опыт в цифрах» слит с «Работали с командами» (внутри Bricks):
           две соседние секции доказывали одно и то же */}
       <Bricks />
       <BookSection />
       <NotFit />
       <Contact />
+
     </PageShell>
   );
 }
@@ -68,6 +81,7 @@ function TasksPage() {
           kicker="Задачи и решения"
           title={<>Какие ваши задачи готовы взять на&nbsp;себя</>}
           lead="Три типовые ситуации T&D-команд и то, чем мы закрываем каждую из них: от описания внутренних практик до подключения внешних экспертов."
+          guide="Выберите ситуацию, похожую на вашу, — дальше кейсы с результатами."
           chips={[
             ["Без ТЗ", "приходите с задачей — рамку проекта соберём вместе"],
             ["7–14 дней", "срок, за который закрываем дефицит компетенции рыночной практикой"],
@@ -88,7 +102,7 @@ function TasksPage() {
                   className="card-link card group flex h-full flex-col rounded-md p-6 md:p-7"
                 >
                   <div className="flex items-start justify-between gap-4">
-                    <div className="font-display t-label font-bold tabular-nums text-[color:var(--color-accent)]">
+                    <div className="font-display t-label tabular-nums text-[color:var(--color-accent)]">
                       0{i + 1}
                     </div>
                     <span
@@ -98,7 +112,7 @@ function TasksPage() {
                       <ArrowRight data-arrow className="h-4 w-4" />
                     </span>
                   </div>
-                  <h2 className="t-body mt-3 font-display text-[color:var(--color-text-primary)] [overflow-wrap:break-word]">
+                  <h2 className="t-body mt-3 font-display font-semibold text-[color:var(--color-text-primary)] [overflow-wrap:break-word]">
                     {it.situation}
                   </h2>
                   <p className="mt-4 t-body text-[color:var(--color-text-secondary)]">{it.detail}</p>
@@ -118,7 +132,7 @@ function TasksPage() {
           </div>
         </div>
       </section>
-      <CtaBand path="/tasks" />
+      <CtaBand path="/tasks" secondary={<NextLink href="/cases">Посмотреть кейсы</NextLink>} />
     </PageShell>
   );
 }
@@ -134,6 +148,7 @@ function CasesPage() {
           kicker="Кейсы"
           title={<>Что мы уже сделали</>}
           lead="Корпоративные проекты и запуски под NDA: что сделали, как посчитали результат и что изменилось в работе заказчика."
+          guide="Здесь — результаты в цифрах; слова самих клиентов — в отзывах."
           chips={[
             ["Считаем результат", "каждый кейс — с метрикой, а не с описанием процесса"],
             ["Проекты под NDA", "часть работ показываем только с письменного согласия"],
@@ -150,7 +165,7 @@ function CasesPage() {
           </p>
         </div>
       </section>
-      <CtaBand path="/cases" />
+      <CtaBand path="/cases" secondary={<NextLink href="/reviews">Читать отзывы клиентов</NextLink>} />
     </PageShell>
   );
 }
@@ -167,6 +182,7 @@ function ReviewsPage() {
           kicker="Отзывы"
           title={<>Что говорят клиенты</>}
           lead="Дословно, без редактуры — мы не переписываем то, что нам написали."
+          guide="Прочитайте пару отзывов — дальше посмотрите, как устроена работа."
           chips={[
             ["Без правок", "публикуем ровно то, что написали клиенты"],
             ["Проекты под NDA", "часть работ не показываем — только с письменного согласия"],
@@ -180,7 +196,7 @@ function ReviewsPage() {
           </div>
         </div>
       </section>
-      <CtaBand path="/reviews" />
+      <CtaBand path="/reviews" secondary={<NextLink href="/how-we-work">Как мы работаем</NextLink>} />
     </PageShell>
   );
 }
@@ -203,6 +219,7 @@ function TeamPage() {
           kicker="О нас"
           title={<>Команда и сеть экспертов</>}
           lead="Люди, которые отвечают за результат вашего проекта, и профессиональная сеть практиков за ними."
+          guide="Сначала — кто ведёт проекты, ниже — как устроена сеть практиков."
           chips={[
             ["Отбор до подключения", "проверяем опыт практика до того, как он попадает в проект"],
             ["72 часа", "представляем первые релевантные профили под вашу задачу"],
@@ -225,7 +242,7 @@ function TeamPage() {
                 <div className="t-eyebrow text-[color:var(--color-accent)]">
                   Владелица агентства
                 </div>
-                <h2 className="mt-2 font-display t-body font-medium">{founder.name}</h2>
+                <h2 className="mt-2 font-display t-body font-semibold">{founder.name}</h2>
                 <p className="mt-1 t-body text-[color:var(--color-text-secondary)]">{founder.role} · {founder.fact}</p>
                 {/* Слова от первого лица — фрагмент её книги (решение
                     Виктории 04.08). Цитата дословная, см. FOUNDER_QUOTE. */}
@@ -257,8 +274,8 @@ function TeamPage() {
                     />
                   </div>
                   <div className="p-6">
-                    <div className="font-display t-body font-bold">{p.name}</div>
-                    <p className="mt-1 t-caption font-medium uppercase tracking-wide text-[color:var(--color-text-secondary)]">{p.role}</p>
+                    <div className="font-display t-body font-semibold">{p.name}</div>
+                    <p className="mt-1 t-eyebrow text-[color:var(--color-text-secondary)]">{p.role}</p>
                     <p className="mt-3 t-body text-[color:var(--color-text-primary)]">{p.fact}</p>
                   </div>
                 </PaperCard>
@@ -276,7 +293,7 @@ function TeamPage() {
           <div className="mt-10 grid items-stretch gap-8 md:grid-cols-3 md:gap-10">
             {network.map(([t, d]) => (
               <PaperCard key={t} className="h-full p-6">
-                <div className="font-display t-body font-bold">{t}</div>
+                <div className="font-display t-body font-semibold">{t}</div>
                 <p className="mt-3 t-body text-[color:var(--color-text-secondary)]">{d}</p>
               </PaperCard>
             ))}
@@ -290,7 +307,7 @@ function TeamPage() {
         </div>
       </section>
       <BookSection />
-      <CtaBand path="/team" />
+      <CtaBand path="/team" secondary={<NextLink href="/cases">Посмотреть кейсы</NextLink>} />
     </PageShell>
   );
 }
@@ -298,9 +315,13 @@ function TeamPage() {
 /* ----------------------------- Как мы работаем ----------------------------- */
 
 function HowWeWorkPage() {
-  const guarantees: [string, string][] = [
+  /* Первые две гарантии — коммерческие обязательства, их выносим крупно;
+     остальные две — условия работы, спокойным рядом. */
+  const core: [string, string][] = [
     ["Критерии приёмки — до старта", "объём работ, этапы, сроки и критерии приёмки фиксируются до начала работы"],
     ["Доработка без доплаты", "если результат этапа не соответствует согласованным критериям — дорабатываем за свой счёт"],
+  ];
+  const secondary: [string, string][] = [
     ["Этап с самостоятельным результатом", "первый этап завершается моделью решения и дорожной картой; продолжать можно с нами или своими силами"],
     ["Конфиденциальность", "NDA; обезличенные фрагменты — только с письменного согласия; часть проектов не показываем вовсе"],
   ];
@@ -311,48 +332,52 @@ function HowWeWorkPage() {
         <PageHead
           kicker="Как мы работаем"
           title={<>Один договор. Одна команда. Одна точка ответственности.</>}
-
           lead="Принцип одного окна: всю дальнейшую работу с пулом разных экспертов мы забираем на себя — для вас процесс остаётся бесшовным."
+          guide="Ниже — этапы, ритм работы и гарантии; дальше выберите свою задачу."
           chips={[
-            ["2 рабочих часа", "отвечаем на заявку и предлагаем время разбора"],
-            ["Доработка без доплаты", "если результат этапа не совпал с критериями приёмки"],
+            ["Одна точка ответственности", "руководитель проекта с нашей стороны отвечает за сроки и результат"],
+            ["Критерии приёмки — до старта", "объём, этапы и сроки фиксируются в договоре до начала работы"],
           ]}
         />
       </section>
-      <Flow />
+      <Flow n="01" />
+      <WorkRhythm n="02" />
       <section className="stage border-b border-[color:var(--color-line)]">
         <Scene blobs={[{ className: "-left-40 top-0", tone: "rose", size: 460 }]} />
         <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
-          <div className="t-eyebrow text-[color:var(--color-text-secondary)]">ваши гарантии</div>
+          <SectionLabel n="03">Ваши гарантии</SectionLabel>
           <RevealHeading className="t-h2 mt-6 max-w-3xl">
             Что защищает ваш результат
           </RevealHeading>
+
           <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            {guarantees.map(([t, d]) => (
-              <PaperCard key={t} className="p-6">
-                <div className="flex items-start gap-3">
-                  <Check className="mt-0.5 h-4 w-4 flex-none text-[color:var(--color-accent)]" />
-                  <div>
-                    <div className="font-display t-body font-bold">{t}</div>
-                    <p className="mt-2 t-body text-[color:var(--color-text-secondary)]">{d}</p>
-                  </div>
-                </div>
+            {core.map(([t, d]) => (
+              <PaperCard key={t} className="border-l-[3px] border-l-[color:var(--color-accent)] p-7">
+                <div className="font-display case-title">{t}</div>
+                <p className="mt-3 t-body text-[color:var(--color-text-primary)]">{d}</p>
               </PaperCard>
             ))}
           </div>
-          <PaperCard className="mt-10 max-w-3xl border-l-[3px] border-l-[color:var(--color-accent)] p-6">
-            <div className="font-display t-body font-bold">Один договор. Одна команда. Одна точка ответственности</div>
-            <p className="mt-2 t-body text-[color:var(--color-text-primary)]">
-              Принцип одного окна: одно контактное лицо, ответственное за результат, один договор. Всю дальнейшую работу с пулом разных экспертов мы забираем на себя, для вас процесс будет бесшовным.
-            </p>
-          </PaperCard>
+
+          <ul className="mt-8 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
+            {secondary.map(([t, d]) => (
+              <li key={t} className="flex items-start gap-3 py-4">
+                <Check className="mt-[0.35em] h-4 w-4 flex-none text-[color:var(--color-accent)]" />
+                <div>
+                  <div className="font-display t-body font-semibold">{t}</div>
+                  <p className="mt-1.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </div>
       </section>
-      <NotFit />
-      <CtaBand path="/how-we-work" />
+      <NotFit n="04" />
+      <CtaBand path="/how-we-work" secondary={<NextLink href="/tasks">Задачи и решения</NextLink>} />
     </PageShell>
   );
 }
+
 
 /* ---------------------------------- FAQ ------------------------------------ */
 
@@ -365,6 +390,7 @@ function FaqPage() {
           kicker="Вопросы и ответы"
           title={<>Частые вопросы</>}
           lead="Не обещаем того, что не проверено на последних проектах: сроки, стоимость, конфиденциальность и формат работы — как есть."
+          guide="Ответы на частые вопросы; если вашего нет — напишите напрямую."
           chips={[
             ["2 рабочих часа", "среднее время ответа на заявку или вопрос"],
             ["Без обязательств", "разбор задачи за 30 минут ни к чему вас не обязывает"],
@@ -377,7 +403,7 @@ function FaqPage() {
           </p>
         </div>
       </section>
-      <CtaBand path="/faq" />
+      <CtaBand path="/faq" secondary={<NextLink href="/contacts#form">Написать напрямую</NextLink>} />
     </PageShell>
   );
 }
@@ -396,6 +422,7 @@ function ContactsPage() {
           kicker="Контакты"
           title={<>Разберём вашу задачу за 30 минут</>}
           lead="Оставьте заявку или напишите напрямую — ответим в течение двух рабочих часов."
+          guide="Форма ниже: два поля и одна строка о задаче — этого достаточно."
           chips={[
             ["Telegram: @vikky_duck", "если удобнее — напишите напрямую, без формы"],
             ["+7 964 584 22 25", "или позвоните: разбор задачи ни к чему вас не обязывает"],

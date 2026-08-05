@@ -599,7 +599,7 @@ export function NodeList({
           className={`flex items-start gap-3 ${divided ? "py-3.5" : ""} ${itemClassName}`}
         >
           <NodeBullet active={accentFirst && i === 0} className="mt-[0.55em]" />
-          <span className="flex-1">{it}</span>
+          <span className="t-body flex-1">{it}</span>
         </li>
       ))}
     </ul>
@@ -800,8 +800,8 @@ export function Field({
   const id = `f-${name}`;
   const errId = `${id}-error`;
   const base = dark
-    ? "min-h-11 w-full rounded-sm border bg-white/5 px-4 py-3 text-base text-[color:var(--color-text-inverse)] outline-none transition placeholder:text-[color:var(--color-text-inverse-2)]/50"
-    : "min-h-11 w-full rounded-sm border bg-[color:var(--color-surface)] px-4 py-3 text-base text-[color:var(--color-text-primary)] outline-none transition placeholder:text-[color:var(--color-steel)]";
+    ? "min-h-11 w-full rounded-sm border bg-white/5 px-4 py-3 t-body text-[color:var(--color-text-inverse)] outline-none transition placeholder:text-[color:var(--color-text-inverse-2)]/50"
+    : "min-h-11 w-full rounded-sm border bg-[color:var(--color-surface)] px-4 py-3 t-body text-[color:var(--color-text-primary)] outline-none transition placeholder:text-[color:var(--color-steel)]";
   const state = error
     ? "border-[color:var(--color-accent)] focus:border-[color:var(--color-accent)]"
     : dark
@@ -867,11 +867,20 @@ export function CookieBar() {
       setShow(true);
     }
   }, []);
+  /* Плашка фиксирована у нижней кромки и на мобильном перекрывала последнюю
+     строку карточек. Пока она видна — резервируем под неё место в потоке. */
+  useEffect(() => {
+    const el = document.documentElement;
+    if (show) el.setAttribute("data-cookie-open", "");
+    else el.removeAttribute("data-cookie-open");
+    return () => el.removeAttribute("data-cookie-open");
+  }, [show]);
   const accept = () => {
     try { window.localStorage.setItem("bv-cookie-ok", "1"); } catch {}
     setShow(false);
   };
   if (!mounted || !show) return null;
+
   /* Раньше вся полоса была <div role="button"> без tabindex: с клавиатуры её
      нельзя было закрыть в принципе, а текст не сообщал, что клик = согласие.
      Теперь полоса — обычный текст со ссылкой, а закрывает её настоящая кнопка. */
@@ -892,7 +901,7 @@ export function CookieBar() {
       <button
         type="button"
         onClick={accept}
-        className="rounded-sm border border-[color:var(--color-line)] px-3 py-1 t-caption font-medium text-[color:var(--color-text-primary)] transition-colors duration-[160ms] hover:border-[color:var(--color-steel)] hover:bg-[color:var(--color-bg-secondary)]"
+        className="rounded-sm border border-[color:var(--color-line)] px-3 py-1 t-eyebrow text-[color:var(--color-text-primary)] transition-colors duration-[160ms] hover:border-[color:var(--color-steel)] hover:bg-[color:var(--color-bg-secondary)]"
       >
         Понятно
       </button>
@@ -909,6 +918,15 @@ export const NAV_LINKS: [string, string][] = [
   ["Как мы работаем", "/how-we-work"],
   ["О нас", "/team"],
 ];
+
+/* Второй уровень: раньше жил в футере, теперь — в меню. */
+export const NAV_SECONDARY: [string, string][] = [
+  ["Бизнес-эффект", "/business-effect"],
+  ["Отзывы", "/reviews"],
+  ["Частые вопросы", "/faq"],
+  ["Контакты", "/contacts"],
+];
+
 
 
 export const CTA_LABEL = "Разбор задачи за 30 минут";
@@ -947,12 +965,44 @@ export function Nav({ path = "/" }: { path?: string }) {
   }, [path]);
 
 
+  const menuRef = useRef<HTMLDivElement | null>(null);
+  const burgerRef = useRef<HTMLButtonElement | null>(null);
+
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [open]);
+
+  /* Клавиатура: Esc закрывает меню и возвращает фокус на кнопку,
+     Tab не выходит за пределы открытой панели. */
+  useEffect(() => {
+    if (!open) return;
+    const first = menuRef.current?.querySelector<HTMLElement>("a, button");
+    first?.focus();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        setOpen(false);
+        burgerRef.current?.focus();
+        return;
+      }
+      if (e.key !== "Tab" || !menuRef.current) return;
+      const items = Array.from(
+        menuRef.current.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
+      ).filter((el) => el.offsetParent !== null);
+      if (!items.length) return;
+      const edge = e.shiftKey ? items[0] : items[items.length - 1];
+      if (document.activeElement === edge) {
+        e.preventDefault();
+        (e.shiftKey ? items[items.length - 1] : items[0]).focus();
+      }
+    };
+    document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [open]);
+
 
   useEffect(() => {
     const measure = () => setNavH(headRef.current?.getBoundingClientRect().height ?? 64);
@@ -972,7 +1022,7 @@ export function Nav({ path = "/" }: { path?: string }) {
             и рвёт названия («Задачи и / решения»). Полное меню — от 1280 px,
             ниже его заменяет бургер: четыре русских пункта, вход в кабинет
             и действие в одну строку уже, чем в 1280 px, не помещаются. */}
-        <nav className="hidden items-center gap-0.5 t-nav font-medium tracking-[0.005em] xl:flex">
+        <nav aria-label="Основная навигация" className="hidden items-center gap-0.5 t-nav tracking-[0.005em] xl:flex">
           {NAV_LINKS.map(([label, href]) => {
             const active = path === href;
             return (
@@ -1011,12 +1061,16 @@ export function Nav({ path = "/" }: { path?: string }) {
             <ArrowUpRight data-arrow className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
           </a>
           <button
+            ref={burgerRef}
             type="button"
             aria-label={open ? "Закрыть меню" : "Открыть меню"}
             aria-expanded={open}
+            aria-haspopup="menu"
+            aria-controls="site-menu"
             onClick={() => setOpen((v) => !v)}
-            className="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-primary)] transition-colors hover:bg-[color:var(--color-bg-secondary)] xl:hidden"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-primary)] transition-colors hover:bg-[color:var(--color-bg-secondary)]"
           >
+
             <span className="relative block h-3 w-4">
               <span
                 className={`absolute left-0 block h-px w-4 bg-current transition-transform duration-300 ${open ? "top-1.5 rotate-45" : "top-0.5"}`}
@@ -1036,19 +1090,61 @@ export function Nav({ path = "/" }: { path?: string }) {
       />
 
       {open && (
-        <div className="fixed inset-x-0 bottom-0 z-[2] flex flex-col border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] xl:hidden" style={{ top: navH }}>
-          <nav className="mx-auto w-full max-w-3xl flex-1 overflow-y-auto overscroll-contain px-5 pb-4 pt-2 md:px-8">
-            {NAV_LINKS.map(([label, href]) => (
+        <div
+          id="site-menu"
+          ref={menuRef}
+          role="dialog"
+          aria-modal="true"
+          aria-label="Меню сайта"
+          className="fixed inset-x-0 bottom-0 z-[2] flex flex-col border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]"
+          style={{ top: navH }}
+        >
+          <nav aria-label="Меню сайта" className="mx-auto w-full max-w-3xl flex-1 overflow-y-auto overscroll-contain px-5 pb-4 pt-2 md:px-8">
+            {/* От 1280 px первые четыре пункта уже стоят строкой в шапке —
+                в меню остаётся только второй уровень. */}
+            {NAV_LINKS.slice(0, 3).map(([label, href]) => (
               <a
                 key={href}
                 href={href}
+                aria-current={path === href ? "page" : undefined}
+                onClick={() => setOpen(false)}
+                className="flex min-h-[60px] items-center justify-between border-b border-[color:var(--color-line)] py-4 t-body text-[color:var(--color-text-primary)] xl:hidden"
+              >
+                {label}
+                <ArrowUpRight aria-hidden data-arrow className="h-5 w-5 shrink-0 text-[color:var(--color-text-secondary)]" />
+              </a>
+            ))}
+            {/* О нас — отдельный блок, чтобы не сливался с коммерческими страницами. */}
+            <div className="mt-6 xl:hidden">
+              <div className="pb-2 t-eyebrow text-[color:var(--color-text-secondary)]">О нас</div>
+              {NAV_LINKS.slice(3).map(([label, href]) => (
+                <a
+                  key={href}
+                  href={href}
+                  aria-current={path === href ? "page" : undefined}
+                  onClick={() => setOpen(false)}
+                  className="flex min-h-[52px] items-center justify-between border-b border-[color:var(--color-line)] py-3 t-body text-[color:var(--color-text-primary)]"
+                >
+                  {label}
+                  <ArrowUpRight aria-hidden data-arrow className="h-5 w-5 shrink-0 text-[color:var(--color-text-secondary)]" />
+                </a>
+              ))}
+            </div>
+            {NAV_SECONDARY.map(([label, href]) => (
+              <a
+                key={href}
+                href={href}
+                aria-current={path === href ? "page" : undefined}
                 onClick={() => setOpen(false)}
                 className="flex min-h-[60px] items-center justify-between border-b border-[color:var(--color-line)] py-4 t-body text-[color:var(--color-text-primary)]"
               >
                 {label}
-                <ArrowUpRight data-arrow className="h-5 w-5 shrink-0 text-[color:var(--color-text-secondary)]" />
+                <ArrowUpRight aria-hidden data-arrow className="h-5 w-5 shrink-0 text-[color:var(--color-text-secondary)]" />
               </a>
             ))}
+
+
+
             {/* Вход для действующих клиентов */}
             <a
               href={LK_URL}
@@ -1082,85 +1178,36 @@ export function Nav({ path = "/" }: { path?: string }) {
 /* -------------------------------- Footer --------------------------------- */
 
 export function Footer() {
-  const nav = [
-    ["Задачи и решения", "/tasks"],
-    ["Кейсы", "/cases"],
-    ["Бизнес-эффект", "/business-effect"],
-    ["Отзывы", "/reviews"],
-    ["Как мы работаем", "/how-we-work"],
-    ["О нас", "/team"],
-    ["Частые вопросы", "/faq"],
-    ["Контакты", "/contacts"],
-  ];
-
   return (
     <footer className="border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
-      <div className="mx-auto max-w-7xl px-6 py-14">
-        {/* Материал для бизнес-заказчика вынесен из футера — теперь это
-            часть CtaBand или отдельной секции на страницах. */}
-
-        <div className="grid gap-10 md:grid-cols-[1.2fr_1fr_1fr]">
-          <div>
-            <StencilLogo className="logo-md" />
-            {/* Кот — талисман бюро: один кот на носитель, только контур */}
-            <CatMark className="mt-6 h-20 w-24 text-[color:var(--color-text-primary)]/70" strokeWidth={2} />
-            <p className="mt-5 max-w-sm t-body text-[color:var(--color-text-secondary)]">
-              Проектная команда методологов и продактов. Превращаем экспертный
-              опыт в применимый продукт.
-            </p>
-          </div>
-          <div>
-            <div className="t-eyebrow text-[color:var(--color-text-secondary)]">
-              Навигация
-            </div>
-            <ul className="mt-4 grid grid-cols-2 gap-y-2 t-body">
-              {nav.map(([label, href]) => (
-                <li key={href}>
-                  <a href={href} className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">
-                    {label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div>
-            <div className="t-eyebrow text-[color:var(--color-text-secondary)]">
-              Связь
-            </div>
-            <a
-              href="/contacts"
-              className="mt-4 inline-flex items-center gap-2 font-display t-body text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]"
-            >
-              Написать нам
-              <ArrowUpRight data-arrow className="h-4 w-4" />
-            </a>
-            <div className="mt-2 t-body text-[color:var(--color-text-secondary)]">
-              Ответ в рабочее время в течение 2 часов
-            </div>
-            <ul className="mt-4 space-y-1.5 t-body">
-              <li><a href="tel:+79645842225" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">+7 964 584 22 25</a></li>
-              <li><a href="https://t.me/vikky_duck" target="_blank" rel="noreferrer" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">Telegram: @vikky_duck</a></li>
-              <li><a href="mailto:vu@withoutwater.ru" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">vu@withoutwater.ru</a></li>
-              {/* Вход для действующих клиентов — из шапки в футер (03.08) */}
-              <li><a href={LK_URL} target="_blank" rel="noopener" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">{LK_LABEL}</a></li>
-            </ul>
-          </div>
+      <div className="mx-auto max-w-7xl px-5 py-8 md:px-8">
+        {/* Навигация переехала в меню шапки: в футере — только контакты
+            и юридический блок. */}
+        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <a href="/" className="flex items-center gap-3 text-[color:var(--color-text-primary)]" aria-label="БЕЗ ВОДЫ — на главную">
+            <CatMark className="h-8 w-auto text-[color:var(--color-text-primary)]/70" strokeWidth={2} />
+            <StencilLogo className="logo-sm" />
+          </a>
+          <ul className="flex flex-wrap gap-x-6 gap-y-2 t-body">
+            <li><a href="tel:+79645842225" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">+7 964 584 22 25</a></li>
+            <li><a href="https://t.me/vikky_duck" target="_blank" rel="noreferrer" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">Telegram: @vikky_duck</a></li>
+            <li><a href="mailto:vu@withoutwater.ru" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">vu@withoutwater.ru</a></li>
+            {/* «Личный кабинет» живёт только в меню шапки */}
+          </ul>
         </div>
-        <div className="mt-12 flex flex-col gap-4 border-t border-[color:var(--color-line)] pt-6 t-caption text-[color:var(--color-text-secondary)]">
+        <div className="mt-6 flex flex-col gap-3 border-t border-[color:var(--color-line)] pt-5 t-caption text-[color:var(--color-text-secondary)]">
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             <a href="/politics_pd" className="transition hover:text-[color:var(--color-accent)]">Политика конфиденциальности</a>
             <a href="/consent_pd" className="transition hover:text-[color:var(--color-accent)]">Согласие на обработку персональных данных</a>
             <a href="/pub_oferta" className="transition hover:text-[color:var(--color-accent)]">Публичная оферта</a>
           </div>
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div>© {new Date().getFullYear()} БЕЗ ВОДЫ · withoutwater · ИП Уткина Виктория Викторовна · ИНН 771586055972</div>
-            <div>Методология · Продукт · Проектное управление</div>
-          </div>
+          <div>© {new Date().getFullYear()} БЕЗ ВОДЫ · withoutwater · ИП Уткина Виктория Викторовна · ИНН 771586055972</div>
         </div>
       </div>
     </footer>
   );
 }
+
 
 /* ------------------------------ PageShell -------------------------------- */
 /* Общая обёртка каждой страницы: шапка, футер, калм-переключатель, cookie-бар,
@@ -1184,8 +1231,9 @@ export function PageShell({ path, children }: { path: string; children: ReactNod
   useEffect(() => {
     const renumber = () => {
       document.querySelectorAll("main [data-seclabel] .stencil").forEach((el, i) => {
-        el.textContent = String(i).padStart(2, "0");
+        el.textContent = String(i + 1).padStart(2, "0");
       });
+
     };
     renumber();
     const id = window.setTimeout(renumber, 300);
@@ -1217,6 +1265,8 @@ export function PageShell({ path, children }: { path: string; children: ReactNod
             Поднята выше cookie-плашки. */}
         <div
           className={`fixed bottom-12 left-4 z-40 md:hidden ${
+            path === "/cases" ? "hidden" : ""
+          } ${
             showBar ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-20 opacity-0"
           }`}
           aria-hidden={!showBar}
@@ -1294,7 +1344,7 @@ export function ScrollRing({ className = "" }: { className?: string }) {
         aria-hidden
         style={{
           background:
-            "radial-gradient(closest-side, rgba(233,196,189,0.12), rgba(233,196,189,0))",
+            "radial-gradient(closest-side, rgba(228,169,206,0.12), rgba(228,169,206,0))",
           filter: "blur(8px)",
         }}
       />
@@ -1313,7 +1363,7 @@ export function ScrollRing({ className = "" }: { className?: string }) {
           cy="50"
           r={R}
           fill="none"
-          stroke="rgba(241,239,234,0.12)"
+          stroke="rgba(232,238,247,0.12)"
           strokeWidth="1.5"
         />
         <circle
@@ -1321,7 +1371,7 @@ export function ScrollRing({ className = "" }: { className?: string }) {
           cy="50"
           r={R}
           fill="none"
-          stroke="#E9C4BD"
+          stroke="var(--color-accent)"
           strokeWidth="1.8"
           strokeLinecap="round"
           strokeDasharray={C}
@@ -1343,12 +1393,15 @@ export function PageHead({
   kicker,
   title,
   lead,
+  guide,
   chips,
   actions,
 }: {
   kicker: string;
   title?: ReactNode;
   lead?: ReactNode;
+  /* Одна строка-ориентир под лидом: что здесь и куда идти дальше */
+  guide?: ReactNode;
   chips?: [string, string][];
   actions?: ReactNode;
 }) {
@@ -1360,7 +1413,7 @@ export function PageHead({
           className="absolute inset-y-0 left-0 right-0 hidden md:block"
           style={{
             backgroundImage:
-              "repeating-linear-gradient(to right, rgba(241,239,234,0.055) 0 1px, transparent 1px 8.3333%)",
+              "repeating-linear-gradient(to right, rgba(232,238,247,0.055) 0 1px, transparent 1px 8.3333%)",
             WebkitMaskImage: "linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent)",
             maskImage: "linear-gradient(to bottom, transparent, #000 20%, #000 80%, transparent)",
           }}
@@ -1371,7 +1424,7 @@ export function PageHead({
           style={{
             background:
               "radial-gradient(120% 90% at 82% 14%, rgba(201,205,212,0.10), transparent 58%)," +
-              "radial-gradient(80% 70% at 8% 100%, rgba(163,86,75,0.18), transparent 62%)",
+              "radial-gradient(80% 70% at 8% 100%, rgba(126,92,158,0.18), transparent 62%)",
           }}
         />
         <NodeScene className="text-[color:var(--color-text-inverse-2)]" opacity={0.3} />
@@ -1401,6 +1454,10 @@ export function PageHead({
           <p className={`t-body measure text-[color:var(--color-text-inverse-2)] ${title ? "mt-6" : "mt-5"}`}>
             {lead}
           </p>
+        )}
+        {/* Строка-ориентир: как читать страницу и куда идти дальше (приёмка, п. 6). */}
+        {guide && (
+          <p className="t-eyebrow mt-5 text-[color:var(--color-text-inverse-2)]">{guide}</p>
         )}
         {actions && (
           <div className="mt-9 flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-5 print:hidden">
@@ -1460,13 +1517,13 @@ export function CtaBand({
           <span>Следующий шаг</span>
         </div>
         <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
-          {title ?? "Разберём вашу задачу за 30 минут"}
+          {title ?? "Что будет на разборе"}
         </RevealHeading>
         <p className="t-body measure mt-5 text-[color:var(--color-text-inverse-2)]">
           {note ?? (
             <>
-              Готовить презентацию и ТЗ не нужно. Сверим задачу и определим
-              следующий шаг — или честно скажем, что не поможем.
+              30 минут онлайн: сверим задачу, доступные источники опыта и
+              возможный результат первого этапа. Презентацию и ТЗ готовить не нужно.
             </>
           )}
         </p>
@@ -1484,11 +1541,11 @@ export function CtaBand({
             чтобы везде была возможность написать или позвонить») */}
         <p className="mt-5 t-body text-[color:var(--color-text-inverse-2)]">
           Или напрямую:{" "}
-          <a href="https://t.me/vikky_duck" target="_blank" rel="noreferrer" className="font-medium text-[color:var(--color-text-inverse)] underline underline-offset-4 transition hover:text-[color:var(--color-accent-glass)]">
+          <a href="https://t.me/vikky_duck" target="_blank" rel="noreferrer" className="font-semibold text-[color:var(--color-text-inverse)] underline underline-offset-4 transition hover:text-[color:var(--color-accent-glass)]">
             Telegram @vikky_duck
           </a>
           {" · "}
-          <a href="tel:+79645842225" className="font-medium text-[color:var(--color-text-inverse)] underline underline-offset-4 transition hover:text-[color:var(--color-accent-glass)]">
+          <a href="tel:+79645842225" className="font-semibold text-[color:var(--color-text-inverse)] underline underline-offset-4 transition hover:text-[color:var(--color-accent-glass)]">
             +7 964 584 22 25
           </a>
         </p>

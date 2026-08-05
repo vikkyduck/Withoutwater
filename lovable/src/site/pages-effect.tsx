@@ -115,7 +115,7 @@ function OtherSituations({ current }: { current: string }) {
               className="card-link group h-full"
             >
               <PaperCard className="flex h-full items-start justify-between gap-4 p-6">
-                <span className="font-display t-body font-medium">{s.situation}</span>
+                <span className="font-display t-body font-semibold">{s.situation}</span>
                 <ArrowRight
                   data-arrow
                   className="mt-1 h-4 w-4 shrink-0 text-[color:var(--color-text-secondary)] transition-colors duration-300 group-hover:text-[color:var(--color-accent)]"
@@ -139,7 +139,7 @@ function MetricTiles({ items }: { items: [string, string][] }) {
     <div className="grid gap-3 sm:grid-cols-3">
       {items.map(([value, label], i) => (
         <motion.div key={label} {...reveal(i)} className="surface-dark notch rounded-md px-5 py-6">
-          <div className="font-display t-number font-medium tabular-nums tracking-[-0.02em] text-[color:var(--color-text-inverse)] hyphens-none [overflow-wrap:anywhere]">
+          <div className="font-display t-number tabular-nums tracking-[-0.02em] text-[color:var(--color-text-inverse)] hyphens-none [overflow-wrap:anywhere]">
             {value}
           </div>
           <p className="mt-3 t-body text-[color:var(--color-text-inverse-2)]">{label}</p>
@@ -162,7 +162,7 @@ function TitledCards({
       {items.map(([t, d], i) => (
         <motion.div key={t} {...reveal(i)} className="h-full">
           <PaperCard className="h-full p-6">
-            <div className="font-display t-body font-bold">{t}</div>
+            <div className="font-display t-body font-semibold">{t}</div>
             <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
           </PaperCard>
         </motion.div>
@@ -212,12 +212,12 @@ function StaffCostTable({
         ))}
         <div className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-6 bg-white/[0.04] px-5 py-3.5">
           <span className="t-body font-semibold text-[color:var(--color-text-inverse)]">{STAFF_TOTAL[0]}</span>
-          <span className="font-display t-body font-medium tabular-nums whitespace-nowrap text-[color:var(--color-text-inverse)]">{STAFF_TOTAL[1]}</span>
+          <span className="font-display t-body font-semibold tabular-nums whitespace-nowrap text-[color:var(--color-text-inverse)]">{STAFF_TOTAL[1]}</span>
         </div>
       </div>
 
       <div className="tint-ink mt-6 rounded-md border-l-2 border-[color:var(--color-accent)] p-6">
-        <p className="font-display t-body font-medium text-[color:var(--color-text-inverse)]">{ourLine}</p>
+        <p className="font-display t-body font-semibold text-[color:var(--color-text-inverse)]">{ourLine}</p>
         <p className="mt-2 t-body text-[color:var(--color-text-inverse-3,var(--color-text-inverse-2))]">{afterLine}</p>
       </div>
 
@@ -270,6 +270,7 @@ export function BusinessEffectGeneralPage() {
           kicker="Бизнес-эффект"
           title={<>Бизнес-эффект от сотрудничества с&nbsp;нами</>}
           lead="Результат в компании создают люди. Мы переводим их опыт в инструменты, таким образом, у команды появляется больше инструментов для достижения результата."
+          guide="Ниже — эффект по трём сценариям; дальше выберите свой и посмотрите цифры."
           actions={
             <>
               <CtaButton path={BE.general} />
@@ -287,7 +288,7 @@ export function BusinessEffectGeneralPage() {
           <RevealHeading className="t-h2 mt-6 max-w-3xl">
             Откуда бы ни пришли знание и опыт, оно остается у компании
           </RevealHeading>
-          <p className="mt-5 max-w-3xl font-display t-body font-medium">
+          <p className="mt-5 max-w-3xl font-display t-body font-semibold">
             5 принципов, одинаковых для всех наших работ
           </p>
           <div className="mt-10 grid items-stretch gap-4 sm:grid-cols-2">
@@ -298,7 +299,7 @@ export function BusinessEffectGeneralPage() {
                     <Stencil n={i + 1} active className="t-body" />
                     <span className="h-px w-6 bg-[color:var(--color-line)]" />
                   </div>
-                  <div className="mt-4 font-display t-body font-bold">{t}</div>
+                  <div className="mt-4 font-display t-body font-semibold">{t}</div>
                   <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
                 </PaperCard>
               </motion.div>
@@ -312,7 +313,7 @@ export function BusinessEffectGeneralPage() {
                       <Stencil n={5} active className="t-body" />
                       <span className="h-px w-6 bg-[color:var(--color-line)]" />
                     </div>
-                    <div className="mt-4 font-display t-body font-bold">{principles[4][0]}</div>
+                    <div className="mt-4 font-display t-body font-semibold">{principles[4][0]}</div>
                     <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">{principles[4][1]}</p>
                   </div>
                   {/* Экран личного кабинета (скриншот, чувствительные данные размыты) */}
@@ -347,13 +348,13 @@ export function BusinessEffectGeneralPage() {
             </p>
             <div className="mt-8 grid max-w-4xl gap-4 sm:grid-cols-2">
               <PaperCard className="p-6">
-                <div className="font-display t-body font-bold">Поддержание актуальности</div>
+                <div className="font-display t-body font-semibold">Поддержание актуальности</div>
                 <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">
                   регулярный пересмотр материалов под изменения в компании — от 40 000 ₽ в месяц
                 </p>
               </PaperCard>
               <PaperCard className="p-6">
-                <div className="font-display t-body font-bold">Расширение готовой программы</div>
+                <div className="font-display t-body font-semibold">Расширение готовой программы</div>
                 <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">
                   на новые команды, регионы и роли — по прайсу разработки
                 </p>
@@ -384,7 +385,7 @@ export function BusinessEffectGeneralPage() {
                 Виктории 03.08: «посмотри, где будет лучше»). Здесь — суть
                 и ссылка на полный расчёт. */}
             <div className="tint-ink mt-8 max-w-3xl rounded-md border-l-2 border-[color:var(--color-accent)] p-6">
-              <p className="font-display t-body font-medium text-[color:var(--color-text-inverse)]">
+              <p className="font-display t-body font-semibold text-[color:var(--color-text-inverse)]">
                 Работа с нами: от 180 000 ₽ в месяц.
               </p>
               <p className="mt-2 t-body text-[color:var(--color-text-inverse-3,var(--color-text-inverse-2))]">
@@ -473,10 +474,10 @@ export function BusinessEffectGeneralPage() {
                   {...reveal(i)}
                   className={`flex items-baseline gap-4 px-5 py-3.5 ${i > 0 ? "border-t border-[color:var(--color-line)]" : ""}`}
                 >
-                  <span className="stencil flex-none t-caption tracking-[0.2em] text-[color:var(--color-accent)]">
+                  <span className="stencil flex-none t-small tracking-[0.2em] text-[color:var(--color-accent)]">
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <span className="w-32 flex-none font-display t-body font-medium tracking-tight sm:w-40">{term}</span>
+                  <span className="w-32 flex-none font-display t-body font-semibold tracking-tight sm:w-40">{term}</span>
                   <span className="t-body text-[color:var(--color-text-secondary)]">{what}</span>
                 </motion.div>
               ))}
@@ -512,7 +513,7 @@ export function BusinessEffectGeneralPage() {
                       <ArrowRight data-arrow className="h-4 w-4" />
                     </span>
                   </div>
-                  <div className="mt-3 font-display t-body font-medium text-[color:var(--color-text-inverse)]">
+                  <div className="mt-3 font-display t-body font-semibold text-[color:var(--color-text-inverse)]">
                     {it.title}
                   </div>
                   <p className="mt-auto pt-4 t-body text-[color:var(--color-text-inverse-2)]">{it.step}</p>
@@ -532,10 +533,10 @@ export function BusinessEffectGeneralPage() {
           <a
             href={PDF.general}
             download
-            className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)] print:hidden"
+            className="link-arrow group t-eyebrow text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)] print:hidden"
           >
             Скачать эту страницу в PDF
-            <ArrowDown data-arrow="down" className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+            <ArrowDown data-arrow="down" className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-y-0.5" />
           </a>
         }
       />
@@ -581,6 +582,7 @@ export function InternalExpertsPage() {
           kicker="Опыт ключевых сотрудников — в работу всей команды"
           title={<>Как опыт ключевых сотрудников становится рабочим инструментом команды</>}
           lead="В каждой организации есть люди, которые нашли работающие решения. Мы переводим их способ работы в инструменты, которыми пользуется вся команда."
+          guide="Сначала — как устроено решение, затем — бизнес-эффект и первый шаг."
           actions={
             <>
               <CtaButton path={path} />
@@ -636,8 +638,8 @@ export function InternalExpertsPage() {
               {pathSteps.map((step, i) => (
                 <motion.div key={step} {...reveal(i)} className="relative">
                   <div className="surface-dark flex h-full flex-col rounded-md p-5">
-                    <Stencil n={i + 1} active className="t-caption" />
-                    <div className="mt-3 font-display t-body font-medium text-[color:var(--color-text-inverse)]">
+                    <Stencil n={i + 1} active className="t-small" />
+                    <div className="mt-3 font-display t-body font-semibold text-[color:var(--color-text-inverse)]">
                       {step}
                     </div>
                   </div>
@@ -689,7 +691,7 @@ export function InternalExpertsPage() {
                       className="h-5 w-5 text-[color:var(--color-accent-glass)]"
                     />
                   </div>
-                  <div className="mt-4 font-display t-body font-medium text-[color:var(--color-text-inverse)]">{t}</div>
+                  <div className="mt-4 font-display t-body font-semibold text-[color:var(--color-text-inverse)]">{t}</div>
                   <p className="mt-2.5 t-body text-[color:var(--color-text-inverse-2)]">{d}</p>
                 </motion.div>
               ))}
@@ -742,7 +744,7 @@ export function InternalExpertsPage() {
               </div>
             </div>
             <PaperCard className="mt-10 max-w-3xl border-l-[3px] border-l-[color:var(--color-accent)] p-6">
-              <p className="font-display t-body font-medium">
+              <p className="font-display t-body font-semibold">
                 Инвестиция: 60 000 ₽ · Срок: 7–14 дней
               </p>
             </PaperCard>
@@ -785,6 +787,7 @@ export function InternalExpertsEffectPage() {
         <PageHead
           kicker="Бизнес-эффект · Внутренние эксперты"
           title={<>Что меняется для бизнеса</>}
+          guide="Цифры и эффекты решения; дальше — первый шаг и разбор задачи."
           actions={
             <>
               <CtaButton path={path} />
@@ -897,7 +900,7 @@ export function InternalExpertsEffectPage() {
                 встречается ни разу (формулировка дословно из /business-effect,
                 экран 9; размещение согласовано 03.08) */}
             <PaperCard className="mt-10 max-w-3xl border-l-[3px] border-l-[color:var(--color-accent)] p-6">
-              <p className="font-display t-body font-medium">
+              <p className="font-display t-body font-semibold">
                 Первый шаг: карта экспертности, 60 000 ₽, 7–14 дней
               </p>
               <span className="mt-2 block">
@@ -972,6 +975,7 @@ export function TeamSubscriptionPage() {
           kicker="Реализация большого объёма обучения без потери качества"
           title={<>План обучения выполняется, а&nbsp;штат не растет</>}
           lead="Полная команда производства обучения — методолог, руководитель проекта, сборка — работает на согласованный объем за фиксированную сумму в месяц."
+          guide="Ниже — состав подписки и цена; дальше — бизнес-эффект решения."
           actions={
             <>
               <CtaButton path={path} />
@@ -1024,7 +1028,7 @@ export function TeamSubscriptionPage() {
                         <Stencil n={i + 1} active className="t-body" />
                         <span className="h-px w-6 bg-[color:var(--color-line)]" />
                       </div>
-                      <div className="mt-4 font-display t-body font-bold">{t}</div>
+                      <div className="mt-4 font-display t-body font-semibold">{t}</div>
                       <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
                     </PaperCard>
                   </motion.div>
@@ -1138,6 +1142,7 @@ export function TeamSubscriptionEffectPage() {
         <PageHead
           kicker="Бизнес-эффект · Команда по подписке"
           title={<>Что меняется для бизнеса</>}
+          guide="Цифры и эффекты подписки; дальше — как устроена работа."
           actions={
             <>
               <CtaButton path={path} />
@@ -1174,7 +1179,7 @@ export function TeamSubscriptionEffectPage() {
             </div>
             {/* Первый шаг — дословно из /business-effect, экран 9 */}
             <PaperCard className="mt-10 max-w-3xl border-l-[3px] border-l-[color:var(--color-accent)] p-6">
-              <p className="font-display t-body font-medium">
+              <p className="font-display t-body font-semibold">
                 Первый шаг: разбор объема и плана на квартал
               </p>
               <span className="mt-2 block">
@@ -1218,6 +1223,7 @@ export function ExternalExpertsPage() {
           kicker="Ускорение запуска новых направлений в бизнесе"
           title={<>Практика, которой внутри нет — без&nbsp;долгого поиска и консалтинга</>}
           lead="Находим практика с рынка, переводим его опыт в материалы компании — и этот опыт остается у вас по окончании проекта."
+          guide="Ниже — путь и сроки; дальше — бизнес-эффект и разбор задачи."
           actions={
             <>
               <CtaButton path={path} />
@@ -1308,6 +1314,7 @@ export function ExternalExpertsEffectPage() {
         <PageHead
           kicker="Бизнес-эффект · Внешние эксперты"
           title={<>Что меняется для вас</>}
+          guide="Цифры и эффекты решения; дальше — как мы находим практика."
           actions={
             <>
               <CtaButton path={path} />
@@ -1375,7 +1382,7 @@ export function ExternalExpertsEffectPage() {
             </div>
 
             <div className="tint-ink mt-10 max-w-3xl rounded-md border-l-2 border-[color:var(--color-accent)] p-6 md:p-7">
-              <div className="t-eyebrow text-[color:var(--color-accent-soft,#E9C4BD)]">Что изменилось</div>
+              <div className="t-eyebrow text-[color:var(--color-accent-text)]">Что изменилось</div>
               <p className="mt-3 t-body text-[color:var(--color-text-inverse)]">
                 Команды перестроили предложение под клиента. В результате отток
                 клиентской базы снизился на 16% — по данным заказчика.
@@ -1392,7 +1399,7 @@ export function ExternalExpertsEffectPage() {
 
             {/* Первый шаг — дословно из /business-effect, экран 9 */}
             <div className="tint-ink mt-10 max-w-3xl rounded-md border-l-2 border-[color:var(--color-accent)] p-6">
-              <p className="font-display t-body font-medium text-[color:var(--color-text-inverse)]">
+              <p className="font-display t-body font-semibold text-[color:var(--color-text-inverse)]">
                 Первый шаг: профили практиков за 72 часа, бесплатно
               </p>
               <span className="mt-2 block">

@@ -38,8 +38,8 @@ export function Hero() {
           className="absolute inset-y-0 left-0 right-0"
           style={{
             backgroundImage:
-              "repeating-linear-gradient(to right, rgba(241,239,234,0.055) 0 1px, transparent 1px 8.3333%)," +
-              "repeating-linear-gradient(to bottom, rgba(241,239,234,0.035) 0 1px, transparent 1px 88px)",
+              "repeating-linear-gradient(to right, rgba(232,238,247,0.055) 0 1px, transparent 1px 8.3333%)," +
+              "repeating-linear-gradient(to bottom, rgba(232,238,247,0.035) 0 1px, transparent 1px 88px)",
             WebkitMaskImage: "linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent)",
             maskImage: "linear-gradient(to bottom, transparent, #000 18%, #000 82%, transparent)",
           }}
@@ -52,7 +52,7 @@ export function Hero() {
           style={{
             background:
               "radial-gradient(120% 90% at 78% 18%, rgba(201,205,212,0.06), transparent 58%)," +
-              "radial-gradient(80% 70% at 12% 96%, rgba(163,86,75,0.10), transparent 62%)",
+              "radial-gradient(80% 70% at 12% 96%, rgba(126,92,158,0.10), transparent 62%)",
           }}
         />
 
@@ -74,16 +74,15 @@ export function Hero() {
             «Ваша внешняя команда по обучению» — стала заголовком, образ
             «мощностей» ушёл в надзаголовок. Обе формулировки её, дословно. */}
         <div className="mb-6 [--color-text-secondary:var(--color-text-inverse-2)]">
-          <SectionLabel n="00">Дополнительные мощности для вашей T&D-команды</SectionLabel>
+          <SectionLabel n="01">Дополнительные мощности T&D</SectionLabel>
         </div>
         <RevealHeading as="h1" className="t-h1 max-w-[900px] text-[color:var(--color-text-inverse)]">
           Ваша внешняя команда по обучению
         </RevealHeading>
 
         <p className="t-body measure mt-6 text-[color:var(--color-text-inverse)]/85 md:mt-7">
-          Берём на себя реализацию T&D-проектов: поиск внешних экспертов,
-          перевод ваших рабочих практик в обучающие материалы, управляем
-          проектами и собираем продукты обучения.
+          Реализуем проекты — от привлечения внешних экспертов до готовых
+          образовательных продуктов.
         </p>
 
         {/* Одно главное действие — сразу под смыслом, до всех аргументов */}
@@ -95,35 +94,40 @@ export function Hero() {
             </a>
             <a
               href="/business-effect"
-              className="link-arrow group t-body"
+              className="link-arrow group t-eyebrow text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
             >
               Бизнес-эффект от сотрудничества
-              <ArrowUpRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              <ArrowUpRight data-arrow className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </a>
           </div>
         </div>
 
-        {/* Четыре аргумента — легче H1: ниже по макету, приглушённое стекло.
-            Цена добавлена 04.08 по решению Виктории. «1 час эксперта» поднят
-            туда же из FAQ (разбор 04.08): для HR это главный барьер — сколько
-            времени проекта съест их носитель опыта. */}
-        <div className="relative mt-12 grid max-w-5xl gap-3 sm:grid-cols-2 lg:grid-cols-4 md:mt-16">
+        {/* Три плитки жидкого стекла: что от вас нужно → что произойдёт → цена */}
+        <div className="relative mt-12 grid max-w-4xl items-stretch gap-4 sm:grid-cols-3 md:mt-16">
           {[
-            ["Без ТЗ", "Принимаем вводные в любом виде и собираем из них архитектуру решения и план работ"],
-            ["24 часа", "После согласования назначаем команду и проводим стартовую встречу"],
-            ["1 час эксперта", "30 минут на старте и 30 на финальной сверке. Остальное — работа методолога"],
-            ["от 180 000 ₽", "Подписка на команду, задачи ставите вы"],
-          ].map(([label, desc]) => (
-            <GlassCard key={label} dark interactive className="px-4 py-4 md:px-5 md:py-5">
-              <div className="font-display t-body font-medium text-[color:var(--color-text-inverse)]">
+            ["Без ТЗ", "Вводные в любом виде"],
+            ["24 часа", "Старт со своей командой"],
+            ["от 180 000 ₽", "Подписка на команду"],
+          ].map(([label, desc], i) => (
+            <div
+              key={label}
+              className="lg lg-dark flex h-full flex-col rounded-2xl p-5 md:p-6"
+            >
+              <div
+                className={`font-display tabular-nums text-[color:var(--color-text-inverse)] ${
+                  i === 2 ? "t-h2 tracking-[-0.02em]" : "t-body font-semibold"
+                }`}
+              >
                 {label}
               </div>
-              <p className="t-body mt-1.5 text-[color:var(--color-text-inverse-2)]">
+              <p className="t-body mt-auto pt-2 text-[color:var(--color-text-inverse-2)]">
                 {desc}
               </p>
-            </GlassCard>
+            </div>
           ))}
         </div>
+
+
 
         {/* Явный указатель прокрутки: экран заканчивается, страница — нет */}
         <a
@@ -165,7 +169,7 @@ export function Bricks() {
         <div className="mt-8 flex flex-col gap-x-14 gap-y-4 sm:flex-row">
           {numbers.map(([n, d]) => (
             <div key={n} className="flex items-baseline gap-3">
-              <span className="font-display t-h2 font-medium tabular-nums tracking-[-0.02em]">{n}</span>
+              <span className="font-display t-h2 tabular-nums tracking-[-0.02em]">{n}</span>
               <span className="max-w-[240px] t-body text-[color:var(--color-text-secondary)]">{d}</span>
             </div>
           ))}
@@ -193,7 +197,7 @@ export function Bricks() {
                 }`}
               >
                 <div className="flex items-start justify-between gap-2">
-                  <span className="font-display t-body font-medium tracking-[-0.01em] text-[color:var(--color-text-primary)]">
+                  <span className="font-display t-body font-semibold tracking-[-0.01em] text-[color:var(--color-text-primary)]">
                     {b.name}
                   </span>
                   {b.year && (
@@ -203,7 +207,7 @@ export function Bricks() {
                   )}
                 </div>
                 {b.href && (
-                  <span className="mt-3 inline-flex items-center gap-1.5 t-caption font-medium text-[color:var(--color-steel)] transition group-hover:text-[color:var(--color-accent)]">
+                  <span className="mt-3 inline-flex items-center gap-1.5 t-eyebrow text-[color:var(--color-steel)] transition group-hover:text-[color:var(--color-accent)]">
                     Отзыв клиента
                     <ArrowUpRight data-arrow="diag" className="h-3.5 w-3.5" />
                   </span>
@@ -239,7 +243,7 @@ export function NumbersBand() {
             <div key={n} className="relative pt-6">
               <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-[color:var(--color-line)]" />
               <span aria-hidden className="tex-chrome absolute left-0 top-0 h-[2px] w-12 rounded-pill" />
-              <div className="font-display t-number font-medium tabular-nums tracking-[-0.02em]">{n}</div>
+              <div className="font-display t-number tabular-nums tracking-[-0.02em]">{n}</div>
               <p className="mt-4 max-w-xs t-body text-[color:var(--color-text-secondary)]">{d}</p>
             </div>
           ))}
@@ -289,7 +293,7 @@ export function Production() {
                   className="h-5 w-5 text-[color:var(--color-accent-glass)]"
                 />
               </div>
-              <div className="mt-4 font-display t-body font-medium tracking-tight">{t}</div>
+              <div className="mt-4 font-display t-body font-semibold tracking-tight">{t}</div>
               <p className="mt-2.5 t-body text-[color:var(--color-text-inverse-2)]">{d}</p>
             </motion.div>
           ))}
@@ -339,10 +343,10 @@ export function WhenNeeded() {
                     <Stencil n={i + 1} active className="t-body" />
                     <LineIcon
                       name={(["handoff", "graph", "insight"] as const)[i]}
-                      className="h-7 w-7 text-[color:var(--color-text-inverse-2)] transition-colors duration-300 group-hover:text-[color:var(--color-accent-soft,var(--color-accent))]"
+                      className="h-7 w-7 text-[color:var(--color-text-inverse-2)] transition-colors duration-300 group-hover:text-[color:var(--color-accent-text)]"
                     />
                   </div>
-                  <h3 className="mt-3 font-display t-body font-medium text-[color:var(--color-text-inverse)]">
+                  <h3 className="mt-3 font-display t-body font-semibold text-[color:var(--color-text-inverse)]">
                     {it.situation}
                   </h3>
                   <p className="mt-3 t-body text-[color:var(--color-text-inverse-2)]">
@@ -374,7 +378,7 @@ export function WhenNeeded() {
 /* Брендбук: плотная сетка на волосяных линиях, трафаретная нумерация,
    срез угла (notch), без «надутых» макетов и крупных плашек. */
 
-export function Flow() {
+export function Flow({ n = "02" }: { n?: string } = {}) {
   const stages = [
     { n: "01", t: "2 рабочих часа", d: "отвечаем на заявку" },
     { n: "02", t: "30 минут", d: "проводим первичный разбор" },
@@ -387,10 +391,11 @@ export function Flow() {
     <section className="stage sec-dark grain border-b border-[color:var(--color-line-dark)]">
       <Scene blobs={[{ className: "-right-56 bottom-0", tone: "rose", size: 280 }]} />
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="02">Схема взаимодействия</SectionLabel>
+        <SectionLabel n={n}>Схема взаимодействия</SectionLabel>
         <h2 className="t-h2 mt-6 max-w-3xl">
-          Как мы двигаемся от заявки до старта работы
+          Как мы двигаемся от заявки до приёмки этапа
         </h2>
+
 
         <div className="mt-7 overflow-hidden rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-surface)]">
           {/* Общий путь — компактный рельс */}
@@ -406,7 +411,7 @@ export function Flow() {
                     : "",
                 ].join(" ")}
               >
-                <span className="stencil flex-none t-caption tracking-[0.2em] text-[color:var(--color-accent)]">
+                <span className="stencil flex-none t-small text-[color:var(--color-accent)]">
                   {s.n}
                 </span>
                 <span
@@ -414,7 +419,7 @@ export function Flow() {
                   className="h-px w-4 flex-none bg-[color:var(--color-line)]"
                 />
                 <div className="min-w-0 flex items-baseline gap-2 flex-wrap">
-                  <span className="font-display t-body font-medium tracking-tight">
+                  <span className="font-display t-body font-semibold tracking-tight">
                     {s.t}
                   </span>
                   <span className="t-caption text-[color:var(--color-text-secondary)]">
@@ -461,7 +466,7 @@ export function Flow() {
                   </div>
                 </div>
                 <div className="mt-2 flex items-baseline gap-2 flex-wrap">
-                  <span className="font-display t-body font-medium tracking-tight text-foreground">
+                  <span className="font-display t-body font-semibold tracking-tight text-foreground">
                     {b.time}
                   </span>
                   <span className="t-caption text-[color:var(--color-text-secondary)]">
@@ -471,11 +476,75 @@ export function Flow() {
               </motion.div>
             ))}
           </div>
+
+          {/* Общий финал: обе ветки сходятся в один результат */}
+          <div className="flex items-start gap-3 border-t border-[color:var(--color-line)] bg-[color:var(--color-bg)] px-4 py-3.5 md:px-5">
+            <span className="stencil flex-none t-small text-[color:var(--color-accent)]">03</span>
+            <span aria-hidden className="mt-[0.7em] h-px w-4 flex-none bg-[color:var(--color-line)]" />
+            <div className="min-w-0 flex items-baseline gap-2 flex-wrap">
+              <span className="font-display t-body font-semibold tracking-tight">
+                Старт работы и приёмка этапа
+              </span>
+              <span className="t-caption text-[color:var(--color-text-secondary)]">
+                — этап закрывается по критериям, зафиксированным до начала работы
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
   );
 }
+
+/* --------------------------- Ритм работы (как идёт) ------------------------ */
+/* Схема заканчивалась на старте; клиенту нужен ответ, что происходит дальше:
+   кто контакт, как часто статус, чем закрывается этап и что при отклонении. */
+
+export function WorkRhythm({ n = "02" }: { n?: string } = {}) {
+  const rows: [string, string][] = [
+    [
+      "Одно контактное лицо",
+      "руководитель проекта с нашей стороны отвечает за сроки и результат; общение — в вашем канале (почта, Telegram или ваш таск-трекер)",
+    ],
+    [
+      "Статус — раз в неделю",
+      "короткая сводка: что сделано, что в работе, что нужно от вас и где риск по срокам",
+    ],
+    [
+      "Приёмка — по этапам",
+      "каждый этап закрывается материалом, который можно использовать самостоятельно, и сверкой с критериями приёмки",
+    ],
+    [
+      "Отклонение — наша зона",
+      "если результат этапа не совпал с критериями, дорабатываем за свой счёт; замена эксперта в проекте — тоже на нашей стороне",
+    ],
+  ];
+  return (
+    <section className="stage border-b border-[color:var(--color-line)]">
+      <Scene blobs={[{ className: "-right-40 top-10", tone: "chrome", size: 420 }]} />
+      <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
+        <SectionLabel n={n}>Как идёт работа</SectionLabel>
+        <RevealHeading className="t-h2 mt-6 max-w-3xl">
+          Что происходит после старта
+        </RevealHeading>
+        <ul className="mt-10 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
+          {rows.map(([t, d], i) => (
+            <motion.li key={t} {...reveal(i)} className="py-5">
+              <div className="flex items-start gap-4">
+                <NodeBullet className="mt-[0.55em]" />
+                <div className="min-w-0">
+                  <div className="font-display t-body font-semibold text-foreground">{t}</div>
+                  <p className="mt-1.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
+                </div>
+              </div>
+            </motion.li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  );
+}
+
 
 
 
@@ -495,102 +564,89 @@ export function CaseCard({ item, index, teaser = false }: { item: CaseItem; inde
       className="h-full scroll-mt-28"
     >
       <div className="card-static group flex h-full flex-col overflow-hidden rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-bg)] shadow-none">
-        {/* Шапка — матовое чёрное стекло: название кейса лежит на угольной
-            пластине, под ней узловая сцена (брендбук, разд. 7).
-            Под текстом — затемняющий скрим: держит контраст ≥ 7:1 даже
-            там, где проходит светлый блик. */}
+        {/* Шапка — чистая угольная пластина. Один слой подложки: узловая
+            сцена на низкой непрозрачности. Никаких цветных градиентов —
+            они давали «пятнистый» чёрный. */}
         <div className="relative overflow-hidden bg-[color:var(--color-coal,#131417)] px-5 py-6 sm:px-6 sm:py-7 md:px-7">
           <div className="absolute inset-0" aria-hidden>
             <NodeScene
-              className="!left-auto !right-[4%] !top-[8%] !h-[84%] text-[color:var(--color-text-inverse-2)]"
-              opacity={0.5}
+              className="!left-auto !right-[4%] !top-[8%] !h-[84%] text-[color:var(--color-text-secondary)]"
+              opacity={0.22}
             />
-            <div
-              className="absolute inset-0 transition-[backdrop-filter,opacity] duration-500 group-hover:[backdrop-filter:blur(20px)_saturate(140%)]"
-              style={{
-                background:
-                  "radial-gradient(120% 100% at 88% 6%, rgba(233,196,189,0.16), transparent 58%)",
-                backdropFilter: "blur(14px) saturate(120%)",
-              }}
-            />
-            {/* Матовый скрим — запас по читаемости */}
-            <div
-              className="absolute inset-0 opacity-90 transition-opacity duration-500 group-hover:opacity-100"
-              style={{
-                background:
-                  "linear-gradient(180deg, rgba(4,6,9,0.62) 0%, rgba(4,6,9,0.5) 55%, rgba(4,6,9,0.66) 100%)",
-              }}
-            />
-            {/* Верхняя кромка-линза, ярче при наведении */}
-            <div className="absolute inset-x-0 top-0 h-px bg-white/10 transition-colors duration-500 group-hover:bg-white/25" />
+            <div className="absolute inset-x-0 top-0 h-px bg-white/10 transition-colors duration-500 group-hover:bg-white/20" />
           </div>
 
           <div className="relative grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
-            <div className="t-eyebrow min-w-0 text-[color:var(--color-accent-soft,#F5E4E1)]">
+            <div className="case-meta min-w-0 text-[color:var(--color-text-inverse-2)]">
               {item.category}
             </div>
             {item.nda && (
-              <span className="shrink-0 rounded-pill border border-white/40 px-2 py-1 t-label text-[color:var(--color-text-inverse)]">
+              <span className="case-label shrink-0 rounded-pill border border-white/25 px-2 py-1 text-[color:var(--color-text-inverse-2)]">
                 NDA
               </span>
             )}
           </div>
 
-          <h3 className="relative mt-3 font-display t-body font-bold text-balance text-[color:var(--color-text-inverse)] transition-[color,text-shadow] duration-300 [overflow-wrap:anywhere] group-hover:text-[color:var(--color-accent-soft,#F5E4E1)] group-hover:[text-shadow:0_0_22px_rgba(245,228,225,0.35)]">
+          <h3 className="case-title relative mt-4 text-balance text-[color:var(--color-text-inverse)] transition-colors duration-300 [overflow-wrap:anywhere] group-hover:text-[color:var(--color-accent-text)]">
             {item.title}
           </h3>
 
-          <div className="relative mt-2 flex flex-wrap items-center gap-x-2.5 gap-y-1 t-body text-[color:var(--color-text-inverse-2)]">
+          <div className="case-body relative mt-4 max-w-[60ch] text-[color:var(--color-text-inverse-2)]">
             {item.link ? (
               <a
                 href={item.link}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex min-w-0 items-center gap-1 font-medium text-[color:var(--color-text-inverse)] transition hover:text-[color:var(--color-accent-soft,#F5E4E1)]"
+                className="inline-flex min-w-0 items-center gap-1 text-[color:var(--color-text-inverse-2)] underline-offset-4 transition hover:text-[color:var(--color-accent-text)] hover:underline"
               >
                 <span className="min-w-0 [overflow-wrap:anywhere]">{item.client}</span>
                 <ArrowUpRight data-arrow className="h-3.5 w-3.5 shrink-0" />
               </a>
             ) : (
-              <span className="min-w-0 font-medium text-[color:var(--color-text-inverse)] [overflow-wrap:anywhere]">
+              <span className="min-w-0 [overflow-wrap:anywhere]">
                 {item.client}
               </span>
             )}
-            <span className="hidden text-[color:var(--color-text-inverse-2)]/70 sm:inline">·</span>
-            <span className="min-w-0 [overflow-wrap:anywhere]">{item.role}</span>
+            {item.role && (
+              <p className="mt-1.5 [overflow-wrap:anywhere]">{item.role}</p>
+            )}
+          </div>
+
+
+        </div>
+
+
+
+        <div className="flex flex-1 flex-col gap-8 p-5 sm:p-6 md:p-7">
+
+        {/* Метрики без плиток: цифры живут на общем фоне, разделены
+            вертикальными хайрлайнами. Выравнивание — по левому краю,
+            как весь остальной текст карточки. */}
+        <div className="space-y-4">
+          <div className="case-meta text-[color:var(--color-text-secondary)]">Цифры проекта</div>
+          <div className={`grid gap-y-0 ${item.metrics.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
+            {item.metrics.slice(0, 3).map(([value, label], i) => (
+              <div
+                key={label}
+                className={`min-w-0 border-t border-[color:var(--color-line)] py-4 first:border-t-0 first:pt-0 sm:border-l sm:border-t-0 sm:px-5 sm:py-0 sm:first:border-l-0 sm:first:pl-0`}
+              >
+                <div className="case-title tabular-nums text-[color:var(--color-accent)] [overflow-wrap:anywhere] hyphens-none">
+                  {value}
+                </div>
+                <div className="case-body mt-1 text-[color:var(--color-text-secondary)] [overflow-wrap:anywhere]">
+                  {label}
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-
-        <div className="flex flex-1 flex-col gap-5 p-5 sm:p-6 md:p-7">
-
-
-        <div className="space-y-2">
-        <div className="t-label text-[color:var(--color-text-secondary)]">Цифры проекта</div>
-        <div className={`grid grid-cols-2 gap-2 sm:gap-2.5 ${item.metrics.length === 3 ? "sm:grid-cols-3" : "sm:grid-cols-2"}`}>
-          {item.metrics.slice(0, 3).map(([value, label]) => (
-            <div
-              key={label}
-              className="flex min-w-0 flex-col items-center justify-start rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)] px-2 py-3 text-center transition group-hover:border-[color:var(--color-accent)]/20 group-hover:bg-[color:var(--color-bg-secondary)]"
-            >
-              <div className="w-full font-display t-body font-medium tabular-nums tracking-[-0.015em] text-[color:var(--color-accent)] [overflow-wrap:anywhere] hyphens-none">
-                {value}
-              </div>
-              <div className="t-caption mt-1 text-[color:var(--color-text-secondary)] [overflow-wrap:anywhere]">
-                {label}
-              </div>
-            </div>
-          ))}
-        </div>
-        </div>
-
-
         {!teaser && item.done && item.done.length > 0 && (
-          <div className="space-y-2">
-            <div className="t-eyebrow text-[color:var(--color-text-secondary)]">
+          <div className="space-y-4">
+            <div className="case-meta text-[color:var(--color-text-secondary)]">
               Что сделано
             </div>
-            <ul className="space-y-1.5 t-body text-[color:var(--color-text-primary)]">
+            <ul className="case-body max-w-[65ch] space-y-2 text-[color:var(--color-text-primary)]">
               {item.done.map((d) => (
                 <li key={d} className="flex items-start gap-2.5">
                   <NodeBullet active={false} className="mt-[0.5em] !h-[6px] !w-[6px]" />
@@ -601,34 +657,36 @@ export function CaseCard({ item, index, teaser = false }: { item: CaseItem; inde
           </div>
         )}
 
+        {/* Единственный акцент карточки: тонкая линия слева, без заливки. */}
         {item.changed && (
-          <div className="rounded-sm border-l-[3px] border-[color:var(--color-accent)] bg-[color:var(--color-accent)]/5 px-4 py-3">
-            <div className="t-label text-[color:var(--color-text-secondary)]">
+          <div className="border-l border-[color:var(--color-accent)] pl-4">
+            <div className="case-meta text-[color:var(--color-text-secondary)]">
               Что изменилось у клиента
             </div>
-            <p className="mt-1 t-body font-medium text-foreground/90">{item.changed}</p>
+            <p className="case-body mt-3 max-w-[65ch] text-[color:var(--color-text-secondary)]">{item.changed}</p>
             {/* Разбор 04.08: метрики кейса и гарантии противоречили друг
                 другу — в кейсах мы мерили себя оттоком и выручкой, а в
                 гарантиях от бизнес-показателей открещивались. Атрибуция
                 снимает противоречие, не убирая цифры. */}
-            <p className="mt-2 t-small text-[color:var(--color-text-secondary)]/80">
+            <p className="case-meta mt-3 max-w-[65ch] text-[color:var(--color-text-secondary)]">
               По данным заказчика. Обучение — один из факторов, влияющих на эти показатели.
             </p>
           </div>
         )}
 
         {item.effectHref && (
-          <a href={item.effectHref} className="link-arrow group w-max t-body">
+          <a href={item.effectHref} className="link-arrow case-body group w-max font-semibold">
             Бизнес-эффект и цифры
             <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </a>
         )}
 
         {!teaser && item.source && (
-          <p className="mt-auto t-small italic text-[color:var(--color-text-secondary)]/70">
+          <p className="case-meta mt-auto max-w-[65ch] text-[color:var(--color-text-secondary)]">
             {item.source}
           </p>
         )}
+
         </div>
       </div>
 
@@ -644,38 +702,41 @@ export function CasesBlock({
   limit,
   moreHref,
   teaser = false,
+  proofHeader = false,
 }: {
   compactHeader?: boolean;
   limit?: number;
   moreHref?: string;
   teaser?: boolean;
+  proofHeader?: boolean;
 }) {
   const all = visibleCases();
   const items = limit ? all.slice(0, limit) : all;
   return (
-    <section id="cases" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
+    <section id="cases" className={`stage bg-[color:var(--color-bg-primary)] ${proofHeader ? "" : "border-b border-[color:var(--color-line)]"}`}>
       <Scene blobs={[{ className: "-right-40 top-10", tone: "chrome", size: 600 }, { className: "-left-40 bottom-10", tone: "chrome", size: 520 }]} />
 
-      <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+      <div className={`relative mx-auto max-w-7xl px-5 md:px-8 ${proofHeader ? "sec-pad-t" : "sec-pad"}`}>
         {!compactHeader && (
           <>
-            <SectionLabel n="03">Результаты клиентов</SectionLabel>
+            <SectionLabel n="03">{proofHeader ? "Доказательства" : "Результаты клиентов"}</SectionLabel>
             <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
               <RevealHeading className="t-h2 max-w-3xl">
-                Кейсы с конкретными метриками
+                {proofHeader ? "Результаты клиентов и их слова" : "Кейсы с конкретными метриками"}
               </RevealHeading>
-              <p className="max-w-md text-[color:var(--color-text-secondary)]">
+              <p className="t-body max-w-md text-[color:var(--color-text-secondary)]">
                 Реальные проекты: от запусков продуктов до корпоративных программ и MVP ДПО.
               </p>
             </div>
           </>
         )}
         <div className={`grid items-stretch gap-6 md:grid-cols-2 ${compactHeader ? "" : "mt-14"}`}>
+
           {items.map((item, i) => (
             <CaseCard key={item.title} item={item} index={i} teaser={teaser} />
           ))}
         </div>
-        {moreHref && all.length > items.length && (
+        {moreHref && !proofHeader && all.length > items.length && (
           <a href={moreHref} className="link-arrow group mt-8 t-body">
             Все кейсы
             <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
@@ -687,54 +748,33 @@ export function CasesBlock({
 }
 
 /* -------------------------------- Команда --------------------------------- */
-/* Обратная связь клиентов 04.08: на главной не хватало лиц — до /team люди
-   просто не доходили. Экран команды продублирован сюда 1:1 (карточка
-   владелицы + три лица), тексты и вёрстка — те же, что на /team, дальше
-   кнопка «Подробнее» ведёт на «О нас». */
+/* Приёмка 05.08: на главной команда короткая — лица, одна строка о составе
+   и ссылка на /team. Развёрнутый экран живёт на отдельной странице. */
 
 export function TeamBlock() {
   const founder = TEAM.find((p) => p.founder)!;
   const others = TEAM.filter((p) => !p.founder);
+  const people = [founder, ...others];
   return (
     <section id="team" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <Scene blobs={[{ className: "-right-40 top-10", tone: "rose", size: 520 }]} />
 
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="01">О нас</SectionLabel>
+        <SectionLabel n="04">О нас</SectionLabel>
         <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
           <RevealHeading className="t-h2 max-w-3xl">
             Команда и сеть экспертов
           </RevealHeading>
-          <p className="max-w-md text-[color:var(--color-text-secondary)]">
-            Люди, которые отвечают за результат вашего проекта, и профессиональная сеть практиков за ними.
+          <p className="t-body max-w-md text-[color:var(--color-text-secondary)]">
+            Четыре человека отвечают за результат, за ними — сеть практиков.
           </p>
         </div>
 
-        <PaperCard className="mt-12 overflow-hidden p-0">
-          <div className="grid items-stretch md:grid-cols-[320px_1fr]">
-            <div className="relative min-h-[320px] bg-[color:var(--color-chrome)]/10 md:min-h-0">
-              <img
-                src={founder.photo}
-                alt={founder.name}
-                loading="lazy"
-                className="absolute inset-0 h-full w-full object-cover object-top grayscale"
-              />
-            </div>
-            <div className="p-7 md:p-10">
-              <div className="t-eyebrow text-[color:var(--color-accent)]">
-                Владелица агентства
-              </div>
-              <h3 className="mt-2 font-display t-body font-medium">{founder.name}</h3>
-              <p className="mt-1 t-body text-[color:var(--color-text-secondary)]">{founder.role} · {founder.fact}</p>
-            </div>
-          </div>
-        </PaperCard>
-
-        <div className="mt-6 grid items-stretch gap-5 sm:grid-cols-3">
-          {others.map((p, i) => (
+        <div className="mt-10 grid items-stretch gap-5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+          {people.map((p, i) => (
             <motion.div key={p.slug} {...reveal(i)} className="h-full">
               <PaperCard className="flex h-full flex-col overflow-hidden p-0">
-                <div className="aspect-[4/3] w-full overflow-hidden bg-[color:var(--color-bg-secondary)]">
+                <div className="aspect-[4/5] w-full overflow-hidden bg-[color:var(--color-bg-secondary)]">
                   <img
                     src={p.photo}
                     alt={p.name}
@@ -742,24 +782,37 @@ export function TeamBlock() {
                     className="h-full w-full object-cover object-top grayscale transition duration-500 hover:grayscale-0"
                   />
                 </div>
-                <div className="p-6">
-                  <div className="font-display t-body font-bold">{p.name}</div>
-                  <p className="mt-1 t-caption font-medium uppercase tracking-wide text-[color:var(--color-text-secondary)]">{p.role}</p>
-                  <p className="mt-3 t-body text-[color:var(--color-text-primary)]">{p.fact}</p>
+                <div className="p-5">
+                  <div className="font-display t-body font-semibold">{p.name}</div>
+                  <p className="mt-1 t-eyebrow text-[color:var(--color-text-secondary)]">{p.role}</p>
                 </div>
               </PaperCard>
             </motion.div>
           ))}
+          {/* Пятая плитка — сеть практиков за командой (портретов на неё нет) */}
+          <motion.a href="/team" {...reveal(people.length)} className="h-full">
+            <PaperCard className="card-link group flex h-full flex-col justify-between p-5">
+              <span className="font-display t-h2 tabular-nums tracking-[-0.02em]">30+</span>
+              <div>
+                <div className="font-display t-body font-semibold">Сеть практиков</div>
+                <p className="mt-1 t-eyebrow text-[color:var(--color-text-secondary)]">
+                  Подключаем под задачу
+                </p>
+              </div>
+            </PaperCard>
+          </motion.a>
         </div>
 
-        <a href="/team" className="btn btn-secondary group mt-8">
-          <span>Подробнее</span>
+
+        <a href="/team" className="link-arrow group mt-8 t-body">
+          Подробнее о команде и сети экспертов
           <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
         </a>
       </div>
     </section>
   );
 }
+
 
 /* -------------------------------- Отзывы ---------------------------------- */
 /* Компактные карточки 3 в ряд (вёрстка согласована 26.07), без карусели. */
@@ -790,7 +843,7 @@ export function ReviewCard({ r, index = 0 }: { r: Review; index?: number }) {
             />
           </div>
           <div className="min-w-0">
-            <div className="font-display t-label font-bold">{r.name}</div>
+            <div className="font-display t-label">{r.name}</div>
             <p className="mt-0.5 t-caption text-[color:var(--color-text-secondary)]">{r.role}</p>
           </div>
         </div>
@@ -802,34 +855,47 @@ export function ReviewCard({ r, index = 0 }: { r: Review; index?: number }) {
 /* Секция светлая (решение 03.08): на телефоне три тёмных экрана цитат подряд
    сливались со следующей тёмной секцией. На главной два отзыва — «Все отзывы»
    теперь ведёт к тому, чего на главной нет. */
-export function ReviewsBlock() {
+export function ReviewsBlock({ bare = false }: { bare?: boolean } = {}) {
   const items = homeReviews();
   return (
     <section id="reviews" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <Scene blobs={[{ className: "-left-40 top-10", tone: "rose", size: 560 }, { className: "-right-40 bottom-10", tone: "chrome", size: 480 }]} />
-      <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="04">Отзывы</SectionLabel>
-        <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <RevealHeading className="t-h2 max-w-3xl">
-            Что говорят клиенты
-          </RevealHeading>
-          <p className="max-w-md text-[color:var(--color-text-secondary)]">
-            О работе методологов «Без Воды» — дословно.
-          </p>
-        </div>
-        <div className="mt-12 grid items-stretch gap-6 md:grid-cols-2">
+      <div className={`relative mx-auto max-w-7xl px-5 md:px-8 ${bare ? "sec-pad-b pt-10 md:pt-12" : "sec-pad"}`}>
+        {!bare && (
+          <>
+            <SectionLabel n="04">Отзывы</SectionLabel>
+            <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
+              <RevealHeading className="t-h2 max-w-3xl">
+                Что говорят клиенты
+              </RevealHeading>
+              <p className="t-body max-w-md text-[color:var(--color-text-secondary)]">
+                О работе методологов «Без Воды» — дословно.
+              </p>
+            </div>
+          </>
+        )}
+        <div className={`grid items-stretch gap-6 md:grid-cols-2 ${bare ? "" : "mt-12"}`}>
           {items.map((r, i) => (
             <ReviewCard key={r.slug} r={r} index={i} />
           ))}
         </div>
-        <a
-          href="/reviews"
-          className="link-arrow group mt-8 t-body"
-        >
-          Все отзывы
-          <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-        </a>
+        <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">
+          {bare && (
+            <a href="/cases" className="link-arrow group t-body">
+              Все кейсы
+              <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+          )}
+          <a
+            href="/reviews"
+            className="link-arrow group t-body"
+          >
+            Все отзывы
+            <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </a>
+        </div>
       </div>
+
     </section>
   );
 }
@@ -868,7 +934,7 @@ export function BookSection() {
               </div>
 
               <div className="flex flex-col justify-center gap-3 p-6 md:p-8">
-                <div className="font-display t-body font-bold">
+                <div className="font-display t-body font-semibold">
                   Книга «Эксперт под ключ»
                 </div>
                 <p className="measure t-body text-[color:var(--color-text-secondary)]">
@@ -895,7 +961,7 @@ export function BookSection() {
 
 /* ------------- NotFit («Когда нужен другой подрядчик») + FAQ ------------- */
 
-export function NotFit() {
+export function NotFit({ n = "07" }: { n?: string } = {}) {
   const items = [
     "требуется подбор сотрудника в штат или аутстаффинг",
     "требуется внедрение организационных изменений за пределами образовательного проекта",
@@ -909,11 +975,15 @@ export function NotFit() {
         { className: "-right-40 bottom-0", tone: "rose", size: 420 },
       ]} />
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="07">Границы</SectionLabel>
+        <SectionLabel n={n}>Границы</SectionLabel>
         <RevealHeading className="mt-6 t-h2 max-w-3xl">
           Когда нужен другой подрядчик
         </RevealHeading>
+        <p className="mt-5 max-w-2xl t-body text-[color:var(--color-text-secondary)]">
+          Три задачи, за которые мы не беремся — честнее сказать это до старта.
+        </p>
         <ul className="mt-10 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
+
           {items.map((t) => (
             <li key={t} className="flex items-start gap-4 py-4 t-body text-[color:var(--color-text-primary)]">
               <NodeBullet className="mt-[0.55em]" />
@@ -921,6 +991,10 @@ export function NotFit() {
             </li>
           ))}
         </ul>
+        <p className="mt-6 max-w-3xl t-body text-[color:var(--color-text-secondary)]">
+          Если задача из этого списка — напишите всё равно: подскажем профиль подрядчика и,
+          где можем, порекомендуем конкретных людей из своей сети.
+        </p>
       </div>
     </section>
   );
@@ -944,9 +1018,9 @@ export function FaqAccordion({ items }: { items: { q: string; a: string }[] }) {
             className={`group flex w-full items-start gap-5 px-2 py-5 text-left transition hover:bg-[color:var(--color-surface)] focus-visible:outline-offset-[-2px] ${isOpen ? "bg-[color:var(--color-surface)]" : ""}`}
           >
 
-            <Stencil n={i + 1} active={isOpen} className="mt-1 t-body" />
+            <Stencil n={i + 1} active={isOpen} className="mt-1 t-small" />
             <div className="flex-1">
-              <div className={`font-display t-body font-bold transition ${isOpen ? "text-foreground" : "text-[color:var(--color-text-primary)] group-hover:text-foreground"}`}>
+              <div className={`font-display t-body font-semibold text-foreground transition ${isOpen ? "" : "group-hover:text-[color:var(--color-accent-text)]"}`}>
                 {item.q}
               </div>
               <AnimatePresence initial={false}>
@@ -979,12 +1053,10 @@ export function FaqAccordion({ items }: { items: { q: string; a: string }[] }) {
    пришедший с главной, выглядел чужим. */
 export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; numbered?: boolean } = {}) {
   const [sent, setSent] = useState(false);
-  const [sentName, setSentName] = useState("");
   const [sending, setSending] = useState(false);
   const [err, setErr] = useState<string | null>(null);
   const [fieldErr, setFieldErr] = useState<{ name?: string | null; contact?: string | null }>({});
   const [pdErr, setPdErr] = useState<string | null>(null);
-  const nameRef = useRef<HTMLInputElement>(null);
   const contactRef = useRef<HTMLInputElement>(null);
   const pdRef = useRef<HTMLInputElement>(null);
   const [pd, setPd] = useState(false);
@@ -1034,23 +1106,26 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
     setErr(null);
     const f = e.currentTarget;
     const data = new FormData(f);
-    const name = String(data.get("name") || "").trim();
     const company = String(data.get("company") || "").trim();
     const contact = String(data.get("contact") || "").trim();
+    /* Имя отдельным полем не спрашиваем (приёмка 05.08): в поле контакта
+       человек пишет и как его зовут, и куда ответить. В API имя обязательно —
+       отправляем ту же строку. */
+    const name = contact;
     const about = String(data.get("about") || "").trim();
     const hp = String(data.get("website") || "");
-    const nameMsg = validate("name", name);
     const contactMsg = validate("contact", contact);
     const pdMsg = pd ? null : "Отметьте согласие на обработку персональных данных.";
-    setFieldErr({ name: nameMsg, contact: contactMsg });
+    setFieldErr({ contact: contactMsg });
     setPdErr(pdMsg);
-    if (nameMsg || contactMsg || pdMsg) {
-      const target = nameMsg ? nameRef.current : contactMsg ? contactRef.current : pdRef.current;
+    if (contactMsg || pdMsg) {
+      const target = contactMsg ? contactRef.current : pdRef.current;
       /* На мобильном поле может уйти под липкую шапку — сначала центрируем. */
       target?.scrollIntoView({ block: "center", behavior: "smooth" });
       target?.focus({ preventScroll: true });
       return;
     }
+
 
     setSending(true);
     try {
@@ -1078,7 +1153,6 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
         }),
       });
       if (!r.ok) throw new Error(String(r.status));
-      setSentName(name);
       setSent(true);
       ymGoal("lead_sent");
     } catch {
@@ -1098,27 +1172,28 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
               <span className="tex-chrome h-[2px] w-12 rounded-pill" />
             ) : (
               <>
-                <span className="font-display t-label font-bold tabular-nums text-[color:var(--color-accent)]">08</span>
+                <span className="font-display t-label tabular-nums text-[color:var(--color-accent)]">08</span>
                 <span className="h-px w-10 bg-[color:var(--color-line)]" />
               </>
             )}
             <span>Контакты</span>
           </div>
           <RevealHeading as={asH1 ? "h1" : "h2"} className={`${asH1 ? "t-h1" : "t-h2"} mt-6 max-w-2xl`}>
-            С чего начинается наше сотрудничество
+            30 минут, без подготовки, с планом на выходе
           </RevealHeading>
           <p className="mt-8 max-w-md t-body text-[color:var(--color-text-secondary)]">
             Расскажите, что должно измениться в работе компании и к какому
             сроку. Готовить презентацию и подробное ТЗ не нужно.
           </p>
           <p className="mt-4 max-w-md t-body text-[color:var(--color-text-secondary)]">
-            30 минут онлайн: сверим задачу, доступные источники опыта и
-            возможный результат первого этапа.
+            На встрече сверим задачу, доступные источники опыта и возможный
+            результат первого этапа.
           </p>
           <p className="mt-4 max-w-md t-body text-[color:var(--color-text-secondary)]">
             Готовитесь выступать на конференции для HR или T&D? Поможем собрать
             выступление — бесплатно. Напишите об этом в заявке.
           </p>
+
 
           <div className="mt-12">
             <StencilLogo className="logo-lg text-[color:var(--color-text-primary)]" />
@@ -1148,7 +1223,7 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
               >
                 <CatMark className="h-24 w-28 text-[color:var(--color-text-inverse)]" strokeWidth={2} />
                 <h3 className="t-body mt-6 text-background">
-                  {sentName ? `Спасибо, ${sentName}!` : "Спасибо!"}
+                  Спасибо!
                 </h3>
                 <p className="mt-3 text-[color:var(--color-text-inverse-2)]">
                   Что дальше:
@@ -1175,13 +1250,20 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
                 transition={{ duration: 0.32, ease: REVEAL_EASE }}
                 className="flex flex-col gap-5"
               >
-                <Field label="Ваше имя" name="name" placeholder="Ирина" dark required autoComplete="name"
-                  inputRef={nameRef} error={fieldErr.name} onBlur={checkField("name")} onInput={clearOnInput("name")} />
-                <Field label="Email / Telegram / телефон" name="contact" placeholder="name@company.ru" dark required
-                  inputRef={contactRef} error={fieldErr.contact} onBlur={checkField("contact")} onInput={clearOnInput("contact")} />
+                <Field
+                  label="Как к вам обращаться и куда ответить"
+                  name="contact"
+                  placeholder="Ирина, name@company.ru или @irina"
+                  dark
+                  required
+                  inputRef={contactRef}
+                  error={fieldErr.contact}
+                  onBlur={checkField("contact")}
+                  onInput={clearOnInput("contact")}
+                />
 
-                <Field label="Компания и роль" name="company" placeholder="Компания, роль" dark autoComplete="organization" />
                 <div>
+
                   <label htmlFor="f-about" className="t-label mb-2 block text-[color:var(--color-text-inverse-2)]">
                     Запрос на разбор
                   </label>
@@ -1193,7 +1275,7 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
                     rows={3}
                     name="about"
                     placeholder="Что должно измениться и к какому сроку"
-                    className="w-full resize-none rounded-sm border border-[color:var(--color-line-dark)] bg-white/5 px-4 py-3 text-base text-[color:var(--color-text-inverse)] outline-none transition placeholder:text-[color:var(--color-text-inverse-2)]/50 focus:border-[color:var(--color-accent-glass)] focus:bg-white/10"
+                    className="w-full resize-none rounded-sm border border-[color:var(--color-line-dark)] bg-white/5 px-4 py-3 t-body text-[color:var(--color-text-inverse)] outline-none transition placeholder:text-[color:var(--color-text-inverse-2)]/50 focus:border-[color:var(--color-accent-glass)] focus:bg-white/10"
                   />
                 </div>
                 <p className="hidden" aria-hidden="true">
