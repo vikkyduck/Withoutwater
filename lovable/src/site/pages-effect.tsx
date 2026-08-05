@@ -385,7 +385,7 @@ export function BusinessEffectGeneralPage() {
                 и ссылка на полный расчёт. */}
             <div className="tint-ink mt-8 max-w-3xl rounded-md border-l-2 border-[color:var(--color-accent)] p-6">
               <p className="font-display t-body font-medium text-[color:var(--color-text-inverse)]">
-                Работа с нами: от 200 000 ₽ в месяц.
+                Работа с нами: от 180 000 ₽ в месяц.
               </p>
               <p className="mt-2 t-body text-[color:var(--color-text-inverse-3,var(--color-text-inverse-2))]">
                 Объем работ в обоих случаях зависит от задач: у нас он
@@ -985,7 +985,7 @@ export function TeamSubscriptionPage() {
         <div id="units" className="relative mx-auto max-w-7xl px-5 sec-pad scroll-mt-28 md:px-8">
           <SectionLabel n="01">Что входит в подписку</SectionLabel>
           <RevealHeading className="t-h2 mt-6 max-w-3xl">
-            Подписка на команду по обучению от 200 000 ₽ в месяц. Состав выбираете вы.
+            Подписка на команду по обучению от 180 000 ₽ в месяц. Состав выбираете вы.
           </RevealHeading>
           <p className="mt-5 max-w-3xl t-body text-[color:var(--color-text-primary)]">
             Все работы выполняет команда «Без Воды» на своей стороне и своими средствами.
@@ -1009,7 +1009,7 @@ export function TeamSubscriptionPage() {
             ))}
           </div>
           <p className="mt-5 max-w-3xl t-body text-[color:var(--color-text-secondary)]">
-            Так выглядит месяц за 200 000 ₽. Набор собирается под вашу задачу
+            Так выглядит месяц за 180 000 ₽. Набор собирается под вашу задачу
             из позиций ниже.
           </p>
 
@@ -1158,7 +1158,7 @@ export function TeamSubscriptionEffectPage() {
           <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
             <SectionLabel n="01">Сколько стоит та же мощность внутри</SectionLabel>
             <StaffCostTable
-              ourLine="Подписка: от 200 000 ₽ в месяц."
+              ourLine="Подписка: от 180 000 ₽ в месяц."
               afterLine="Мы сравниваем стоимость доступа к команде такого состава. Объем фиксируется в договоре через образ результата, а не через часовые ставки."
               extraLine="Если задачи ровные и постоянные, их дешевле вести внутри. Подписка нужна там, где нагрузка неравномерная или объем превышает возможности команды."
             />
