@@ -20,6 +20,7 @@ import {
 } from "./blocks";
 import { FAQ_ITEMS, TEAM, FOUNDER_QUOTE, visibleReviews, SITUATIONS } from "./data";
 import { ConstructorPage } from "./pages-constructor";
+import { ExpertiseMapPage } from "./pages-expertise";
 import {
   BE,
   BusinessEffectGeneralPage,
@@ -578,6 +579,16 @@ export const ROUTES: RouteDef[] = [
     description:
       "Форма заявки, телефон, Telegram и почта. Отвечаем в течение 5 минут.",
     Component: ContactsPage,
+  },
+  /* Страница продукта «Карта экспертности» (06.08.2026): на неё ведут все
+     упоминания карты экспертности на сайте. Индексируется — это витрина
+     первого этапа с показанными артефактами. */
+  {
+    path: "/expertise-map",
+    title: "Карта экспертности — первый шаг — БЕЗ ВОДЫ",
+    description:
+      "Самостоятельный законченный этап: карта знаний, карта процесса, матрица компетенций, архитектура базы знаний и дорожная карта. Семь документов, которые остаются у вас.",
+    Component: ExpertiseMapPage,
   },
   /* НЕ ПРИКРЕПЛЁН К САЙТУ (решение Виктории 05.08.2026): ссылки на
      /constructor нет ни в шапке, ни в подвале, ни в sitemap; noindex.

@@ -257,7 +257,7 @@ export function BusinessEffectGeneralPage() {
   ];
 
   const startFrom: { title: string; step: string; href: string }[] = [
-    { title: "Результаты держатся на нескольких людях", step: "Первый шаг: карта экспертности, 60 000 ₽, 7–14 дней", href: BE.internalEffect },
+    { title: "Результаты держатся на нескольких людях", step: "Первый шаг: карта экспертности, 7–14 дней", href: BE.internalEffect },
     { title: "Задач больше, чем рук", step: "Первый шаг: разбор объема и плана на квартал", href: BE.teamEffect },
     { title: "Нужной практики внутри нет", step: "Первый шаг: профили практиков за 60 минут, бесплатно", href: BE.externalEffect },
   ];
@@ -350,7 +350,7 @@ export function BusinessEffectGeneralPage() {
               <PaperCard className="p-6">
                 <div className="font-display t-body font-semibold">Поддержание актуальности</div>
                 <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">
-                  регулярный пересмотр материалов под изменения в компании — от 40 000 ₽ в месяц
+                  регулярный пересмотр материалов под изменения в компании
                 </p>
               </PaperCard>
               <PaperCard className="p-6">
@@ -520,6 +520,16 @@ export function BusinessEffectGeneralPage() {
                 </motion.a>
               ))}
             </div>
+            {/* Карта экспертности упомянута в первой карточке — но карточка
+                целиком ссылка, вложить вторую нельзя. Вход на страницу
+                продукта отдельной строкой под сеткой. */}
+            <a
+              href="/expertise-map"
+              className="link-arrow group mt-8 t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
+            >
+              Что входит в карту экспертности
+              <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
           </div>
         </div>
       </section>
@@ -743,10 +753,16 @@ export function InternalExpertsPage() {
                 </div>
               </div>
             </div>
+            {/* Цена снята 06.08 (единая цифра — от 180 000 ₽ за подписку);
+                вместо неё — вход на страницу продукта с артефактами. */}
             <PaperCard className="mt-10 max-w-3xl border-l-[3px] border-l-[color:var(--color-accent)] p-6">
               <p className="font-display t-body font-semibold">
-                Инвестиция: 60 000 ₽ · Срок: 7–14 дней
+                Срок первого этапа: 7–14 дней
               </p>
+              <a href="/expertise-map" className="link-arrow group mt-3 t-body">
+                Что входит в карту экспертности
+                <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </a>
             </PaperCard>
           </div>
         </div>
@@ -901,8 +917,12 @@ export function InternalExpertsEffectPage() {
                 экран 9; размещение согласовано 03.08) */}
             <PaperCard className="mt-10 max-w-3xl border-l-[3px] border-l-[color:var(--color-accent)] p-6">
               <p className="font-display t-body font-semibold">
-                Первый шаг: карта экспертности, 60 000 ₽, 7–14 дней
+                Первый шаг: карта экспертности, 7–14 дней
               </p>
+              <a href="/expertise-map" className="link-arrow group mt-3 t-body">
+                Что входит в карту экспертности
+                <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+              </a>
               <span className="mt-2 block">
                 <HowLink href={BE.internal} />
               </span>
@@ -1016,6 +1036,10 @@ export function TeamSubscriptionPage() {
             Так выглядит месяц за 180 000 ₽. Набор собирается под вашу задачу
             из позиций ниже.
           </p>
+          <a href="/expertise-map" className="link-arrow group mt-4 t-body">
+            Подробно о карте экспертности
+            <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </a>
 
           {packs.map((pack) => (
             <div key={pack.title} className="mt-12">
