@@ -367,7 +367,7 @@ export function ConstructorPage() {
           </RevealHeading>
           <p className="measure mt-6 t-body text-[color:var(--color-text-primary)]">
             Выберите задачи и нажмите на кнопку «Отправить», когда соберете пакет
-            услуг, мы напишем вам в течение рабочего дня.
+            услуг, мы напишем вам в течение 5 минут.
           </p>
 
           <fieldset className="mt-14 border-0 p-0">
@@ -418,7 +418,7 @@ export function ConstructorPage() {
           {sent ? (
             <div>
               <p className="t-body">
-                Заявка отправлена. Мы напишем вам в течение рабочего дня.
+                Заявка отправлена. Мы напишем вам в течение 5 минут.
               </p>
               {sentLines.length > 0 && (
                 <ul className="mt-3 space-y-1">
