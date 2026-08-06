@@ -380,12 +380,12 @@ export function WhenNeeded() {
 
 export function Flow({ n = "02" }: { n?: string } = {}) {
   const stages = [
-    { n: "01", t: "2 рабочих часа", d: "отвечаем на заявку" },
+    { n: "01", t: "5 минут", d: "отвечаем на заявку" },
     { n: "02", t: "30 минут", d: "проводим первичный разбор" },
   ];
   const branches = [
-    { tag: "Масштабировать внутренний опыт", time: "24 часа", desc: "назначаем команду и проводим стартовую встречу" },
-    { tag: "Привлечь экспертность с рынка", time: "72 часа", desc: "представляем первые релевантные профили" },
+    { tag: "Масштабировать внутренний опыт", time: "24 часа", desc: "назначаем команду и встречаемся, когда вам удобно" },
+    { tag: "Привлечь экспертность с рынка", time: "60 минут", desc: "представляем первые релевантные профили" },
   ];
   return (
     <section className="stage sec-dark grain border-b border-[color:var(--color-line-dark)]">
@@ -1230,7 +1230,7 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
                 </p>
 
                 <ol className="mt-4 space-y-2 t-body text-[color:var(--color-text-inverse-2)]">
-                  <li className="flex gap-3"><span className="node-dot node-dot-active mt-2" />Ответим в течение двух рабочих часов и предложим время.</li>
+                  <li className="flex gap-3"><span className="node-dot node-dot-active mt-2" />Ответим в течение 5 минут и предложим время.</li>
                   <li className="flex gap-3"><span className="node-dot node-dot-active mt-2" />30 минут онлайн: сверим задачу и определим следующий шаг.</li>
                   <li className="flex gap-3"><span className="node-dot node-dot-active mt-2" />Готовиться не нужно — презентация и ТЗ не требуются.</li>
                 </ol>

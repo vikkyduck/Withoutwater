@@ -1533,7 +1533,7 @@ export function CtaBand({
             <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
           </a>
           <span className="t-body text-[color:var(--color-text-inverse-2)]">
-            Ответим в течение двух рабочих часов
+            Ответим в течение 5 минут
           </span>
           {secondary === null ? null : secondary ?? defaultSecondary}
         </div>
