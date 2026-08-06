@@ -1094,13 +1094,15 @@ export function TeamSubscriptionPage() {
           <div className="mt-12">
             <div className="t-eyebrow text-[color:var(--color-accent)]">Личный кабинет</div>
             <RevealHeading className="t-h2 mt-5 max-w-3xl">
-              Видно, во что идут деньги
+              Прозрачность данных по вашим пакетам
             </RevealHeading>
+            {/* Обе фразы уже есть на сайте: первая — из этого же блока,
+                вторая — принцип 05 на /business-effect. Своего не добавлять. */}
             <p className="mt-5 max-w-3xl t-body text-[color:var(--color-text-primary)]">
               Состав месяца фиксируется заранее и виден в личном кабинете: что
-              заказано, что в работе, что принято и каков остаток по пакету.
-              Там же переписка по счетам — вопрос и ответ остаются в одном месте,
-              а не теряются в почте.
+              заказано, что в работе, что принято, каков остаток по пакетам.
+              Движение показано в единицах результата, а не в часах. При изменении
+              состава работ остаток пересчитывается сразу.
             </p>
             <div className="mt-8 grid items-start gap-4 md:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
               <figure className="m-0">
