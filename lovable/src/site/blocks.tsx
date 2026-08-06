@@ -106,7 +106,7 @@ export function Hero() {
         <div className="relative mt-12 grid max-w-4xl items-stretch gap-4 sm:grid-cols-3 md:mt-16">
           {[
             ["Без ТЗ", "Вводные в любом виде"],
-            ["24 часа", "Старт со своей командой"],
+            ["24 часа", "Старт проекта"],
             ["от 180 000 ₽", "Подписка на команду"],
           ].map(([label, desc], i) => (
             <div
@@ -1264,8 +1264,10 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
 
                 <div>
 
+                  {/* Поле необязательное (решение Виктории 06.08): контакта
+                      достаточно, задачу разберём на встрече. */}
                   <label htmlFor="f-about" className="t-label mb-2 block text-[color:var(--color-text-inverse-2)]">
-                    Запрос на разбор
+                    Запрос на разбор — не обязательно
                   </label>
                   {/* Цвета — как у Field dark. Прежний text-background внутри
                       sec-dark резолвился в уголь: человек печатал запрос

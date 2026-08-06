@@ -813,7 +813,7 @@ export function InternalExpertsEffectPage() {
               Федеральная ювелирная сеть
             </RevealHeading>
             <p className="mt-4 t-body text-[color:var(--color-text-inverse-2)]">
-              Масштаб: более 230 салонов, более 70 городов, собственное производство, более 30 000 SKU.
+              Масштаб: более 230 магазинов, более 70 городов, собственное производство, более 30 000 SKU.
             </p>
             <p className="mt-2 t-body text-[color:var(--color-text-inverse)]">
               Система адаптации новых сотрудников на основе практик, которые уже применяют в компании
@@ -824,7 +824,7 @@ export function InternalExpertsEffectPage() {
                 items={[
                   ["1", "месяц до выхода на KPI"],
                   ["в 6 раз", "ускорение адаптации"],
-                  [">230", "салонов в контуре внедрения"],
+                  [">230", "магазинов"],
                 ]}
               />
             </div>
