@@ -17,7 +17,7 @@ import { useMemo, useRef, useState } from "react";
 import {
   motion,
   PageShell, PaperCard, Scene,
-  RevealHeading, NodeList, Check, SectionLabel,
+  RevealHeading, NodeList, Check, SectionLabel, ArrowRight,
   reveal,
 } from "./core";
 
@@ -32,6 +32,9 @@ type Unit = {
   what: string;
   list?: string[];
   note?: string;
+  /* Ссылка на страницу продукта — выводится внутри карточки позиции
+     (требование Виктории 06.08: ссылка должна жить в карточке продукта). */
+  href?: string;
 };
 
 /* Таблица 1 — «Команда по подписке (конструктор задач)».
@@ -124,6 +127,7 @@ const PRODUCTS: Unit[] = [
     id: "map",
     title: "Карта экспертности",
     price: 60000,
+    href: "/expertise-map",
     what: "Первый этап перед базой знаний и разработки обучения. Результат:",
     list: [
       "Карта знаний: минимум, который необходим человеку без необходимого опыта и логика принятия решений",
@@ -225,20 +229,38 @@ function UnitCard({
               {!unit.list && unit.note && (
                 <p className="mt-4 t-body text-[color:var(--color-text-secondary)]">{unit.note}</p>
               )}
+              {!unit.list && unit.href && (
+                <a
+                  href={unit.href}
+                  onClick={(e) => e.stopPropagation()}
+                  className="link-arrow group mt-4 t-body"
+                >
+                  Смотреть, что входит
+                  <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                </a>
+              )}
             </div>
           </label>
 
           {unit.list && (
             <div className="mt-auto px-6 pb-6 pl-[3.75rem]">
-              <button
-                type="button"
-                onClick={() => setOpen((v) => !v)}
-                aria-expanded={open}
-                aria-controls={listId}
-                className="t-body font-semibold text-[color:var(--color-accent)] underline underline-offset-4 decoration-[color:var(--color-line)] transition-colors hover:decoration-[color:var(--color-accent)]"
-              >
-                {open ? "Свернуть" : `Состав — ${unit.list.length}`}
-              </button>
+              <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                <button
+                  type="button"
+                  onClick={() => setOpen((v) => !v)}
+                  aria-expanded={open}
+                  aria-controls={listId}
+                  className="t-body font-semibold text-[color:var(--color-accent)] underline underline-offset-4 decoration-[color:var(--color-line)] transition-colors hover:decoration-[color:var(--color-accent)]"
+                >
+                  {open ? "Свернуть" : `Состав — ${unit.list.length}`}
+                </button>
+                {unit.href && (
+                  <a href={unit.href} className="link-arrow group t-body">
+                    Смотреть, что входит
+                    <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                  </a>
+                )}
+              </div>
               {open && (
                 <div id={listId} className="mt-4">
                   <NodeList divided items={unit.list} />

@@ -520,16 +520,6 @@ export function BusinessEffectGeneralPage() {
                 </motion.a>
               ))}
             </div>
-            {/* Карта экспертности упомянута в первой карточке — но карточка
-                целиком ссылка, вложить вторую нельзя. Вход на страницу
-                продукта отдельной строкой под сеткой. */}
-            <a
-              href="/expertise-map"
-              className="link-arrow group mt-8 t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
-            >
-              Что входит в карту экспертности
-              <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-            </a>
           </div>
         </div>
       </section>
@@ -947,7 +937,10 @@ export function TeamSubscriptionPage() {
      Заменил прежние шесть «единиц результата»: новый список их поглощает
      и раскрывает сроки. Разбивка на «заголовок / описание» — только
      оформление, формулировки не менялись. */
-  const packs: { title: string; items: [string, string][] }[] = [
+  /* Третий элемент строки — ссылка на страницу продукта, если она есть.
+     Ставится ВНУТРИ карточки: висящая ссылка над перечнем не читалась
+     (замечание Виктории 06.08). */
+  const packs: { title: string; items: [string, string, string?][] }[] = [
     {
       title: "Управление проектом или продуктом",
       items: [
@@ -971,7 +964,7 @@ export function TeamSubscriptionPage() {
          Виктории от 05.08. */
       title: "Инструменты работы — для всей команды",
       items: [
-        ["Карта экспертности за 10 дней", "карта знаний компании, матрица компетенций и дорожная карта: чей опыт масштабируем, во что он превращается и в каком порядке"],
+        ["Карта экспертности за 10 дней", "карта знаний компании, матрица компетенций и дорожная карта: чей опыт масштабируем, во что он превращается и в каком порядке", "/expertise-map"],
         ["База знаний для всей команды за 20 дней", "все необходимые знания, практические рекомендации собраны в структуру, которой пользуется вся команда"],
         ["Цифровой наставник по базе знаний за 10 дней", "подскажет, сформулирует, структурирует, предложит — поддержит вашу команду круглосуточно"],
         ["Цифровой двойник эксперта за 10 дней", "работает по методу конкретного специалиста вашей компании"],
@@ -1036,24 +1029,26 @@ export function TeamSubscriptionPage() {
             Так выглядит месяц за 180 000 ₽. Набор собирается под вашу задачу
             из позиций ниже.
           </p>
-          <a href="/expertise-map" className="link-arrow group mt-4 t-body">
-            Подробно о карте экспертности
-            <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-          </a>
 
           {packs.map((pack) => (
             <div key={pack.title} className="mt-12">
               <div className="t-eyebrow text-[color:var(--color-accent)]">{pack.title}</div>
               <div className="mt-5 grid items-stretch gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                {pack.items.map(([t, d], i) => (
+                {pack.items.map(([t, d, href], i) => (
                   <motion.div key={t} {...reveal(i)} className="h-full">
-                    <PaperCard className="h-full p-6">
+                    <PaperCard className="flex h-full flex-col p-6">
                       <div className="flex items-center gap-3">
                         <Stencil n={i + 1} active className="t-body" />
                         <span className="h-px w-6 bg-[color:var(--color-line)]" />
                       </div>
                       <div className="mt-4 font-display t-body font-semibold">{t}</div>
                       <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
+                      {href && (
+                        <a href={href} className="link-arrow group mt-auto pt-4 t-body">
+                          Смотреть, что входит
+                          <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                        </a>
+                      )}
                     </PaperCard>
                   </motion.div>
                 ))}
@@ -1089,34 +1084,61 @@ export function TeamSubscriptionPage() {
             </div>
           </div>
 
-          <p className="mt-10 max-w-3xl t-body text-[color:var(--color-text-primary)]">
-            Состав месяца фиксируется заранее и виден в личном кабинете.
+          <p className="mt-10 max-w-3xl t-body text-[color:var(--color-text-secondary)]">
             Логистика очных выездов — за счет заказчика.
           </p>
-          {/* Экраны личного кабинета: затраты по счёту и переписка (данные размыты) */}
-          <div className="mt-8 grid items-start gap-4 md:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
-            <div className="overflow-hidden rounded-md border border-[color:var(--color-line)] shadow-[var(--shadow-soft)]">
-              <img
-                src="/img/lk/lk-invoice.webp"
-                alt="Личный кабинет заказчика: затраты по счёту помесячно"
-                loading="lazy"
-                decoding="async"
-                width={1800}
-                height={636}
-                className="block h-auto w-full"
-              />
+
+          {/* Личный кабинет. Было: два скриншота без единого слова о том, что
+              это и зачем (замечание Виктории 06.08). Теперь — отдельный
+              подраздел с объяснением, а экраны идут как иллюстрация к нему. */}
+          <div className="mt-12">
+            <div className="t-eyebrow text-[color:var(--color-accent)]">Личный кабинет</div>
+            <RevealHeading className="t-h2 mt-5 max-w-3xl">
+              Видно, во что идут деньги
+            </RevealHeading>
+            <p className="mt-5 max-w-3xl t-body text-[color:var(--color-text-primary)]">
+              Состав месяца фиксируется заранее и виден в личном кабинете: что
+              заказано, что в работе, что принято и каков остаток по пакету.
+              Там же переписка по счетам — вопрос и ответ остаются в одном месте,
+              а не теряются в почте.
+            </p>
+            <div className="mt-8 grid items-start gap-4 md:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+              <figure className="m-0">
+                <div className="overflow-hidden rounded-md border border-[color:var(--color-line)] shadow-[var(--shadow-soft)]">
+                  <img
+                    src="/img/lk/lk-invoice.webp"
+                    alt="Личный кабинет заказчика: затраты по счёту помесячно"
+                    loading="lazy"
+                    decoding="async"
+                    width={1800}
+                    height={636}
+                    className="block h-auto w-full"
+                  />
+                </div>
+                <figcaption className="mt-3 t-caption text-[color:var(--color-text-secondary)]">
+                  Затраты по счёту помесячно
+                </figcaption>
+              </figure>
+              <figure className="m-0">
+                <div className="overflow-hidden rounded-md border border-[color:var(--color-line)] shadow-[var(--shadow-soft)]">
+                  <img
+                    src="/img/lk/lk-messages.webp"
+                    alt="Личный кабинет заказчика: переписка по счетам"
+                    loading="lazy"
+                    decoding="async"
+                    width={1800}
+                    height={1464}
+                    className="block h-auto w-full"
+                  />
+                </div>
+                <figcaption className="mt-3 t-caption text-[color:var(--color-text-secondary)]">
+                  Переписка по счетам
+                </figcaption>
+              </figure>
             </div>
-            <div className="overflow-hidden rounded-md border border-[color:var(--color-line)] shadow-[var(--shadow-soft)]">
-              <img
-                src="/img/lk/lk-messages.webp"
-                alt="Личный кабинет заказчика: переписка по счетам"
-                loading="lazy"
-                decoding="async"
-                width={1800}
-                height={1464}
-                className="block h-auto w-full"
-              />
-            </div>
+            <p className="mt-4 t-caption text-[color:var(--color-text-secondary)]">
+              Данные на экранах размыты.
+            </p>
           </div>
         </div>
 
