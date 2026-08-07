@@ -29,6 +29,9 @@ type Unit = {
   id: string;
   title: string;
   price: number;
+  /* Если цена не сумма, а доля (комиссия) — показываем эту строку,
+     а в итог позиция не считается. */
+  priceLabel?: string;
   what: string;
   list?: string[];
   note?: string;
@@ -93,6 +96,15 @@ const SUBSCRIPTION: Unit[] = [
     title: "Поддержание актуальности материалов по обучению",
     price: 40000,
     what: "Регулярная актуализация действующих программ и материалов: обновление контента под изменения в процессах и продуктах. Задачи формулируем в начале каждого месяца",
+  },
+  {
+    id: "providers",
+    title: "Находим и оплачиваем провайдеров по обучению",
+    /* Цена не сумма, а доля: комиссия 25% от бюджета обучения. В итог
+       конструктора позиция не считается — поэтому price 0 и своя строка. */
+    price: 0,
+    priceLabel: "25% от бюджета",
+    what: "Любые инструменты для развития навыка в ИПР. От вас нужно описание запроса, все остальное делаем мы: ищем варианты, согласуем с вами, оплачиваем и организуем обучение сотрудника. Комиссия — 25% от стоимости обучения: из каждых 100 ₽ бюджета 75 ₽ идет провайдеру, 25 ₽ — «Без Воды».",
   },
   {
     id: "designer",
@@ -219,8 +231,7 @@ function UnitCard({
               <span className="min-w-0 flex-1 font-display t-body font-semibold">{unit.title}</span>
               {/* Цена — второй голос: та же величина, нейтральный серый. */}
               <span className="shrink-0 whitespace-nowrap font-display t-body tabular-nums text-[color:var(--color-text-secondary)]">
-                {money(unit.price)}
-                {suffix}
+                {unit.priceLabel ?? `${money(unit.price)}${suffix}`}
               </span>
             </div>
 

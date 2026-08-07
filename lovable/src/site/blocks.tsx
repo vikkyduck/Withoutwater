@@ -200,15 +200,27 @@ export function Bricks() {
                   <span className="font-display t-body font-semibold tracking-[-0.01em] text-[color:var(--color-text-primary)]">
                     {b.name}
                   </span>
-                  {b.year && (
+                  {b.nda ? (
+                    <span className="shrink-0 rounded-pill border border-[color:var(--color-line)] px-2 py-0.5 t-label text-[color:var(--color-text-secondary)]">
+                      NDA
+                    </span>
+                  ) : b.year ? (
                     <span className="t-caption shrink-0 tabular-nums text-[color:var(--color-steel)]">
                       {b.year}
                     </span>
-                  )}
+                  ) : null}
                 </div>
+                {/* Подпись: что за проект. Где публиковать пока нечего —
+                    честное «готовим вам кейс и отзыв» вместо пустоты
+                    (структура плиток от 06.08). */}
+                {b.note && (
+                  <p className="mt-2 t-caption text-[color:var(--color-text-secondary)]">
+                    {b.note}
+                  </p>
+                )}
                 {b.href && (
                   <span className="mt-3 inline-flex items-center gap-1.5 t-eyebrow text-[color:var(--color-steel)] transition group-hover:text-[color:var(--color-accent)]">
-                    Отзыв клиента
+                    Смотреть
                     <ArrowUpRight data-arrow="diag" className="h-3.5 w-3.5" />
                   </span>
                 )}
