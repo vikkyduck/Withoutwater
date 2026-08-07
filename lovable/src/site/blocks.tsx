@@ -17,7 +17,8 @@ import {
   useOpenReview, openReview, closeReview, reviewLinkHandler, registerReviewModal,
 } from "./core";
 import {
-  BRICKS, BRICK_INDUSTRIES, CASE_INDUSTRIES, visibleCases, homeReviews, REVIEWS, SITUATIONS, TEAM,
+  BRICKS, BRICK_INDUSTRIES, BRICK_SERVICES, CASE_INDUSTRIES, CASE_SERVICES,
+  visibleCases, homeReviews, REVIEWS, SITUATIONS, TEAM,
   type CaseItem, type Review,
 } from "./data";
 
@@ -152,6 +153,54 @@ export function Hero() {
 }
 
 
+/* Полоса фильтров: одна на «Отрасли», вторая на «Услуги». Фильтруем на
+   клиенте — пререндер отдаёт полный список, поэтому поиск видит всё. */
+function FilterRow({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: string[];
+  value: string | null;
+  onChange: (v: string | null) => void;
+}) {
+  if (options.length < 2) return null;
+  return (
+    <div className="flex flex-wrap items-center gap-2">
+      <span className="mr-1 t-label text-[color:var(--color-text-secondary)]">{label}</span>
+      <button
+        type="button"
+        onClick={() => onChange(null)}
+        aria-pressed={value === null}
+        className={`rounded-pill border px-4 py-2 t-caption transition-colors ${
+          value === null
+            ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)]"
+            : "border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
+        }`}
+      >
+        Все
+      </button>
+      {options.map((opt) => (
+        <button
+          key={opt}
+          type="button"
+          onClick={() => onChange(opt === value ? null : opt)}
+          aria-pressed={opt === value}
+          className={`rounded-pill border px-4 py-2 t-caption transition-colors ${
+            opt === value
+              ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)]"
+              : "border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
+          }`}
+        >
+          {opt}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 /* --------------------- Кирпичики клиентов (главная) ---------------------- */
 /* Решение Виктории от 26.07: плитки-кейсы с именами клиентов вместо «знаков».
    Тексты кейсов придут позже; пока каждая плитка ведёт на отзыв клиента.
@@ -161,7 +210,12 @@ export function Bricks() {
   /* Фильтр по отрасли (решение Виктории 06.08). Фильтруем на клиенте:
      пререндер отдаёт все плитки, поэтому поиск и печать видят полный список. */
   const [industry, setIndustry] = useState<string | null>(null);
-  const bricks = industry ? BRICKS.filter((b) => b.industries?.includes(industry)) : BRICKS;
+  const [service, setService] = useState<string | null>(null);
+  const bricks = BRICKS.filter(
+    (b) =>
+      (!industry || b.industries?.includes(industry)) &&
+      (!service || b.services?.includes(service)),
+  );
 
   /* Цифры опыта переехали сюда из отдельной секции «Наш опыт в цифрах»
      (решение 03.08): две секции рядом доказывали одно и то же. Тексты
@@ -192,34 +246,9 @@ export function Bricks() {
           Проекты этих компаний под NDA — показываем обезличенно. Там, где
           клиент дал согласие, плитка ведёт на его отзыв.
         </p>
-        <div className="mt-8 flex flex-wrap gap-2">
-          <button
-            type="button"
-            onClick={() => setIndustry(null)}
-            aria-pressed={industry === null}
-            className={`rounded-pill border px-4 py-2 t-caption transition-colors ${
-              industry === null
-                ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)]"
-                : "border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
-            }`}
-          >
-            Все отрасли
-          </button>
-          {BRICK_INDUSTRIES.map((ind) => (
-            <button
-              key={ind}
-              type="button"
-              onClick={() => setIndustry(ind === industry ? null : ind)}
-              aria-pressed={ind === industry}
-              className={`rounded-pill border px-4 py-2 t-caption transition-colors ${
-                ind === industry
-                  ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)]"
-                  : "border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
-              }`}
-            >
-              {ind}
-            </button>
-          ))}
+        <div className="mt-8 flex flex-col gap-3">
+          <FilterRow label="Отрасль" options={BRICK_INDUSTRIES} value={industry} onChange={setIndustry} />
+          <FilterRow label="Услуга" options={BRICK_SERVICES} value={service} onChange={setService} />
         </div>
 
         <div className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-line)] sm:grid-cols-3">
@@ -259,6 +288,12 @@ export function Bricks() {
                   <p className="mt-2 inline-flex items-center gap-2 t-caption text-[color:var(--color-text-secondary)]">
                     <CookingPot aria-hidden className="h-4 w-4 shrink-0 text-[color:var(--color-accent)]" />
                     Готовим кейс
+                  </p>
+                )}
+                {/* Услуга проекта — подпись внизу карточки (решение 06.08) */}
+                {b.services && b.services.length > 0 && (
+                  <p className="mt-3 t-caption text-[color:var(--color-accent)]">
+                    {b.services.join(" · ")}
                   </p>
                 )}
                 {b.href && (
@@ -769,9 +804,12 @@ export function CasesBlock({
   /* Фильтр по отрасли — только на странице кейсов (там compactHeader).
      На главной показываем два кейса без фильтра. */
   const [industry, setIndustry] = useState<string | null>(null);
-  const filtered = industry
-    ? all.filter((c) => c.industries?.includes(industry))
-    : all;
+  const [service, setService] = useState<string | null>(null);
+  const filtered = all.filter(
+    (c) =>
+      (!industry || c.industries?.includes(industry)) &&
+      (!service || c.services?.includes(service)),
+  );
   const items = limit ? filtered.slice(0, limit) : filtered;
   return (
     <section id="cases" className={`stage bg-[color:var(--color-bg-primary)] ${proofHeader ? "" : "border-b border-[color:var(--color-line)]"}`}>
@@ -791,35 +829,10 @@ export function CasesBlock({
             </div>
           </>
         )}
-        {compactHeader && CASE_INDUSTRIES.length > 1 && (
-          <div className="mb-8 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setIndustry(null)}
-              aria-pressed={industry === null}
-              className={`rounded-pill border px-4 py-2 t-caption transition-colors ${
-                industry === null
-                  ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)]"
-                  : "border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
-              }`}
-            >
-              Все отрасли
-            </button>
-            {CASE_INDUSTRIES.map((ind) => (
-              <button
-                key={ind}
-                type="button"
-                onClick={() => setIndustry(ind === industry ? null : ind)}
-                aria-pressed={ind === industry}
-                className={`rounded-pill border px-4 py-2 t-caption transition-colors ${
-                  ind === industry
-                    ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)]"
-                    : "border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
-                }`}
-              >
-                {ind}
-              </button>
-            ))}
+        {compactHeader && (
+          <div className="mb-8 flex flex-col gap-3">
+            <FilterRow label="Отрасль" options={CASE_INDUSTRIES} value={industry} onChange={setIndustry} />
+            <FilterRow label="Услуга" options={CASE_SERVICES} value={service} onChange={setService} />
           </div>
         )}
         <div className={`grid items-stretch gap-6 md:grid-cols-2 ${compactHeader ? "" : "mt-14"}`}>

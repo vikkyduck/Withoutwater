@@ -177,6 +177,8 @@ export type Brick = {
   /* Отрасли — по ним работает фильтр. У проекта их может быть 2–3:
      УрбанТех это и IT, и городские технологии (уточнение Виктории 06.08). */
   industries?: string[];
+  /* Услуги проекта — второй фильтр и подпись в карточке (06.08.2026). */
+  services?: string[];
   /* Проект под соглашением о неразглашении — компания не называется */
   nda?: boolean;
   /* Ссылка только там, где отзыв этой компании действительно опубликован.
@@ -187,24 +189,28 @@ export type Brick = {
 };
 
 export const BRICKS: Brick[] = [
-  { name: "УрбанТех", industries: ["IT", "Городские технологии", "Транспорт"], note: "ИИ-агент первичного скоринга", href: "/cases/urbantech" },
-  { name: "Сеть ювелирных магазинов", industries: ["Ритейл"], note: "Система адаптации по всей сети", nda: true, href: "/cases/jewelry-retail" },
-  { name: "Global Broker League", industries: ["Финансы", "Образование"], note: "Цифровой Брокер: MVP ДПО-программы", href: "/cases/digital-broker" },
-  { name: "Авито", industries: ["IT"], pending: true, href: "/reviews#kvirkeliya" },
-  { name: "Маркетинг", industries: ["IT"], nda: true, pending: true, href: "/reviews#pirogova" },
-  { name: "Топ-менеджеры и владельцы компаний", industries: ["Консалтинг"], pending: true, href: "/reviews#aliev" },
-  { name: "ИТ-компания, маркетплейс", industries: ["IT", "Ритейл"], nda: true, pending: true },
-  { name: "Колл-центр", industries: ["IT", "Клиентский сервис"], nda: true, pending: true },
-  { name: "VK", industries: ["IT"], pending: true },
-  { name: "Yes Apart", industries: ["Недвижимость", "Гостеприимство"], pending: true },
-  { name: "MBA Рыбакова", industries: ["Образование"], pending: true },
-  { name: "EdTech-компания топ-3", industries: ["Образование", "IT"], nda: true, pending: true },
-  { name: "Global Creative Hub", industries: ["Креатив"], pending: true },
-  { name: "McDonald's", industries: ["Общепит", "Ритейл"], year: "2021", pending: true },
-  { name: "World Class", industries: ["Фитнес"], pending: true },
+  { name: "УрбанТех", industries: ["IT", "Городские технологии", "Транспорт"], services: ["ИИ-решения"], note: "ИИ-агент первичного скоринга", href: "/cases/urbantech" },
+  { name: "Сеть ювелирных магазинов", industries: ["Ритейл"], services: ["Разработка программ", "Методология"], note: "Система адаптации по всей сети", nda: true, href: "/cases/jewelry-retail" },
+  { name: "Global Broker League", industries: ["Недвижимость", "Образование", "IT"], services: ["Разработка программ"], note: "Цифровой Брокер: MVP ДПО-программы", href: "/cases/digital-broker" },
+  { name: "Авито", industries: ["IT"], services: ["Разработка программ"], pending: true, href: "/reviews#kvirkeliya" },
+  { name: "Маркетинг", industries: ["IT", "Маркетинг"], services: ["Внешние эксперты"], nda: true, pending: true, href: "/reviews#pirogova" },
+  { name: "Топ-менеджеры и владельцы компаний", industries: ["Консалтинг"], services: ["Внешние эксперты", "Тренинги и сессии"], pending: true, href: "/reviews#aliev" },
+  { name: "ИТ-компания, маркетплейс", industries: ["IT", "Ритейл"], services: ["Тренинги и сессии"], nda: true, pending: true },
+  { name: "Колл-центр", industries: ["IT", "Клиентский сервис"], services: ["Внешние эксперты", "ИИ-решения"], nda: true, pending: true },
+  { name: "VK", industries: ["IT"], services: ["Тренинги и сессии"], pending: true },
+  { name: "Yes Apart", industries: ["Гостеприимство", "Недвижимость"], services: ["Разработка программ"], pending: true },
+  { name: "MBA Рыбакова", industries: ["Образование"], services: ["Разработка программ"], pending: true },
+  { name: "EdTech-компания топ-3", industries: ["Образование", "IT"], services: ["Разработка программ"], nda: true, pending: true },
+  { name: "Global Creative Hub", industries: ["Креативные индустрии", "Образование"], services: ["Тренинги и сессии"], pending: true },
+  { name: "McDonald's", industries: ["Общепит", "Франчайзинг", "Недвижимость"], services: ["Тренинги и сессии"], year: "2021", pending: true },
+  { name: "World Class", industries: ["Фитнес"], services: ["Разработка программ"], pending: true },
 ];
 
 /* Отрасли для фильтра: сначала самые частые, дальше по алфавиту. */
+export const BRICK_SERVICES = Array.from(
+  new Set(BRICKS.flatMap((b) => b.services ?? [])),
+);
+
 export const BRICK_INDUSTRIES = Array.from(
   new Set(BRICKS.flatMap((b) => b.industries ?? [])),
 ).sort((a, b) => {
@@ -234,6 +240,8 @@ export type CaseItem = {
   slug?: string;
   /* Отрасли для фильтра, 1–3 тега. */
   industries?: string[];
+  /* Услуги проекта — второй фильтр. */
+  services?: string[];
   /* slug отзыва этого же клиента: показываем его внизу страницы кейса. */
   reviewSlug?: string;
   /* страница «Бизнес-эффект и цифры» с полным разбором кейса */
@@ -245,6 +253,7 @@ export const CASES: CaseItem[] = [
      (добавлен 06.08.2026 по решению Виктории). */
   {
     slug: "urbantech",
+    services: ["ИИ-решения"],
     industries: ["IT", "Городские технологии", "Транспорт"],
     reviewSlug: "minchenko",
     category: "ИИ-решения",
@@ -270,6 +279,7 @@ export const CASES: CaseItem[] = [
      на страницах эффектов. Тексты дословно из документа «Бизнес-эффект». */
   {
     slug: "jewelry-retail",
+    services: ["Разработка программ", "Методология"],
     industries: ["Ритейл"],
     category: "Корпоративное обучение",
     title: "Федеральная ювелирная сеть",
@@ -293,7 +303,8 @@ export const CASES: CaseItem[] = [
   },
   {
     slug: "b2b-procurement",
-    industries: ["B2B"],
+    services: ["Внешние эксперты", "Разработка программ"],
+    industries: ["IT", "Маркетинг"],
     category: "Корпоративное обучение",
     title: "B2B-компания: логика закупки глазами клиента",
     nda: true,
@@ -315,7 +326,8 @@ export const CASES: CaseItem[] = [
   {
     category: "Корпоративное обучение",
     slug: "digital-broker",
-    industries: ["Финансы", "Образование"],
+    services: ["Разработка программ", "Методология"],
+    industries: ["Недвижимость", "Образование", "IT"],
     title: "Цифровой Брокер",
     client: "Global Broker League",
     link: "https://globalbrokerleague.com/",
@@ -338,7 +350,8 @@ export const CASES: CaseItem[] = [
   {
     category: "Корпоративное обучение",
     slug: "product-approach",
-    industries: ["Образование"],
+    services: ["Методология", "Тренинги и сессии"],
+    industries: ["IT", "Электронная коммерция"],
     title: "Продуктовый подход в корпоративном обучении",
     nda: true,
     client: "Корпоративный заказчик",
@@ -361,7 +374,8 @@ export const CASES: CaseItem[] = [
   {
     category: "Запуски продуктов",
     slug: "ten-spheres",
-    industries: ["Образование", "Креатив"],
+    services: ["Разработка программ"],
+    industries: ["Образование"],
     title: "Курс «10 сфер жизни»",
     nda: true,
     client: "Предприниматель-блогер, 1 млн+ подписчиков",
@@ -388,6 +402,11 @@ export const visibleCases = () => CASES;
 /* Отрасли кейсов — для фильтра на /cases. */
 export const CASE_INDUSTRIES = Array.from(
   new Set(CASES.flatMap((c) => c.industries ?? [])),
+);
+
+/* Услуги кейсов — второй фильтр на /cases. */
+export const CASE_SERVICES = Array.from(
+  new Set(CASES.flatMap((c) => c.services ?? [])),
 );
 
 /* --------------------------------- FAQ ------------------------------------ */
