@@ -5,7 +5,7 @@
    ========================================================================== */
 import {
   motion, AnimatePresence,
-  ArrowUpRight, ArrowRight, Plus, Check, ExternalLink,
+  ArrowUpRight, ArrowRight, Plus, Check, ExternalLink, CookingPot,
   useRef, useState, useEffect,
   ymGoal,
   SectionLabel, GlassCard, PaperCard, Scene, NodeScene, ScrollRing,
@@ -211,11 +211,16 @@ export function Bricks() {
                   ) : null}
                 </div>
                 {/* Подпись: что за проект. Где публиковать пока нечего —
-                    честное «готовим вам кейс и отзыв» вместо пустоты
-                    (структура плиток от 06.08). */}
+                    «Готовим описание кейса» с иконкой (решение 06.08). */}
                 {b.note && (
                   <p className="mt-2 t-caption text-[color:var(--color-text-secondary)]">
                     {b.note}
+                  </p>
+                )}
+                {b.pending && (
+                  <p className="mt-2 inline-flex items-center gap-2 t-caption text-[color:var(--color-text-secondary)]">
+                    <CookingPot aria-hidden className="h-4 w-4 shrink-0 text-[color:var(--color-accent)]" />
+                    Готовим описание кейса
                   </p>
                 )}
                 {b.href && (

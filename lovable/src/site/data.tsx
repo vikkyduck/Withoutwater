@@ -169,9 +169,10 @@ export const homeReviews = () => REVIEWS.filter((r) => r.home).slice(0, 2);
 export type Brick = {
   name: string;
   year?: string;
-  /* Короткая подпись под именем: что за проект или «Готовим вам кейс и отзыв»,
-     если публиковать пока нечего (структура плиток от 06.08.2026). */
+  /* Короткая подпись под именем: что за проект. */
   note?: string;
+  /* Кейс в работе: вместо подписи — «Готовим описание кейса» с иконкой. */
+  pending?: boolean;
   /* Проект под соглашением о неразглашении — компания не называется */
   nda?: boolean;
   /* Ссылка только там, где отзыв этой компании действительно опубликован.
@@ -183,16 +184,20 @@ export type Brick = {
 
 export const BRICKS: Brick[] = [
   { name: "УрбанТех", note: "ИИ-агент первичного скоринга", href: "/reviews#minchenko" },
-  { name: "Yes Apart", note: "Готовим вам кейс и отзыв" },
+  { name: "Авито", note: "Отзыв клиента", href: "/reviews#kvirkeliya" },
   { name: "Global Broker League", note: "Цифровой Брокер: MVP ДПО-программы", href: "/cases" },
   { name: "Сеть ювелирных магазинов", note: "Система адаптации по всей сети", nda: true, href: "/cases#jewelry-retail" },
   { name: "Маркетинг", note: "Отзыв клиента", nda: true, href: "/reviews#pirogova" },
-  { name: "VK", note: "Готовим вам кейс и отзыв" },
   { name: "Топ-менеджеры и владельцы компаний", note: "Подготовка к выступлению и сборка тренингов", href: "/reviews#aliev" },
-  { name: "MBA Рыбакова", note: "Готовим вам кейс и отзыв" },
-  { name: "EdTech-компания топ-3", note: "Готовим вам кейс и отзыв", nda: true },
   { name: "ИТ-компания, маркетплейс", note: "Команда бизнес-тренеров по продажам: рост показателей продавцов платформы", nda: true },
   { name: "Колл-центр", note: "Автоматизация процессов клиентского сервиса: консультации и обучение внешнего эксперта", nda: true },
+  { name: "VK", pending: true },
+  { name: "Yes Apart", pending: true },
+  { name: "MBA Рыбакова", pending: true },
+  { name: "EdTech-компания топ-3", nda: true, pending: true },
+  { name: "Global Creative Hub", pending: true },
+  { name: "McDonald's", year: "2021", pending: true },
+  { name: "World Class", pending: true },
 ];
 
 /* -------------------------------- Кейсы ---------------------------------- */

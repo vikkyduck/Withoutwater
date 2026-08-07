@@ -17,10 +17,10 @@ import {
   AnimatePresence,
   MotionConfig,
 } from "motion/react";
-import { ArrowUpRight, ArrowRight, ArrowDown, Plus, Check, ExternalLink, Calendar } from "lucide-react";
+import { ArrowUpRight, ArrowRight, ArrowDown, Plus, Check, ExternalLink, Calendar, CookingPot } from "lucide-react";
 
 export { motion, AnimatePresence };
-export { ArrowUpRight, ArrowRight, ArrowDown, Plus, Check, ExternalLink, Calendar };
+export { ArrowUpRight, ArrowRight, ArrowDown, Plus, Check, ExternalLink, Calendar, CookingPot };
 export { useRef, useState, useEffect };
 export type { ReactNode, CSSProperties };
 
