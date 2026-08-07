@@ -1396,6 +1396,7 @@ export function PageHead({
   guide,
   chips,
   actions,
+  compact = false,
 }: {
   kicker: string;
   title?: ReactNode;
@@ -1404,6 +1405,9 @@ export function PageHead({
   guide?: ReactNode;
   chips?: [string, string][];
   actions?: ReactNode;
+  /* Компактная шапка: половинные вертикальные отступы. Нужна там, где
+     страница — это сразу содержимое, а не обещание (отзывы, 06.08.2026). */
+  compact?: boolean;
 }) {
   return (
     <div className="stage sec-dark grain relative -mx-0 border-b border-[color:var(--color-line-dark)]">
@@ -1440,7 +1444,11 @@ export function PageHead({
           висело обрезанным за левым краем на всех страницах. Компонент
           ScrollRing оставлен ниже: вернуть — одна строка. */}
 
-      <div className="relative z-10 mx-auto max-w-7xl px-5 pb-14 pt-12 md:px-8 md:pb-20 md:pt-24">
+      <div
+        className={`relative z-10 mx-auto max-w-7xl px-5 md:px-8 ${
+          compact ? "pb-10 pt-10 md:pb-12 md:pt-14" : "pb-14 pt-12 md:pb-20 md:pt-24"
+        }`}
+      >
         <div className="t-eyebrow flex items-center gap-3 text-[color:var(--color-text-inverse-2)]">
           <span className="tex-chrome h-[2px] w-12 rounded-pill" />
           <span>{kicker}</span>
@@ -1465,7 +1473,7 @@ export function PageHead({
           </div>
         )}
         {chips && chips.length > 0 && (
-          <div className="mt-9 grid max-w-3xl gap-4 sm:grid-cols-2 md:mt-12">
+          <div className={`grid max-w-3xl gap-4 sm:grid-cols-2 ${compact ? "mt-7" : "mt-9 md:mt-12"}`}>
             {chips.map(([label, desc]) => (
               <div key={label} className="surface-dark rounded-md px-5 py-6 md:px-6">
                 <div className="font-display t-body text-[color:var(--color-text-inverse)]">
