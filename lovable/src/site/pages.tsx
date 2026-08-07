@@ -21,6 +21,7 @@ import {
 import { FAQ_ITEMS, TEAM, FOUNDER_QUOTE, visibleReviews, SITUATIONS } from "./data";
 import { ConstructorPage } from "./pages-constructor";
 import { ExpertiseMapPage } from "./pages-expertise";
+import { CASE_PAGES } from "./pages-case";
 import {
   BE,
   BusinessEffectGeneralPage,
@@ -584,6 +585,15 @@ export const ROUTES: RouteDef[] = [
       "Самостоятельный законченный этап: карта знаний, карта процесса, матрица компетенций, архитектура базы знаний и дорожная карта. Семь документов, которые остаются у вас.",
     Component: ExpertiseMapPage,
   },
+  /* Страницы кейсов: /cases/<slug>. Разворачиваются из данных — добавить
+     кейс в CASES достаточно, маршрут и мета появятся сами (архитектура
+     06.08.2026). */
+  ...CASE_PAGES.map(({ slug, item, Component }) => ({
+    path: `/cases/${slug}`,
+    title: `${item.title} — кейс — БЕЗ ВОДЫ`,
+    description: [item.client, item.role].filter(Boolean).join(". "),
+    Component,
+  })),
   /* НЕ ПРИКРЕПЛЁН К САЙТУ (решение Виктории 05.08.2026): ссылки на
      /constructor нет ни в шапке, ни в подвале, ни в sitemap; noindex.
      Страница существует только чтобы отправлять ссылку клиенту. */

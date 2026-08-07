@@ -14,11 +14,14 @@ import {
   CTA_LABEL, CTA_NOTE,
   reveal,
   REVEAL_EASE,
+  useOpenReview, openReview, closeReview, reviewLinkHandler, registerReviewModal,
 } from "./core";
 import {
-  BRICKS, BRICK_INDUSTRIES, visibleCases, homeReviews, SITUATIONS, TEAM,
+  BRICKS, BRICK_INDUSTRIES, CASE_INDUSTRIES, visibleCases, homeReviews, REVIEWS, SITUATIONS, TEAM,
   type CaseItem, type Review,
 } from "./data";
+
+import type React from "react";
 
 const bookCover = { url: "/img/book-cover.webp" };
 
@@ -158,7 +161,7 @@ export function Bricks() {
   /* Фильтр по отрасли (решение Виктории 06.08). Фильтруем на клиенте:
      пререндер отдаёт все плитки, поэтому поиск и печать видят полный список. */
   const [industry, setIndustry] = useState<string | null>(null);
-  const bricks = industry ? BRICKS.filter((b) => b.industry === industry) : BRICKS;
+  const bricks = industry ? BRICKS.filter((b) => b.industries?.includes(industry)) : BRICKS;
 
   /* Цифры опыта переехали сюда из отдельной секции «Наш опыт в цифрах»
      (решение 03.08): две секции рядом доказывали одно и то же. Тексты
@@ -225,7 +228,7 @@ export function Bricks() {
             return (
               <Tag
                 key={b.name}
-                {...(b.href ? { href: b.href } : {})}
+                {...(b.href ? { href: b.href, onClick: reviewLinkHandler(b.href) } : {})}
                 {...reveal(i)}
                 className={`group relative flex min-h-[92px] flex-col justify-between rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-5 md:min-h-[104px] ${
                   b.href ? "card-link transition-colors duration-300 hover:bg-[color:var(--color-bg-primary)]" : ""
@@ -719,8 +722,15 @@ export function CaseCard({ item, index, teaser = false }: { item: CaseItem; inde
           </div>
         )}
 
+        {/* Карточка ведёт на страницу кейса: /cases/<slug> (архитектура 06.08) */}
+        {item.slug && (
+          <a href={`/cases/${item.slug}`} className="link-arrow case-body group w-max font-semibold">
+            Смотреть кейс
+            <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+          </a>
+        )}
         {item.effectHref && (
-          <a href={item.effectHref} className="link-arrow case-body group w-max font-semibold">
+          <a href={item.effectHref} className="link-arrow case-body group w-max">
             Бизнес-эффект и цифры
             <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </a>
@@ -756,7 +766,13 @@ export function CasesBlock({
   proofHeader?: boolean;
 }) {
   const all = visibleCases();
-  const items = limit ? all.slice(0, limit) : all;
+  /* Фильтр по отрасли — только на странице кейсов (там compactHeader).
+     На главной показываем два кейса без фильтра. */
+  const [industry, setIndustry] = useState<string | null>(null);
+  const filtered = industry
+    ? all.filter((c) => c.industries?.includes(industry))
+    : all;
+  const items = limit ? filtered.slice(0, limit) : filtered;
   return (
     <section id="cases" className={`stage bg-[color:var(--color-bg-primary)] ${proofHeader ? "" : "border-b border-[color:var(--color-line)]"}`}>
       <Scene blobs={[{ className: "-right-40 top-10", tone: "chrome", size: 600 }, { className: "-left-40 bottom-10", tone: "chrome", size: 520 }]} />
@@ -774,6 +790,37 @@ export function CasesBlock({
               </p>
             </div>
           </>
+        )}
+        {compactHeader && CASE_INDUSTRIES.length > 1 && (
+          <div className="mb-8 flex flex-wrap gap-2">
+            <button
+              type="button"
+              onClick={() => setIndustry(null)}
+              aria-pressed={industry === null}
+              className={`rounded-pill border px-4 py-2 t-caption transition-colors ${
+                industry === null
+                  ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)]"
+                  : "border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
+              }`}
+            >
+              Все отрасли
+            </button>
+            {CASE_INDUSTRIES.map((ind) => (
+              <button
+                key={ind}
+                type="button"
+                onClick={() => setIndustry(ind === industry ? null : ind)}
+                aria-pressed={ind === industry}
+                className={`rounded-pill border px-4 py-2 t-caption transition-colors ${
+                  ind === industry
+                    ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)]"
+                    : "border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
+                }`}
+              >
+                {ind}
+              </button>
+            ))}
+          </div>
         )}
         <div className={`grid items-stretch gap-6 md:grid-cols-2 ${compactHeader ? "" : "mt-14"}`}>
 
@@ -861,6 +908,94 @@ export function TeamBlock() {
 
 /* -------------------------------- Отзывы ---------------------------------- */
 /* Компактные карточки 3 в ряд (вёрстка согласована 26.07), без карусели. */
+
+/* Ссылка-открывалка: показывает отзыв модальным окном. */
+export function ReviewOpener({ slug, children }: { slug: string; children: React.ReactNode }) {
+  return (
+    <a
+      href={`/reviews#${slug}`}
+      onClick={reviewLinkHandler(`/reviews#${slug}`)}
+      className="link-arrow group t-body"
+    >
+      {children}
+      <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+    </a>
+  );
+}
+
+/* Само окно: крупная копия отзыва — фото, имя, роль и полный текст.
+   Монтируется один раз в PageShell, поэтому доступно на любой странице. */
+export function ReviewModal() {
+  const slug = useOpenReview();
+  const review = slug ? REVIEWS.find((r) => r.slug === slug) : undefined;
+
+  useEffect(() => {
+    if (!slug) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeReview();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [slug]);
+
+  return (
+    <AnimatePresence>
+      {/* Подложка без анимации прозрачности: если анимация почему-то не
+          отработает, окно всё равно остаётся читаемым, а не полупрозрачным. */}
+      {review && (
+        <motion.div
+          key="review-modal"
+          className="fixed inset-0 z-[100] flex items-start justify-center overflow-y-auto bg-[color:var(--color-bg-dark)]/85 p-4 backdrop-blur-sm md:p-10"
+          onClick={closeReview}
+          role="dialog"
+          aria-modal="true"
+          aria-label={`Отзыв: ${review.name}`}
+        >
+          <motion.div
+            initial={{ y: 12 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.24, ease: REVEAL_EASE }}
+            onClick={(e) => e.stopPropagation()}
+            className="relative my-auto w-full max-w-2xl rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-6 shadow-[var(--shadow-float)] md:p-10"
+          >
+            <button
+              type="button"
+              onClick={closeReview}
+              aria-label="Закрыть"
+              className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-pill border border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] transition-colors hover:text-[color:var(--color-text-primary)]"
+            >
+              <Plus aria-hidden className="h-5 w-5 rotate-45" />
+            </button>
+
+            <div className="size-28 overflow-hidden rounded-pill border border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)] md:size-32">
+              <img
+                src={review.photo}
+                alt={review.name}
+                width={240}
+                height={240}
+                className="size-full object-cover grayscale"
+              />
+            </div>
+            <div className="mt-5">
+              <div className="font-display t-h2">{review.name}</div>
+              <p className="mt-2 t-body text-[color:var(--color-text-secondary)]">{review.role}</p>
+            </div>
+            <span className="mt-6 block font-display t-h2 text-[color:var(--color-accent)]">«</span>
+            <blockquote className="mt-2 flex flex-col gap-3 t-body text-[color:var(--color-text-primary)]">
+              {review.text.map((p) => (
+                <p key={p}>{p}</p>
+              ))}
+            </blockquote>
+            <a href="/reviews" className="link-arrow group mt-8 t-body">
+              Все отзывы
+              <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+            </a>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
 
 export function ReviewCard({ r, index = 0 }: { r: Review; index?: number }) {
   return (
@@ -1382,3 +1517,6 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
     </section>
   );
 }
+
+/* Регистрируем окно в ядре: PageShell рисует его через слот. */
+registerReviewModal(() => <ReviewModal />);

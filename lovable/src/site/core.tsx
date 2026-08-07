@@ -12,6 +12,7 @@ import {
   type ReactNode,
   type CSSProperties,
 } from "react";
+import type React from "react";
 import {
   motion,
   AnimatePresence,
@@ -74,6 +75,61 @@ export function useCalm(): [boolean, (v: boolean) => void] {
     return () => mq.removeEventListener?.("change", handler);
   }, []);
   return [value, setCalm];
+}
+
+/* Слот для модалки: blocks.tsx регистрирует сюда свой компонент. Так core
+   не импортирует blocks — иначе получается круговая зависимость. */
+let ReviewModalImpl: (() => React.ReactNode) | null = null;
+export function registerReviewModal(fn: () => React.ReactNode) {
+  ReviewModalImpl = fn;
+}
+function ReviewModalSlot() {
+  useOpenReview();
+  return ReviewModalImpl ? <>{ReviewModalImpl()}</> : null;
+}
+
+/* ------------------------- Модальное окно отзыва -------------------------- */
+/* Решение Виктории 06.08.2026: отзыв открывается крупным окном поверх
+   страницы, а не уводит человека с кейса. Ссылки вида /reviews#slug
+   продолжают работать (SEO, «открыть в новой вкладке»), но обычный клик
+   перехватывается и показывает окно. Витрина /reviews остаётся. */
+
+const reviewListeners = new Set<() => void>();
+let openReviewSlug: string | null = null;
+
+export function openReview(slug: string) {
+  openReviewSlug = slug;
+  if (typeof document !== "undefined") document.body.style.overflow = "hidden";
+  reviewListeners.forEach((l) => l());
+}
+
+export function closeReview() {
+  openReviewSlug = null;
+  if (typeof document !== "undefined") document.body.style.overflow = "";
+  reviewListeners.forEach((l) => l());
+}
+
+export function useOpenReview(): string | null {
+  return useSyncExternalStore(
+    (cb) => {
+      reviewListeners.add(cb);
+      return () => reviewListeners.delete(cb);
+    },
+    () => openReviewSlug,
+    () => null,
+  );
+}
+
+/* Клик по ссылке на отзыв: открываем окно вместо перехода. Ctrl/Cmd-клик
+   и средняя кнопка работают как обычная ссылка — это ожидаемое поведение. */
+export function reviewLinkHandler(href: string) {
+  return (e: React.MouseEvent) => {
+    const m = /^\/reviews#(.+)$/.exec(href);
+    if (!m) return;
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+    e.preventDefault();
+    openReview(m[1]);
+  };
 }
 
 function useMediaQuery(query: string): boolean {
@@ -1246,6 +1302,8 @@ export function PageShell({ path, children }: { path: string; children: ReactNod
       <LensFilter />
       <GlassPointer />
       <div className="min-h-screen bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-primary)]">
+        {/* Окно отзыва — одно на страницу, открывается из плиток и кейсов */}
+        <ReviewModalSlot />
         <Nav path={path} />
         <main className="pb-20 md:pb-0">{children}</main>
 

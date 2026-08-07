@@ -174,8 +174,9 @@ export type Brick = {
   /* Кейса ещё нет: показываем «Готовим кейс» с иконкой — независимо от того,
      есть ли у клиента отзыв (решение Виктории 06.08). */
   pending?: boolean;
-  /* Отрасль — по ней работает фильтр над плитками. */
-  industry?: string;
+  /* Отрасли — по ним работает фильтр. У проекта их может быть 2–3:
+     УрбанТех это и IT, и городские технологии (уточнение Виктории 06.08). */
+  industries?: string[];
   /* Проект под соглашением о неразглашении — компания не называется */
   nda?: boolean;
   /* Ссылка только там, где отзыв этой компании действительно опубликован.
@@ -186,27 +187,30 @@ export type Brick = {
 };
 
 export const BRICKS: Brick[] = [
-  { name: "УрбанТех", industry: "Девелопмент", note: "ИИ-агент первичного скоринга", href: "/reviews#minchenko" },
-  { name: "Сеть ювелирных магазинов", industry: "Ритейл", note: "Система адаптации по всей сети", nda: true, href: "/cases#jewelry-retail" },
-  { name: "Global Broker League", industry: "Финансы", note: "Цифровой Брокер: MVP ДПО-программы", href: "/cases" },
-  { name: "Авито", industry: "IT", pending: true, href: "/reviews#kvirkeliya" },
-  { name: "Маркетинг", industry: "IT", nda: true, pending: true, href: "/reviews#pirogova" },
-  { name: "Топ-менеджеры и владельцы компаний", industry: "Консалтинг", pending: true, href: "/reviews#aliev" },
-  { name: "ИТ-компания, маркетплейс", industry: "IT", nda: true, pending: true },
-  { name: "Колл-центр", industry: "IT", nda: true, pending: true },
-  { name: "VK", industry: "IT", pending: true },
-  { name: "Yes Apart", industry: "Недвижимость", pending: true },
-  { name: "MBA Рыбакова", industry: "Образование", pending: true },
-  { name: "EdTech-компания топ-3", industry: "Образование", nda: true, pending: true },
-  { name: "Global Creative Hub", industry: "Креатив", pending: true },
-  { name: "McDonald's", industry: "Общепит", year: "2021", pending: true },
-  { name: "World Class", industry: "Фитнес", pending: true },
+  { name: "УрбанТех", industries: ["IT", "Городские технологии", "Транспорт"], note: "ИИ-агент первичного скоринга", href: "/cases/urbantech" },
+  { name: "Сеть ювелирных магазинов", industries: ["Ритейл"], note: "Система адаптации по всей сети", nda: true, href: "/cases/jewelry-retail" },
+  { name: "Global Broker League", industries: ["Финансы", "Образование"], note: "Цифровой Брокер: MVP ДПО-программы", href: "/cases/digital-broker" },
+  { name: "Авито", industries: ["IT"], pending: true, href: "/reviews#kvirkeliya" },
+  { name: "Маркетинг", industries: ["IT"], nda: true, pending: true, href: "/reviews#pirogova" },
+  { name: "Топ-менеджеры и владельцы компаний", industries: ["Консалтинг"], pending: true, href: "/reviews#aliev" },
+  { name: "ИТ-компания, маркетплейс", industries: ["IT", "Ритейл"], nda: true, pending: true },
+  { name: "Колл-центр", industries: ["IT", "Клиентский сервис"], nda: true, pending: true },
+  { name: "VK", industries: ["IT"], pending: true },
+  { name: "Yes Apart", industries: ["Недвижимость", "Гостеприимство"], pending: true },
+  { name: "MBA Рыбакова", industries: ["Образование"], pending: true },
+  { name: "EdTech-компания топ-3", industries: ["Образование", "IT"], nda: true, pending: true },
+  { name: "Global Creative Hub", industries: ["Креатив"], pending: true },
+  { name: "McDonald's", industries: ["Общепит", "Ритейл"], year: "2021", pending: true },
+  { name: "World Class", industries: ["Фитнес"], pending: true },
 ];
 
-/* Отрасли для фильтра — в порядке появления, дубликаты схлопнуты. */
+/* Отрасли для фильтра: сначала самые частые, дальше по алфавиту. */
 export const BRICK_INDUSTRIES = Array.from(
-  new Set(BRICKS.map((b) => b.industry).filter(Boolean) as string[]),
-);
+  new Set(BRICKS.flatMap((b) => b.industries ?? [])),
+).sort((a, b) => {
+  const count = (x: string) => BRICKS.filter((br) => br.industries?.includes(x)).length;
+  return count(b) - count(a) || a.localeCompare(b, "ru");
+});
 
 /* -------------------------------- Кейсы ---------------------------------- */
 /* Порядок: корпоративные кейсы ПЕРВЫМИ (разбор 26.07 — первое
@@ -225,8 +229,13 @@ export type CaseItem = {
   metrics: [string, string][];
   source?: string;
   changed?: string; // «что изменилось у клиента» — языком потребности
-  /* якорь карточки (обратные ссылки со страниц эффектов) */
+  /* Адрес страницы кейса: /cases/<slug>. Есть у каждого кейса —
+     иначе на него нельзя сослаться (архитектура 06.08.2026). */
   slug?: string;
+  /* Отрасли для фильтра, 1–3 тега. */
+  industries?: string[];
+  /* slug отзыва этого же клиента: показываем его внизу страницы кейса. */
+  reviewSlug?: string;
   /* страница «Бизнес-эффект и цифры» с полным разбором кейса */
   effectHref?: string;
 };
@@ -236,6 +245,8 @@ export const CASES: CaseItem[] = [
      (добавлен 06.08.2026 по решению Виктории). */
   {
     slug: "urbantech",
+    industries: ["IT", "Городские технологии", "Транспорт"],
+    reviewSlug: "minchenko",
     category: "ИИ-решения",
     title: "ИИ-агент первичного скоринга",
     client: "ГК «УрбанТех»",
@@ -259,6 +270,7 @@ export const CASES: CaseItem[] = [
      на страницах эффектов. Тексты дословно из документа «Бизнес-эффект». */
   {
     slug: "jewelry-retail",
+    industries: ["Ритейл"],
     category: "Корпоративное обучение",
     title: "Федеральная ювелирная сеть",
     nda: true,
@@ -281,6 +293,7 @@ export const CASES: CaseItem[] = [
   },
   {
     slug: "b2b-procurement",
+    industries: ["B2B"],
     category: "Корпоративное обучение",
     title: "B2B-компания: логика закупки глазами клиента",
     nda: true,
@@ -301,6 +314,8 @@ export const CASES: CaseItem[] = [
   },
   {
     category: "Корпоративное обучение",
+    slug: "digital-broker",
+    industries: ["Финансы", "Образование"],
     title: "Цифровой Брокер",
     client: "Global Broker League",
     link: "https://globalbrokerleague.com/",
@@ -322,6 +337,8 @@ export const CASES: CaseItem[] = [
   },
   {
     category: "Корпоративное обучение",
+    slug: "product-approach",
+    industries: ["Образование"],
     title: "Продуктовый подход в корпоративном обучении",
     nda: true,
     client: "Корпоративный заказчик",
@@ -343,6 +360,8 @@ export const CASES: CaseItem[] = [
   },
   {
     category: "Запуски продуктов",
+    slug: "ten-spheres",
+    industries: ["Образование", "Креатив"],
     title: "Курс «10 сфер жизни»",
     nda: true,
     client: "Предприниматель-блогер, 1 млн+ подписчиков",
@@ -365,6 +384,11 @@ export const CASES: CaseItem[] = [
 ];
 
 export const visibleCases = () => CASES;
+
+/* Отрасли кейсов — для фильтра на /cases. */
+export const CASE_INDUSTRIES = Array.from(
+  new Set(CASES.flatMap((c) => c.industries ?? [])),
+);
 
 /* --------------------------------- FAQ ------------------------------------ */
 /* Состав по ТЗ v3 + решения Виктории от 26.07 (вопросы 2, 4, 6, 8 закрыты
