@@ -16,7 +16,7 @@ import {
   REVEAL_EASE,
 } from "./core";
 import {
-  BRICKS, visibleCases, homeReviews, SITUATIONS, TEAM,
+  BRICKS, BRICK_INDUSTRIES, visibleCases, homeReviews, SITUATIONS, TEAM,
   type CaseItem, type Review,
 } from "./data";
 
@@ -155,6 +155,11 @@ export function Hero() {
    Вордмарки текстовые — заменим на файлы логотипов, когда будут согласованы. */
 
 export function Bricks() {
+  /* Фильтр по отрасли (решение Виктории 06.08). Фильтруем на клиенте:
+     пререндер отдаёт все плитки, поэтому поиск и печать видят полный список. */
+  const [industry, setIndustry] = useState<string | null>(null);
+  const bricks = industry ? BRICKS.filter((b) => b.industry === industry) : BRICKS;
+
   /* Цифры опыта переехали сюда из отдельной секции «Наш опыт в цифрах»
      (решение 03.08): две секции рядом доказывали одно и то же. Тексты
      дословно из прежней секции. */
@@ -184,8 +189,38 @@ export function Bricks() {
           Проекты этих компаний под NDA — показываем обезличенно. Там, где
           клиент дал согласие, плитка ведёт на его отзыв.
         </p>
-        <div className="mt-8 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-line)] sm:grid-cols-3">
-          {BRICKS.map((b, i) => {
+        <div className="mt-8 flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => setIndustry(null)}
+            aria-pressed={industry === null}
+            className={`rounded-pill border px-4 py-2 t-caption transition-colors ${
+              industry === null
+                ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)]"
+                : "border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
+            }`}
+          >
+            Все отрасли
+          </button>
+          {BRICK_INDUSTRIES.map((ind) => (
+            <button
+              key={ind}
+              type="button"
+              onClick={() => setIndustry(ind === industry ? null : ind)}
+              aria-pressed={ind === industry}
+              className={`rounded-pill border px-4 py-2 t-caption transition-colors ${
+                ind === industry
+                  ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)]"
+                  : "border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
+              }`}
+            >
+              {ind}
+            </button>
+          ))}
+        </div>
+
+        <div className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-line)] sm:grid-cols-3">
+          {bricks.map((b, i) => {
             const Tag: any = b.href ? motion.a : motion.div;
             return (
               <Tag
@@ -211,7 +246,7 @@ export function Bricks() {
                   ) : null}
                 </div>
                 {/* Подпись: что за проект. Где публиковать пока нечего —
-                    «Готовим описание кейса» с иконкой (решение 06.08). */}
+                    «Готовим кейс» с иконкой (решение 06.08). */}
                 {b.note && (
                   <p className="mt-2 t-caption text-[color:var(--color-text-secondary)]">
                     {b.note}
@@ -220,7 +255,7 @@ export function Bricks() {
                 {b.pending && (
                   <p className="mt-2 inline-flex items-center gap-2 t-caption text-[color:var(--color-text-secondary)]">
                     <CookingPot aria-hidden className="h-4 w-4 shrink-0 text-[color:var(--color-accent)]" />
-                    Готовим описание кейса
+                    Готовим кейс
                   </p>
                 )}
                 {b.href && (
@@ -681,13 +716,6 @@ export function CaseCard({ item, index, teaser = false }: { item: CaseItem; inde
               Что изменилось у клиента
             </div>
             <p className="case-body mt-3 max-w-[65ch] text-[color:var(--color-text-secondary)]">{item.changed}</p>
-            {/* Разбор 04.08: метрики кейса и гарантии противоречили друг
-                другу — в кейсах мы мерили себя оттоком и выручкой, а в
-                гарантиях от бизнес-показателей открещивались. Атрибуция
-                снимает противоречие, не убирая цифры. */}
-            <p className="case-meta mt-3 max-w-[65ch] text-[color:var(--color-text-secondary)]">
-              По данным заказчика. Обучение — один из факторов, влияющих на эти показатели.
-            </p>
           </div>
         )}
 

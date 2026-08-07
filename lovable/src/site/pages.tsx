@@ -158,15 +158,6 @@ function CasesPage() {
         />
       </section>
       <CasesBlock compactHeader />
-      <section className="relative border-b border-[color:var(--color-line)]">
-        <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
-          <p className="max-w-2xl t-body text-[color:var(--color-text-secondary)]">
-            Готовим к публикации кейсы проектов с Авито, ВкусВилл, Beyond Taylor,
-            Global Creative Hub, McDonald's (2021) и World Class — пока
-            почитайте, <a href="/reviews" className="font-semibold text-[color:var(--color-accent)] underline underline-offset-2 hover:text-foreground">что говорят сами клиенты</a>.
-          </p>
-        </div>
-      </section>
       <CtaBand path="/cases" secondary={<NextLink href="/reviews">Читать отзывы клиентов</NextLink>} />
     </PageShell>
   );

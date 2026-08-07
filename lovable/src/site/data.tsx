@@ -171,8 +171,11 @@ export type Brick = {
   year?: string;
   /* Короткая подпись под именем: что за проект. */
   note?: string;
-  /* Кейс в работе: вместо подписи — «Готовим описание кейса» с иконкой. */
+  /* Кейса ещё нет: показываем «Готовим кейс» с иконкой — независимо от того,
+     есть ли у клиента отзыв (решение Виктории 06.08). */
   pending?: boolean;
+  /* Отрасль — по ней работает фильтр над плитками. */
+  industry?: string;
   /* Проект под соглашением о неразглашении — компания не называется */
   nda?: boolean;
   /* Ссылка только там, где отзыв этой компании действительно опубликован.
@@ -183,22 +186,27 @@ export type Brick = {
 };
 
 export const BRICKS: Brick[] = [
-  { name: "УрбанТех", note: "ИИ-агент первичного скоринга", href: "/reviews#minchenko" },
-  { name: "Авито", note: "Отзыв клиента", href: "/reviews#kvirkeliya" },
-  { name: "Global Broker League", note: "Цифровой Брокер: MVP ДПО-программы", href: "/cases" },
-  { name: "Сеть ювелирных магазинов", note: "Система адаптации по всей сети", nda: true, href: "/cases#jewelry-retail" },
-  { name: "Маркетинг", note: "Отзыв клиента", nda: true, href: "/reviews#pirogova" },
-  { name: "Топ-менеджеры и владельцы компаний", note: "Подготовка к выступлению и сборка тренингов", href: "/reviews#aliev" },
-  { name: "ИТ-компания, маркетплейс", note: "Команда бизнес-тренеров по продажам: рост показателей продавцов платформы", nda: true },
-  { name: "Колл-центр", note: "Автоматизация процессов клиентского сервиса: консультации и обучение внешнего эксперта", nda: true },
-  { name: "VK", pending: true },
-  { name: "Yes Apart", pending: true },
-  { name: "MBA Рыбакова", pending: true },
-  { name: "EdTech-компания топ-3", nda: true, pending: true },
-  { name: "Global Creative Hub", pending: true },
-  { name: "McDonald's", year: "2021", pending: true },
-  { name: "World Class", pending: true },
+  { name: "УрбанТех", industry: "Девелопмент", note: "ИИ-агент первичного скоринга", href: "/reviews#minchenko" },
+  { name: "Сеть ювелирных магазинов", industry: "Ритейл", note: "Система адаптации по всей сети", nda: true, href: "/cases#jewelry-retail" },
+  { name: "Global Broker League", industry: "Финансы", note: "Цифровой Брокер: MVP ДПО-программы", href: "/cases" },
+  { name: "Авито", industry: "IT", pending: true, href: "/reviews#kvirkeliya" },
+  { name: "Маркетинг", industry: "IT", nda: true, pending: true, href: "/reviews#pirogova" },
+  { name: "Топ-менеджеры и владельцы компаний", industry: "Консалтинг", pending: true, href: "/reviews#aliev" },
+  { name: "ИТ-компания, маркетплейс", industry: "IT", nda: true, pending: true },
+  { name: "Колл-центр", industry: "IT", nda: true, pending: true },
+  { name: "VK", industry: "IT", pending: true },
+  { name: "Yes Apart", industry: "Недвижимость", pending: true },
+  { name: "MBA Рыбакова", industry: "Образование", pending: true },
+  { name: "EdTech-компания топ-3", industry: "Образование", nda: true, pending: true },
+  { name: "Global Creative Hub", industry: "Креатив", pending: true },
+  { name: "McDonald's", industry: "Общепит", year: "2021", pending: true },
+  { name: "World Class", industry: "Фитнес", pending: true },
 ];
+
+/* Отрасли для фильтра — в порядке появления, дубликаты схлопнуты. */
+export const BRICK_INDUSTRIES = Array.from(
+  new Set(BRICKS.map((b) => b.industry).filter(Boolean) as string[]),
+);
 
 /* -------------------------------- Кейсы ---------------------------------- */
 /* Порядок: корпоративные кейсы ПЕРВЫМИ (разбор 26.07 — первое
