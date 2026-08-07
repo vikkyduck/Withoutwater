@@ -836,29 +836,31 @@ export function ReviewCard({ r, index = 0 }: { r: Review; index?: number }) {
       {...reveal(index)}
       className="h-full scroll-mt-28"
     >
-      <PaperCard className="flex h-full flex-col gap-4 p-6">
-        <span className="font-display t-h2 text-[color:var(--color-accent)]">«</span>
-        <blockquote className="flex flex-col gap-2.5 t-body text-[color:var(--color-text-primary)]">
+      {/* Фото сверху и крупно (решение Виктории 06.08): раньше лицо было
+          пятачком 44 px в подвале карточки — человека не разглядеть.
+          Теперь портрет открывает карточку, под ним имя и должность,
+          дальше сама цитата. */}
+      <PaperCard className="flex h-full flex-col p-6">
+        <div className="mx-auto size-28 shrink-0 overflow-hidden rounded-pill border border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)] md:size-32">
+          <img
+            src={r.photo}
+            alt={r.name}
+            loading="lazy"
+            width={240}
+            height={240}
+            className="size-full object-cover grayscale"
+          />
+        </div>
+        <div className="mt-4 text-center">
+          <div className="font-display t-body font-semibold">{r.name}</div>
+          <p className="mt-1 t-caption text-[color:var(--color-text-secondary)]">{r.role}</p>
+        </div>
+        <span className="mt-5 font-display t-h2 text-[color:var(--color-accent)]">«</span>
+        <blockquote className="mt-2 flex flex-col gap-2.5 t-body text-[color:var(--color-text-primary)]">
           {r.text.map((p) => (
             <p key={p}>{p}</p>
           ))}
         </blockquote>
-        <div className="mt-auto flex items-center gap-3 border-t border-[color:var(--color-line)] pt-4">
-          <div className="size-11 shrink-0 overflow-hidden rounded-pill border border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
-            <img
-              src={r.photo}
-              alt={r.name}
-              loading="lazy"
-              width={120}
-              height={120}
-              className="size-full object-cover grayscale"
-            />
-          </div>
-          <div className="min-w-0">
-            <div className="font-display t-label">{r.name}</div>
-            <p className="mt-0.5 t-caption text-[color:var(--color-text-secondary)]">{r.role}</p>
-          </div>
-        </div>
       </PaperCard>
     </motion.div>
   );
