@@ -380,6 +380,10 @@ export function ConstructorPage() {
             Выберите задачи и нажмите на кнопку «Отправить», когда соберете пакет
             услуг, мы напишем вам в течение 5 минут.
           </p>
+          {/* Общее условие работы — то же, что в шапках страниц решений. */}
+          <p className="measure mt-5 border-l-2 border-[color:var(--color-accent)] pl-4 t-body text-[color:var(--color-text-secondary)]">
+            Все услуги и продукты подразумевают подбор исполнителей с нашей стороны.
+          </p>
 
           <fieldset className="mt-14 border-0 p-0">
             <legend className="sr-only">Команда по подписке — оплата в месяц</legend>

@@ -1396,6 +1396,7 @@ export function PageHead({
   guide,
   chips,
   actions,
+  note,
   compact = false,
 }: {
   kicker: string;
@@ -1405,6 +1406,9 @@ export function PageHead({
   guide?: ReactNode;
   chips?: [string, string][];
   actions?: ReactNode;
+  /* Общее условие работы, одинаковое для всех решений (06.08.2026):
+     исполнителей подбираем мы. Идёт отдельной строкой под лидом. */
+  note?: ReactNode;
   /* Компактная шапка: половинные вертикальные отступы. Нужна там, где
      страница — это сразу содержимое, а не обещание (отзывы, 06.08.2026). */
   compact?: boolean;
@@ -1466,6 +1470,11 @@ export function PageHead({
         {/* Строка-ориентир: как читать страницу и куда идти дальше (приёмка, п. 6). */}
         {guide && (
           <p className="t-eyebrow mt-5 text-[color:var(--color-text-inverse-2)]">{guide}</p>
+        )}
+        {note && (
+          <p className="measure mt-5 border-l-2 border-[color:var(--color-accent)] pl-4 t-body text-[color:var(--color-text-inverse-2)]">
+            {note}
+          </p>
         )}
         {actions && (
           <div className="mt-9 flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-5 print:hidden">
