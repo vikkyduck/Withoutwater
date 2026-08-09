@@ -17,7 +17,7 @@ import { useMemo, useRef, useState } from "react";
 import {
   motion,
   PageShell, PaperCard, Scene,
-  RevealHeading, NodeList, Check, SectionLabel, ArrowRight,
+  RevealHeading, NodeList, Check, Plus, Minus, SectionLabel, ArrowRight,
   reveal,
 } from "./core";
 
@@ -35,6 +35,9 @@ type Unit = {
   what: string;
   list?: string[];
   note?: string;
+  /* Позиция без количества: комиссия считается от бюджета, множить нечего
+     (требование Виктории 09.08 — количество нужно у услуг и сотрудников). */
+  fixed?: boolean;
   /* Ссылка на страницу продукта — выводится внутри карточки позиции
      (требование Виктории 06.08: ссылка должна жить в карточке продукта). */
   href?: string;
@@ -104,6 +107,7 @@ const SUBSCRIPTION: Unit[] = [
        конструктора позиция не считается — поэтому price 0 и своя строка. */
     price: 0,
     priceLabel: "25% от бюджета",
+    fixed: true,
     what: "Любые инструменты для развития навыка в ИПР. От вас нужно описание запроса, все остальное делаем мы: ищем варианты, согласуем с вами, оплачиваем и организуем обучение сотрудника.",
     /* Отдельным абзацем (решение Виктории 06.08): условие оплаты не должно
        теряться в конце описания услуги. */
@@ -184,19 +188,74 @@ const PRODUCTS: Unit[] = [
 
 const money = (n: number) => n.toLocaleString("ru-RU").replace(/ /g, " ") + " ₽";
 
+/* Сколько одинаковых единиц можно набрать в одной позиции. Потолок нужен,
+   чтобы случайный зажатый «+» не увёл смету в миллиарды. */
+const MAX_QTY = 20;
+
+/* Шаг количества: появляется только у выбранной позиции. Стоит вне <label>
+   карточки — иначе клик по «+» снимал бы галочку. */
+function QtyStepper({
+  qty,
+  unitTitle,
+  onQty,
+}: {
+  qty: number;
+  unitTitle: string;
+  onQty: (n: number) => void;
+}) {
+  const btn =
+    "flex h-8 w-8 items-center justify-center rounded-sm text-[color:var(--color-text-secondary)] transition-colors hover:text-[color:var(--color-text-primary)] disabled:cursor-not-allowed disabled:opacity-30";
+  return (
+    <div className="flex items-center gap-3">
+      <span className="t-label text-[color:var(--color-text-secondary)]">Количество</span>
+      <div className="flex items-center rounded-pill border border-[color:var(--color-line)] p-1">
+        <button
+          type="button"
+          onClick={() => onQty(qty - 1)}
+          disabled={qty <= 1}
+          aria-label={`Убавить количество: ${unitTitle}`}
+          className={btn}
+        >
+          <Minus className="h-4 w-4" />
+        </button>
+        <span
+          aria-live="polite"
+          className="min-w-8 text-center font-display t-body font-semibold tabular-nums"
+        >
+          {qty}
+        </span>
+        <button
+          type="button"
+          onClick={() => onQty(qty + 1)}
+          disabled={qty >= MAX_QTY}
+          aria-label={`Прибавить количество: ${unitTitle}`}
+          className={btn}
+        >
+          <Plus className="h-4 w-4" />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function UnitCard({
   unit,
   index,
   suffix,
-  checked,
+  qty,
   onToggle,
+  onQty,
 }: {
   unit: Unit;
   index: number;
   suffix: string;
-  checked: boolean;
+  qty: number;
   onToggle: () => void;
+  onQty: (n: number) => void;
 }) {
+  const checked = qty > 0;
+  /* Количество есть у всех позиций, кроме комиссионной. */
+  const countable = checked && !unit.fixed;
   /* Длинные списки («Карта экспертности», «ИИ-агент») ломали сетку: карточка
      была вдвое выше соседней. Прячем состав под раскрытие — карточки ровные,
      содержимое доступно по клику. */
@@ -232,9 +291,24 @@ function UnitCard({
                 onChange={onToggle}
               />
               <span className="min-w-0 flex-1 font-display t-body font-semibold">{unit.title}</span>
-              {/* Цена — второй голос: та же величина, нейтральный серый. */}
-              <span className="shrink-0 whitespace-nowrap font-display t-body tabular-nums text-[color:var(--color-text-secondary)]">
-                {unit.priceLabel ?? `${money(unit.price)}${suffix}`}
+              {/* Цена — второй голос: та же величина, нейтральный серый.
+                  От двух единиц наверху стоит сумма позиции, под ней — из чего
+                  она сложилась. */}
+              <span className="shrink-0 whitespace-nowrap text-right">
+                <span
+                  className={`block font-display t-body tabular-nums ${
+                    qty > 1
+                      ? "font-semibold text-[color:var(--color-accent)]"
+                      : "text-[color:var(--color-text-secondary)]"
+                  }`}
+                >
+                  {unit.priceLabel ?? `${money(unit.price * Math.max(qty, 1))}${suffix}`}
+                </span>
+                {qty > 1 && (
+                  <span className="mt-1 block t-caption tabular-nums text-[color:var(--color-text-secondary)]">
+                    {money(unit.price)}{suffix} × {qty}
+                  </span>
+                )}
               </span>
             </div>
 
@@ -256,30 +330,37 @@ function UnitCard({
             </div>
           </label>
 
-          {unit.list && (
-            <div className="mt-auto px-6 pb-6 pl-[3.75rem]">
-              <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-                <button
-                  type="button"
-                  onClick={() => setOpen((v) => !v)}
-                  aria-expanded={open}
-                  aria-controls={listId}
-                  className="t-body font-semibold text-[color:var(--color-accent)] underline underline-offset-4 decoration-[color:var(--color-line)] transition-colors hover:decoration-[color:var(--color-accent)]"
-                >
-                  {open ? "Свернуть" : `Состав — ${unit.list.length}`}
-                </button>
-                {unit.href && (
-                  <a href={unit.href} className="link-arrow group t-body">
-                    Смотреть, что входит
-                    <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-                  </a>
-                )}
-              </div>
-              {open && (
-                <div id={listId} className="mt-4">
-                  <NodeList divided items={unit.list} />
-                  {unit.note && (
-                    <p className="mt-4 t-body text-[color:var(--color-text-secondary)]">{unit.note}</p>
+          {(unit.list || countable) && (
+            <div className="mt-auto flex flex-col gap-4 px-6 pb-6 pl-[3.75rem]">
+              {countable && (
+                <QtyStepper qty={qty} unitTitle={unit.title} onQty={onQty} />
+              )}
+              {unit.list && (
+                <div>
+                  <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+                    <button
+                      type="button"
+                      onClick={() => setOpen((v) => !v)}
+                      aria-expanded={open}
+                      aria-controls={listId}
+                      className="t-body font-semibold text-[color:var(--color-accent)] underline underline-offset-4 decoration-[color:var(--color-line)] transition-colors hover:decoration-[color:var(--color-accent)]"
+                    >
+                      {open ? "Свернуть" : `Состав — ${unit.list.length}`}
+                    </button>
+                    {unit.href && (
+                      <a href={unit.href} className="link-arrow group t-body">
+                        Смотреть, что входит
+                        <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
+                      </a>
+                    )}
+                  </div>
+                  {open && (
+                    <div id={listId} className="mt-4">
+                      <NodeList divided items={unit.list} />
+                      {unit.note && (
+                        <p className="mt-4 t-body text-[color:var(--color-text-secondary)]">{unit.note}</p>
+                      )}
+                    </div>
                   )}
                 </div>
               )}
@@ -292,8 +373,18 @@ function UnitCard({
 }
 
 export function ConstructorPage() {
-  const [picked, setPicked] = useState<Record<string, boolean>>({});
-  const toggle = (id: string) => setPicked((p) => ({ ...p, [id]: !p[id] }));
+  /* Ключ — позиция, значение — количество. Позиции нет в объекте, пока её не
+     выбрали: так «Выбрано» и чипы считаются по одному источнику. */
+  const [picked, setPicked] = useState<Record<string, number>>({});
+  const toggle = (id: string) =>
+    setPicked((p) => {
+      const next = { ...p };
+      if (next[id]) delete next[id];
+      else next[id] = 1;
+      return next;
+    });
+  const setQty = (id: string, n: number) =>
+    setPicked((p) => ({ ...p, [id]: Math.max(1, Math.min(MAX_QTY, n)) }));
 
   const [contact, setContact] = useState("");
   const [pd, setPd] = useState(false);
@@ -308,7 +399,7 @@ export function ConstructorPage() {
 
   const { monthly, once, count, chosen } = useMemo(() => {
     const sum = (list: Unit[]) =>
-      list.reduce((acc, u) => (picked[u.id] ? acc + u.price : acc), 0);
+      list.reduce((acc, u) => acc + u.price * (picked[u.id] ?? 0), 0);
     const picks = [...SUBSCRIPTION, ...PRODUCTS].filter((u) => picked[u.id]);
     return { monthly: sum(SUBSCRIPTION), once: sum(PRODUCTS), count: picks.length, chosen: picks };
   }, [picked]);
@@ -326,10 +417,15 @@ export function ConstructorPage() {
         ? "Отметьте согласие на обработку персональных данных."
         : null;
 
+  /* Строки для заявки: количество и сумма позиции, чтобы в письме было видно
+     не только «Методолог», но и сколько их. */
   const summaryLines = () =>
-    chosen.map(
-      (u) => `${u.title} — ${money(u.price)}${SUBSCRIPTION.includes(u) ? " / мес" : ""}`,
-    );
+    chosen.map((u) => {
+      const q = picked[u.id] ?? 1;
+      const per = SUBSCRIPTION.includes(u) ? " / мес" : "";
+      const price = u.priceLabel ?? `${money(u.price * q)}${per}`;
+      return `${u.title}${q > 1 ? ` × ${q}` : ""} — ${price}`;
+    });
 
   const send = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -399,8 +495,9 @@ export function ConstructorPage() {
                   unit={u}
                   index={i}
                   suffix=" / мес"
-                  checked={!!picked[u.id]}
+                  qty={picked[u.id] ?? 0}
                   onToggle={() => toggle(u.id)}
+                  onQty={(n) => setQty(u.id, n)}
                 />
               ))}
             </div>
@@ -419,8 +516,9 @@ export function ConstructorPage() {
                   unit={u}
                   index={i}
                   suffix=""
-                  checked={!!picked[u.id]}
+                  qty={picked[u.id] ?? 0}
                   onToggle={() => toggle(u.id)}
+                  onQty={(n) => setQty(u.id, n)}
                 />
               ))}
             </div>
@@ -516,7 +614,14 @@ export function ConstructorPage() {
                           className="flex max-w-[18rem] items-center gap-2 rounded-pill border border-[color:var(--color-line-dark)] px-3 py-1.5 text-left t-caption text-[color:var(--color-text-inverse-2)] transition-colors hover:border-[color:var(--color-accent-glass)] hover:text-[color:var(--color-text-inverse)]"
                         >
                           <span className="truncate">{u.title}</span>
-                          <span aria-hidden className="flex-none">×</span>
+                          {(picked[u.id] ?? 1) > 1 && (
+                            <span className="flex-none font-display tabular-nums text-[color:var(--color-accent)]">
+                              × {picked[u.id]}
+                            </span>
+                          )}
+                          {/* Крестик — другой знак, иначе рядом с «× 2» читается
+                              как второй множитель. */}
+                          <span aria-hidden className="flex-none">✕</span>
                         </button>
                       </li>
                     ))}
