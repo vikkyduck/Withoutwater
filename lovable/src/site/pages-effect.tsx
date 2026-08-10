@@ -1007,7 +1007,7 @@ export function TeamSubscriptionPage() {
         <div id="units" className="relative mx-auto max-w-7xl px-5 sec-pad scroll-mt-28 md:px-8">
           <SectionLabel n="01">Что входит в подписку</SectionLabel>
           <RevealHeading className="t-h2 mt-6 max-w-3xl">
-            Подписка на команду по обучению от 180 000 ₽ в месяц. Состав выбираете вы.
+            Подписка на наши услуги от 180 000 ₽ в месяц. Состав выбираете вы.
           </RevealHeading>
           <p className="mt-5 max-w-3xl t-body text-[color:var(--color-text-primary)]">
             Все работы выполняет команда «Без Воды» на своей стороне и своими средствами.
@@ -1193,7 +1193,7 @@ export function TeamSubscriptionEffectPage() {
     <PageShell path={path}>
       <section className="stage border-b border-[color:var(--color-line)]">
         <PageHead
-          kicker="Бизнес-эффект · Команда по подписке"
+          kicker="Бизнес-эффект · Подписка на наши услуги"
           title={<>Что меняется для бизнеса</>}
           guide="Цифры и эффекты подписки; дальше — как устроена работа."
           actions={
