@@ -19,6 +19,7 @@ import {
   MotionConfig,
 } from "motion/react";
 import { ArrowUpRight, ArrowRight, ArrowDown, Plus, Minus, Check, ExternalLink, Calendar, CookingPot } from "lucide-react";
+import { CONTACT } from "./data";
 
 export { motion, AnimatePresence };
 export { ArrowUpRight, ArrowRight, ArrowDown, Plus, Minus, Check, ExternalLink, Calendar, CookingPot };
@@ -1239,21 +1240,29 @@ export function Footer() {
   return (
     <footer className="border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
       <div className="mx-auto max-w-7xl px-5 py-8 md:px-8">
-        {/* Навигация переехала в меню шапки: в футере — только контакты
-            и юридический блок. */}
+        {/* Основная навигация живёт в шапке. Второй уровень (NAV_SECONDARY)
+            до 10.08.2026 существовал только в бургер-меню, которое рендерится
+            по клику: в статичном HTML на /faq не вело ни одной ссылки —
+            страница была сиротой для поисковика. Теперь уровень продублирован
+            здесь, в футере. */}
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <a href="/" className="flex items-center gap-3 text-[color:var(--color-text-primary)]" aria-label="БЕЗ ВОДЫ — на главную">
             <CatMark className="h-8 w-auto text-[color:var(--color-text-primary)]/70" strokeWidth={2} />
             <StencilLogo className="logo-sm" />
           </a>
           <ul className="flex flex-wrap gap-x-6 gap-y-2 t-body">
-            <li><a href="tel:+79645842225" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">+7 964 584 22 25</a></li>
-            <li><a href="https://t.me/vikky_duck" target="_blank" rel="noreferrer" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">Telegram: @vikky_duck</a></li>
-            <li><a href="mailto:vu@withoutwater.ru" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">vu@withoutwater.ru</a></li>
+            <li><a href={CONTACT.tel} className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">{CONTACT.phone}</a></li>
+            <li><a href={CONTACT.tgUrl} target="_blank" rel="noreferrer" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">Telegram: {CONTACT.tg}</a></li>
+            <li><a href={`mailto:${CONTACT.email}`} className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">{CONTACT.email}</a></li>
             {/* «Личный кабинет» живёт только в меню шапки */}
           </ul>
         </div>
         <div className="mt-6 flex flex-col gap-3 border-t border-[color:var(--color-line)] pt-5 t-caption text-[color:var(--color-text-secondary)]">
+          <nav aria-label="Разделы" className="flex flex-wrap gap-x-5 gap-y-2">
+            {NAV_SECONDARY.map(([label, href]) => (
+              <a key={href} href={href} className="transition hover:text-[color:var(--color-accent)]">{label}</a>
+            ))}
+          </nav>
           <div className="flex flex-wrap gap-x-5 gap-y-2">
             <a href="/politics_pd" className="transition hover:text-[color:var(--color-accent)]">Политика конфиденциальности</a>
             <a href="/consent_pd" className="transition hover:text-[color:var(--color-accent)]">Согласие на обработку персональных данных</a>
@@ -1618,12 +1627,12 @@ export function CtaBand({
             чтобы везде была возможность написать или позвонить») */}
         <p className="mt-5 t-body text-[color:var(--color-text-inverse-2)]">
           Или напрямую:{" "}
-          <a href="https://t.me/vikky_duck" target="_blank" rel="noreferrer" className="font-semibold text-[color:var(--color-text-inverse)] underline underline-offset-4 transition hover:text-[color:var(--color-accent-glass)]">
-            Telegram @vikky_duck
+          <a href={CONTACT.tgUrl} target="_blank" rel="noreferrer" className="font-semibold text-[color:var(--color-text-inverse)] underline underline-offset-4 transition hover:text-[color:var(--color-accent-glass)]">
+            Telegram {CONTACT.tg}
           </a>
           {" · "}
-          <a href="tel:+79645842225" className="font-semibold text-[color:var(--color-text-inverse)] underline underline-offset-4 transition hover:text-[color:var(--color-accent-glass)]">
-            +7 964 584 22 25
+          <a href={CONTACT.tel} className="font-semibold text-[color:var(--color-text-inverse)] underline underline-offset-4 transition hover:text-[color:var(--color-accent-glass)]">
+            {CONTACT.phone}
           </a>
         </p>
       </div>

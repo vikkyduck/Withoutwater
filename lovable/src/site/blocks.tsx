@@ -19,6 +19,7 @@ import {
 import {
   BRICKS, BRICK_INDUSTRIES, BRICK_SERVICES, CASE_INDUSTRIES, CASE_SERVICES,
   visibleCases, homeReviews, REVIEWS, SITUATIONS, TEAM,
+  LEAD_ERROR, PRACTICE_PROOF_LC,
   type CaseItem, type Review,
 } from "./data";
 
@@ -155,6 +156,15 @@ export function Hero() {
 
 /* Полоса фильтров: одна на «Отрасли», вторая на «Услуги». Фильтруем на
    клиенте — пререндер отдаёт полный список, поэтому поиск видит всё. */
+/* Класс пилюли фильтра — одна функция на оба состояния (кнопка «Все» и
+   варианты дублировали тройную строку классов). */
+const filterPill = (active: boolean) =>
+  `rounded-pill border px-4 py-2 t-caption transition-colors ${
+    active
+      ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)]"
+      : "border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
+  }`;
+
 function FilterRow({
   label,
   options,
@@ -170,16 +180,7 @@ function FilterRow({
   return (
     <div className="flex flex-wrap items-center gap-2">
       <span className="mr-1 t-label text-[color:var(--color-text-secondary)]">{label}</span>
-      <button
-        type="button"
-        onClick={() => onChange(null)}
-        aria-pressed={value === null}
-        className={`rounded-pill border px-4 py-2 t-caption transition-colors ${
-          value === null
-            ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)]"
-            : "border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
-        }`}
-      >
+      <button type="button" onClick={() => onChange(null)} aria-pressed={value === null} className={filterPill(value === null)}>
         Все
       </button>
       {options.map((opt) => (
@@ -188,15 +189,30 @@ function FilterRow({
           type="button"
           onClick={() => onChange(opt === value ? null : opt)}
           aria-pressed={opt === value}
-          className={`rounded-pill border px-4 py-2 t-caption transition-colors ${
-            opt === value
-              ? "border-[color:var(--color-accent)] text-[color:var(--color-accent)]"
-              : "border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] hover:text-[color:var(--color-text-primary)]"
-          }`}
+          className={filterPill(opt === value)}
         >
           {opt}
         </button>
       ))}
+    </div>
+  );
+}
+
+/* Пустой срез: оба фильтра могут дать 0 карточек — молчаливая пустая сетка
+   выглядела как поломка. Формулировку можно заменить на слова Виктории. */
+function FilterEmpty({ onReset, dark = false }: { onReset: () => void; dark?: boolean }) {
+  return (
+    <div className="py-10">
+      <p className={`t-body ${dark ? "text-[color:var(--color-text-inverse-2)]" : "text-[color:var(--color-text-secondary)]"}`}>
+        Под это сочетание фильтров пока пусто.
+      </p>
+      <button
+        type="button"
+        onClick={onReset}
+        className="mt-3 t-body font-semibold text-[color:var(--color-accent)] underline underline-offset-4"
+      >
+        Показать все
+      </button>
     </div>
   );
 }
@@ -251,6 +267,9 @@ export function Bricks() {
           <FilterRow label="Услуга" options={BRICK_SERVICES} value={service} onChange={setService} />
         </div>
 
+        {bricks.length === 0 && (
+          <FilterEmpty dark onReset={() => { setIndustry(null); setService(null); }} />
+        )}
         <div className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-line)] sm:grid-cols-3">
           {bricks.map((b, i) => {
             const Tag: any = b.href ? motion.a : motion.div;
@@ -475,7 +494,7 @@ export function Flow({ n = "02" }: { n?: string } = {}) {
   ];
   const branches = [
     { tag: "Масштабировать внутренний опыт", time: "24 часа", desc: "старт проекта" },
-    { tag: "Привлечь экспертность с рынка", time: "60 минут", desc: "описание опыта и подтвержденные кейсы практиков, которые будут работать над задачей в рамках проекта" },
+    { tag: "Привлечь экспертность с рынка", time: "60 минут", desc: PRACTICE_PROOF_LC },
   ];
   return (
     <section className="stage sec-dark grain border-b border-[color:var(--color-line-dark)]">
@@ -834,6 +853,9 @@ export function CasesBlock({
             <FilterRow label="Отрасль" options={CASE_INDUSTRIES} value={industry} onChange={setIndustry} />
             <FilterRow label="Услуга" options={CASE_SERVICES} value={service} onChange={setService} />
           </div>
+        )}
+        {compactHeader && items.length === 0 && (
+          <FilterEmpty onReset={() => { setIndustry(null); setService(null); }} />
         )}
         <div className={`grid items-stretch gap-6 md:grid-cols-2 ${compactHeader ? "" : "mt-14"}`}>
 
@@ -1360,7 +1382,7 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
       setSent(true);
       ymGoal("lead_sent");
     } catch {
-      setErr("Заявка не отправилась. Попробуйте ещё раз или напишите в Telegram: @vikky_duck.");
+      setErr(LEAD_ERROR);
     } finally {
       setSending(false);
     }
