@@ -475,7 +475,7 @@ export function Flow({ n = "02" }: { n?: string } = {}) {
   ];
   const branches = [
     { tag: "Масштабировать внутренний опыт", time: "24 часа", desc: "старт проекта" },
-    { tag: "Привлечь экспертность с рынка", time: "60 минут", desc: "представляем первые релевантные профили" },
+    { tag: "Привлечь экспертность с рынка", time: "60 минут", desc: "описание опыта и подтвержденные кейсы практиков, которые будут работать над задачей" },
   ];
   return (
     <section className="stage sec-dark grain border-b border-[color:var(--color-line-dark)]">
