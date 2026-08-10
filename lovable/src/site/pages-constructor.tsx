@@ -43,7 +43,7 @@ type Unit = {
   href?: string;
 };
 
-/* Таблица 1 — «Команда по подписке (конструктор задач)».
+/* Таблица 1 — «Подписка на наши услуги (конструктор задач)».
    Колонки: Единица результата · Цена · Что заказчик получает за месяц. */
 const SUBSCRIPTION: Unit[] = [
   {
@@ -473,7 +473,7 @@ export function ConstructorPage() {
 
         <div className="relative mx-auto max-w-7xl px-5 pt-14 md:px-8 md:pt-20">
           <RevealHeading as="h1" className="t-h1 max-w-4xl">
-            Команда по подписке: конструктор
+            Подписка на наши услуги: конструктор
           </RevealHeading>
           <p className="measure mt-6 t-body text-[color:var(--color-text-primary)]">
             Выберите задачи и нажмите на кнопку «Отправить», когда соберете пакет
@@ -481,13 +481,13 @@ export function ConstructorPage() {
           </p>
           {/* Общее условие работы — то же, что в шапках страниц решений. */}
           <p className="measure mt-5 border-l-2 border-[color:var(--color-accent)] pl-4 t-body text-[color:var(--color-text-secondary)]">
-            Все услуги и продукты подразумевают подбор исполнителей с нашей стороны.
+            Мы привлекаем всех необходимых профильных экспертов для реализации проекта.
           </p>
 
           <fieldset className="mt-14 border-0 p-0">
-            <legend className="sr-only">Команда по подписке — оплата в месяц</legend>
-            <SectionLabel n="01">Команда по подписке · в месяц</SectionLabel>
-            <RevealHeading className="t-h2 mt-6 max-w-3xl">Команда по подписке</RevealHeading>
+            <legend className="sr-only">Подписка на наши услуги — оплата в месяц</legend>
+            <SectionLabel n="01">Подписка на наши услуги · в месяц</SectionLabel>
+            <RevealHeading className="t-h2 mt-6 max-w-3xl">Подписка на наши услуги</RevealHeading>
             <div className="mt-8 grid items-stretch gap-4 lg:grid-cols-2">
               {SUBSCRIPTION.map((u, i) => (
                 <UnitCard
