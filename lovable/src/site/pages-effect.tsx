@@ -125,7 +125,7 @@ function OtherSituations({ current }: { current: string }) {
           ))}
         </div>
         <a href="/tasks" className="link-arrow group mt-6 t-body">
-          Все задачи и решения
+          Все услуги
           <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
         </a>
       </div>
