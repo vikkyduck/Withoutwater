@@ -268,6 +268,32 @@ function csvEscape(v) {
 }
 
 /* ── сервер ── */
+/* ── срок хранения (политика ПД, ред. 17.09.2026) ──
+   Заявка, не завершившаяся договором, хранится 1 год: чистим «новые» и
+   «закрытые» старше года из базы и из резервного журнала. «В работе» не
+   трогаем — по ним идет договор, срок другой. Раз в сутки и при старте. */
+const RETENTION_DAYS = Number(process.env.RETENTION_DAYS || 365);
+function purgeStaleLeads() {
+  try {
+    const cutoff = new Date(Date.now() - RETENTION_DAYS * 86400e3).toISOString();
+    const stale = db.prepare("SELECT id FROM leads WHERE status IN ('new','done') AND ts < ?").all(cutoff).map((r) => r.id);
+    if (!stale.length) return;
+    const del = db.prepare('DELETE FROM leads WHERE id = ?');
+    for (const id of stale) del.run(id);
+    if (existsSync(LEADS_FILE)) {
+      const gone = new Set(stale);
+      const kept = readFileSync(LEADS_FILE, 'utf8').split('\n').filter((line) => {
+        if (!line.trim()) return false;
+        try { return !gone.has(JSON.parse(line).id); } catch { return true; }
+      });
+      writeFile(LEADS_FILE, kept.length ? kept.join('\n') + '\n' : '', 'utf8').catch((e) => console.error('[retention] jsonl:', e.message));
+    }
+    console.log(`[retention] удалено заявок старше ${RETENTION_DAYS} дн.: ${stale.length}`);
+  } catch (e) { console.error('[retention] не отработало:', e.message); }
+}
+purgeStaleLeads();
+setInterval(purgeStaleLeads, 86400e3).unref();
+
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
   const origin = req.headers.origin || '';

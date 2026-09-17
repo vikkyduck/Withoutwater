@@ -30,19 +30,25 @@
     <link rel="preload" href="/fonts/golos-latin.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preconnect" href="https://mc.yandex.ru" />
     <link rel="stylesheet" href="/fonts/fonts.css" />
-    <!-- Яндекс Метрика 110744367 (данные в РФ), цель lead_sent на отправку формы -->
+    <!-- Яндекс Метрика 110744367 (данные в РФ), цель lead_sent на отправку формы.
+         Стартует только после «Принять» на плашке cookie (152-ФЗ: плашка-уведомление
+         согласием не считается, ревизия 17.09.2026). Повторный визит с сохраненным
+         согласием — сразу. Без согласия счетчик не грузится, cookie не ставятся. -->
     <script type="text/javascript">
-    (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-    m[i].l=1*new Date();
-    for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-    k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-    (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-    ym(110744367, "init", {ssr:true, webvisor:true, clickmap:true, accurateTrackBounce:true, trackLinks:true});
-    window.YM_ID = 110744367;
+    window.bvMetrika = function () {
+      if (window.YM_ID) return;
+      (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+      m[i].l=1*new Date();
+      for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+      k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+      (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+      ym(110744367, "init", {ssr:true, webvisor:true, clickmap:true, accurateTrackBounce:true, trackLinks:true});
+      window.YM_ID = 110744367;
+    };
+    try { if (window.localStorage.getItem("bv-cookie-ok")) window.bvMetrika(); } catch (e) {}
     </script>
   </head>
   <body>
-    <noscript><div><img src="https://mc.yandex.ru/watch/110744367" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

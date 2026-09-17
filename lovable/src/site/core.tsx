@@ -937,6 +937,8 @@ export function CookieBar() {
   }, [show]);
   const accept = () => {
     try { window.localStorage.setItem("bv-cookie-ok", "1"); } catch {}
+    /* Метрика подключается только отсюда (index.html): до согласия счетчика нет */
+    try { (window as unknown as { bvMetrika?: () => void }).bvMetrika?.(); } catch {}
     setShow(false);
   };
   if (!mounted || !show) return null;
@@ -950,7 +952,7 @@ export function CookieBar() {
       className="fixed inset-x-0 bottom-0 z-40 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] px-4 py-2 text-center"
     >
       <span className="t-caption text-[color:var(--color-text-secondary)]">
-        Cookie и Яндекс Метрика ·{" "}
+        Cookie и Яндекс Метрика — только после согласия ·{" "}
         <a
           href="/politics_pd/"
           className="underline underline-offset-2 hover:text-[color:var(--color-text-primary)]"
@@ -963,7 +965,7 @@ export function CookieBar() {
         onClick={accept}
         className="rounded-sm border border-[color:var(--color-line)] px-3 py-1 t-eyebrow text-[color:var(--color-text-primary)] transition-colors duration-[160ms] hover:border-[color:var(--color-steel)] hover:bg-[color:var(--color-bg-secondary)]"
       >
-        Понятно
+        Принять
       </button>
     </div>
   );

@@ -81,14 +81,14 @@ export function Hero() {
             собственной рамкой. Образ «мощностей» остается в надзаголовке.
             Формулировки ее, дословно. */}
         <div className="mb-6 [--color-text-secondary:var(--color-text-inverse-2)]">
-          <SectionLabel n="01">Новые возможности T&D</SectionLabel>
+          <SectionLabel n="01">Для HR, T&D и EdTech</SectionLabel>
         </div>
         <RevealHeading as="h1" className="t-h1 max-w-[900px] text-[color:var(--color-text-inverse)]">
           Проектное бюро по обучению
         </RevealHeading>
 
         <p className="t-body measure mt-6 text-[color:var(--color-text-inverse)]/85 md:mt-7">
-          Проектируем программы обучения с привлечением профильных специалистов
+          Реализуем образовательные продукты заказчика в срок и в соответствии с ожиданиями по качеству. Проектируем программы обучения с привлечением профильных специалистов
         </p>
 
         {/* Одно главное действие — сразу под смыслом, до всех аргументов */}
@@ -112,8 +112,8 @@ export function Hero() {
         <div className="relative mt-12 grid max-w-4xl items-stretch gap-4 sm:grid-cols-3 md:mt-16">
           {[
             ["Без ТЗ", "Вводные в любом виде"],
-            ["24 часа", "Включаемся в работу"],
-            ["от 180 000 ₽/мес", "Подписка на услуги БЕЗ ВОДЫ"],
+            ["24 часа", "Включаемся в работу после подписания договора"],
+            ["от 180 000 ₽/мес", "Подписка на отдел обучения"],
           ].map(([label, desc], i) => (
             <div
               key={label}
@@ -298,7 +298,7 @@ export function WhenNeeded() {
         ]}
       />
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="02" heading>Когда подключается команда «Без Воды»</SectionLabel>
+        <SectionLabel n="02" heading>Когда подключается команда БЕЗ ВОДЫ</SectionLabel>
         <div className="mt-8 grid gap-5 md:grid-cols-3">
           {SITUATIONS.map((it, i) => (
             <motion.div key={it.id} {...reveal(i)}>
@@ -784,7 +784,7 @@ export function ReviewsBlock({ bare = false }: { bare?: boolean } = {}) {
                 Что говорят клиенты
               </RevealHeading>
               <p className="t-body max-w-md text-[color:var(--color-text-secondary)]">
-                О работе методологов «Без Воды» — дословно.
+                О работе методологов БЕЗ ВОДЫ — дословно.
               </p>
             </div>
           </>
