@@ -1426,8 +1426,8 @@ export function ScrollRing({ className = "" }: { className?: string }) {
     <button
       type="button"
       onClick={onClick}
-      aria-label={atTop ? "Листать дальше" : `Прочитано ${pct}% — наверх`}
-      title={atTop ? "Листать дальше" : "Наверх"}
+      aria-label={atTop ? "Листать страницу" : `Прочитано ${pct}% — наверх`}
+      title={atTop ? "Листать страницу" : "Наверх"}
       className={`card-link group pointer-events-auto absolute hidden aspect-square rounded-pill md:block print:hidden ${className}`}
     >
       <span

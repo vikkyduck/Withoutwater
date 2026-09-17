@@ -1153,7 +1153,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                   Спасибо!
                 </h3>
                 <p className="mt-3 text-[color:var(--color-text-inverse-2)]">
-                  Что дальше:
+                  Следующие шаги:
                 </p>
 
                 <ol className="mt-4 space-y-2 t-body text-[color:var(--color-text-inverse-2)]">
