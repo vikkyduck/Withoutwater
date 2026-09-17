@@ -84,11 +84,12 @@ export function Hero() {
           <SectionLabel n="01">Для HR, T&D и EdTech</SectionLabel>
         </div>
         <RevealHeading as="h1" className="t-h1 max-w-[900px] text-[color:var(--color-text-inverse)]">
-          Проектное бюро по обучению
+          Отдел обучения по подписке
         </RevealHeading>
 
+        {/* Оффер по Хормози, вариант C — формулировки Виктории 18.09.2026, дословно */}
         <p className="t-body measure mt-6 text-[color:var(--color-text-inverse)]/85 md:mt-7">
-          Реализуем образовательные продукты заказчика в срок и в соответствии с ожиданиями по качеству. Проектируем программы обучения с привлечением профильных специалистов
+          Подписка: методолог, руководитель проекта и сборщик курсов от 180 000 ₽ в месяц за тот же результат вместо суммы от 600 000 ₽
         </p>
 
         {/* Одно главное действие — сразу под смыслом, до всех аргументов */}
@@ -106,14 +107,18 @@ export function Hero() {
               <ArrowUpRight data-arrow className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </a>
           </div>
+          {/* Гарантия — сразу под действием (снятие риска) */}
+          <p className="t-caption text-[color:var(--color-text-inverse-2)]">
+            Постоплата по актам. Проект считается закрытым только после успешного пилота.
+          </p>
         </div>
 
-        {/* Три плитки жидкого стекла: что от вас нужно → что произойдет → цена */}
+        {/* Три плитки жидкого стекла: цена → старт → гибкость */}
         <div className="relative mt-12 grid max-w-4xl items-stretch gap-4 sm:grid-cols-3 md:mt-16">
           {[
-            ["Без ТЗ", "Вводные в любом виде"],
-            ["24 часа", "Включаемся в работу"],
-            ["от 180 000 ₽/мес", "Подписка на отдел обучения"],
+            ["от 180 000 ₽/мес", "Подписка"],
+            ["24 часа", "Старт"],
+            ["48 часов", "Перестройка группы под новые вводные"],
           ].map(([label, desc], i) => (
             <div
               key={label}
@@ -121,7 +126,7 @@ export function Hero() {
             >
               <div
                 className={`font-display tabular-nums text-[color:var(--color-text-inverse)] ${
-                  i === 2 ? "t-h2 tracking-[-0.02em]" : "t-body font-semibold"
+                  i === 0 ? "t-h2 tracking-[-0.02em]" : "t-body font-semibold"
                 }`}
               >
                 {label}
