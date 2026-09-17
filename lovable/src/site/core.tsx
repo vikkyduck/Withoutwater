@@ -857,12 +857,12 @@ export function Field({
   const id = `f-${name}`;
   const errId = `${id}-error`;
   const base = dark
-    ? "min-h-11 w-full rounded-sm border bg-white/5 px-4 py-3 t-body text-[color:var(--color-text-inverse)] outline-none transition placeholder:text-[color:var(--color-text-inverse-2)]/50"
+    ? "min-h-11 w-full rounded-sm border bg-white/5 px-4 py-3 t-body text-[color:var(--color-text-inverse)] outline-none transition placeholder:text-[color:var(--color-text-muted)]"
     : "min-h-11 w-full rounded-sm border bg-[color:var(--color-surface)] px-4 py-3 t-body text-[color:var(--color-text-primary)] outline-none transition placeholder:text-[color:var(--color-steel)]";
   const state = error
     ? "border-[color:var(--color-accent)] focus:border-[color:var(--color-accent)]"
     : dark
-      ? "border-[color:var(--color-line-dark)] focus:border-[color:var(--color-accent-glass)]"
+      ? "border-[color:var(--color-text-muted)] focus:border-[color:var(--color-accent-glass)]"
       : "border-[color:var(--color-line)] focus:border-[color:var(--color-accent)]";
   return (
     <div>
@@ -1253,7 +1253,7 @@ export function Footer() {
   ];
   return (
     <footer className="border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
-      <div className="mx-auto max-w-7xl px-5 py-4 text-xs leading-5 text-[color:var(--color-text-secondary)] md:px-8 md:py-5 md:text-sm md:leading-6">
+      <div className="mx-auto max-w-7xl px-5 py-4 text-sm leading-5 text-[color:var(--color-text-secondary)] md:px-8 md:py-5 md:leading-6">
         {/* Ревизия 17.09.2026 (по редакции Виктории): в подвале — разделы,
             документы и копирайт. Логотип здесь был третьим на экране, контакты
             дублировали строку под формой. Разделы на телефоне не дублируем —
@@ -1540,7 +1540,7 @@ export function PageHead({
         )}
         {/* Строка-ориентир: как читать страницу и куда идти дальше (приемка, п. 6). */}
         {guide && (
-          <p className="t-eyebrow mt-5 text-[color:var(--color-text-inverse-2)]">{guide}</p>
+          <p className="measure mt-5 t-body text-[color:var(--color-text-inverse-2)]">{guide}</p>
         )}
         {note && (
           <p className="measure mt-5 border-l-2 border-[color:var(--color-accent)] pl-4 t-body text-[color:var(--color-text-inverse-2)]">

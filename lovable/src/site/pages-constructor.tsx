@@ -181,7 +181,7 @@ function QtyStepper({
   onQty: (n: number) => void;
 }) {
   const btn =
-    "flex h-8 w-8 items-center justify-center rounded-sm text-[color:var(--color-text-secondary)] transition-colors hover:text-[color:var(--color-text-primary)] disabled:cursor-not-allowed disabled:opacity-30";
+    "flex h-8 w-8 items-center justify-center rounded-sm text-[color:var(--color-text-secondary)] transition-colors hover:text-[color:var(--color-text-primary)] disabled:cursor-not-allowed disabled:opacity-50";
   return (
     <div className="flex items-center gap-3">
       <span className="t-label text-[color:var(--color-text-secondary)]">Количество</span>
@@ -616,7 +616,7 @@ export function ConstructorPage() {
                         placeholder="Телефон, Telegram или почта"
                         aria-label="Телефон, Telegram или почта"
                         autoComplete="off"
-                        className="w-full rounded-sm border border-[color:var(--color-line-dark)] bg-white/5 px-4 py-3 t-body text-[color:var(--color-text-inverse)] outline-none transition placeholder:text-[color:var(--color-text-inverse-2)]/50 focus:border-[color:var(--color-accent-glass)] focus:bg-white/10"
+                        className="w-full rounded-sm border border-[color:var(--color-text-muted)] bg-white/5 px-4 py-3 t-body text-[color:var(--color-text-inverse)] outline-none transition placeholder:text-[color:var(--color-text-muted)] focus:border-[color:var(--color-accent-glass)] focus:bg-white/10"
                       />
                       <button
                         type="submit"

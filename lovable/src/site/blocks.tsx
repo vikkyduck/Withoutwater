@@ -99,7 +99,7 @@ export function Hero() {
             </a>
             <a
               href="/business-effect"
-              className="link-arrow group t-eyebrow text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
+              className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
             >
               Экономический эффект от наших услуг
               <ArrowUpRight data-arrow className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
@@ -1092,7 +1092,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
           onSubmit={onSubmit}
           onFocusCapture={onFormFocus}
           onPointerDownCapture={onFormFocus}
-          className="text-background"
+          className="text-[color:var(--color-text-inverse)]"
         >
 
           <AnimatePresence mode="wait">
@@ -1105,7 +1105,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                 className="flex min-h-[420px] flex-col items-start justify-center"
               >
                 <CatMark className="h-24 w-28 text-[color:var(--color-text-inverse)]" strokeWidth={2} />
-                <h3 className="t-body mt-6 text-background">
+                <h3 className="t-body mt-6 text-[color:var(--color-text-inverse)]">
                   Спасибо!
                 </h3>
                 <p className="mt-3 text-[color:var(--color-text-inverse-2)]">
@@ -1120,7 +1120,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                 <button
                   type="button"
                   onClick={() => setSent(false)}
-                  className="mt-8 t-body font-semibold text-[color:var(--color-text-inverse)] underline-offset-4 hover:text-background hover:underline"
+                  className="mt-8 t-body font-semibold text-[color:var(--color-text-inverse)] underline-offset-4 hover:text-[color:var(--color-accent-glass)] hover:underline"
                 >
                   Отправить еще одну заявку
                 </button>
@@ -1173,9 +1173,9 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                   />
                   <span>
                     Согласен(а) на обработку персональных данных —{" "}
-                    <a href="/consent_pd" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-background">условия</a>{" "}
+                    <a href="/consent_pd" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-[color:var(--color-accent-glass)]">условия</a>{" "}
                     и{" "}
-                    <a href="/politics_pd" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-background">политика</a>
+                    <a href="/politics_pd" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-[color:var(--color-accent-glass)]">политика</a>
                   </span>
                 </label>
                 {pdErr && (

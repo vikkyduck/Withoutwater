@@ -93,7 +93,7 @@
   /* --- Контейнеры --- */
   --container: 1200px;
   --container-wide: 1360px;
-  --measure: 65ch; /* длина строки чтения */
+  --measure: 60ch; /* длина строки чтения: ~67 знаков Golos 17px (ревизия читаемости 17.09.2026: было 65ch ≈ 75, край нормы) */
 
   /* --- Движение --- */
   --duration-fast: 160ms;
@@ -145,7 +145,8 @@
 
   ::selection {
     background: var(--color-accent-glass);
-    color: var(--color-text-primary);
+    /* светлый текст на розовом давал 1.7:1 — выделенное не читалось */
+    color: var(--color-bg-dark);
   }
 
   /* Фокус — кольцо Пыльной розы 2 px с отступом 2 px */
@@ -201,19 +202,21 @@
 /* Единая система: наборный текст всегда 17/400, служебная метка всегда
    12/600 uppercase. t-caption и t-label оставлены как алиасы, чтобы не
    плодить третий и четвёртый уровень серого. */
-@utility t-caption { font-size: 1.0625rem; font-weight: 400; line-height: 1.6; letter-spacing: 0; text-transform: none; }
+/* Подпись на ступень мельче текста (15 px): иначе подпись и текст различались
+   только серым, а серый на угле и так 8:1 — иерархии не было (ревизия 17.09). */
+@utility t-caption { font-size: 0.9375rem; font-weight: 400; line-height: 1.55; letter-spacing: 0; text-transform: none; }
 @utility t-small  { font-size: 0.75rem; font-weight: 600; line-height: 1.5; letter-spacing: 0.14em; text-transform: uppercase; }
 @utility t-eyebrow {
   font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.8125rem; /* 13 px: под капителью бывают фразы в 30–80 знаков */
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
 @utility t-label {
   font-family: var(--font-sans);
   font-weight: 600;
-  font-size: 0.75rem;
+  font-size: 0.8125rem;
   letter-spacing: 0.14em;
   text-transform: uppercase;
 }
@@ -1065,11 +1068,16 @@ html[data-calm="true"] .lg-tilt { transform: none !important; }
 }
 
 
-/* Абзацы описаний не длиннее строки чтения */
-section p:not(.measure-off),
-section dd:not(.measure-off),
-section li.t-body:not(.measure-off) { max-width: var(--measure); }
-section p.t-eyebrow, section p.t-caption, blockquote p { max-width: none; }
+/* Абзацы описаний не длиннее строки чтения. В слое components — чтобы
+   max-w-* из утилит перебивал это правило (раньше оно было вне слоёв и
+   молча ломало max-w-md/2xl/3xl у абзацев). Подписи тоже держат строку:
+   «Справочно: расчёт…» шёл 128 знаками в одну строку. */
+@layer components {
+  section p:not(.measure-off),
+  section dd:not(.measure-off),
+  section li.t-body:not(.measure-off) { max-width: var(--measure); }
+  section p.t-eyebrow, blockquote p { max-width: none; }
+}
 
 /* Спокойный режим: полная остановка движения. Остаётся только смена цвета. */
 html[data-calm="true"] .stage__blob,

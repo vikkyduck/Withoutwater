@@ -118,7 +118,7 @@ function Steps({ items }: { items: ReactNode[] }) {
           <span className="font-display t-label tabular-nums text-[color:var(--color-accent)]">
             {String(i + 1).padStart(2, "0")}
           </span>
-          <div className="t-body text-[color:var(--color-text-primary)]">{t}</div>
+          <div className="measure t-body text-[color:var(--color-text-primary)]">{t}</div>
         </li>
       ))}
     </ol>
@@ -134,7 +134,7 @@ function Table3({ head, rows, total }: { head: [string, string, string]; rows: [
         <thead>
           <tr className="bg-[color:var(--color-surface)]">
             {head.map((h) => (
-              <th key={h} className={`${cell} t-eyebrow font-normal text-[color:var(--color-text-secondary)]`}>{h}</th>
+              <th key={h} className={`${cell} t-eyebrow text-[color:var(--color-text-secondary)]`}>{h}</th>
             ))}
           </tr>
         </thead>
