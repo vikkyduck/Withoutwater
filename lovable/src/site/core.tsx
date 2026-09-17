@@ -653,7 +653,7 @@ export function NodeList({
       {items.map((it, i) => (
         <li
           key={i}
-          className={`flex items-start gap-3 ${divided ? "py-3.5" : ""} ${itemClassName}`}
+          className={`flex items-start gap-4 ${divided ? "py-4" : ""} ${itemClassName}`}
         >
           <NodeBullet active={accentFirst && i === 0} className="mt-[0.55em]" />
           <span className="t-body flex-1">{it}</span>
@@ -1014,7 +1014,12 @@ export function Nav({ path = "/" }: { path?: string }) {
     const onScroll = () => {
       const max = document.documentElement.scrollHeight - window.innerHeight;
       setProgress(max > 0 ? Math.min(1, window.scrollY / max) : 0);
-      setPastHero(path !== "/" || window.scrollY > window.innerHeight * 0.6);
+      /* Кнопка шапки primary только между обложкой и формой: на обложке
+         и над формой главная кнопка уже есть — двух primary на экране
+         не бывает (ревизия 17.09.2026). */
+      const contact = document.getElementById("contact");
+      const formInView = !!contact && contact.getBoundingClientRect().top < window.innerHeight * 0.5;
+      setPastHero((path !== "/" || window.scrollY > window.innerHeight * 0.6) && !formInView);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -1238,9 +1243,8 @@ export function Nav({ path = "/" }: { path?: string }) {
 
 export function Footer() {
   /* Подвал ужат по замечанию Виктории 17.09.2026: на телефоне он занимал
-     59% экрана (13 строк столбиком с большими отступами). Теперь три
-     строки мелким кеглем: логотип и контакты, разделы и документы,
-     копирайт. Состав тот же. */
+     59% экрана (13 строк столбиком с большими отступами). Теперь две
+     строки мелким кеглем: разделы и документы, копирайт. */
   const link = "transition hover:text-[color:var(--color-accent)]";
   const legal: [string, string][] = [
     ["Политика конфиденциальности", "/politics_pd"],
@@ -1250,18 +1254,11 @@ export function Footer() {
   return (
     <footer className="border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
       <div className="mx-auto max-w-7xl px-5 py-4 text-xs leading-5 text-[color:var(--color-text-secondary)] md:px-8 md:py-5 md:text-sm md:leading-6">
-        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
-          <a href="/" className="flex items-center gap-2 text-[color:var(--color-text-primary)]" aria-label="БЕЗ ВОДЫ — на главную">
-            <CatMark className="h-5 w-auto text-[color:var(--color-text-primary)]/70" strokeWidth={2} />
-            <StencilLogo className="logo-sm" />
-          </a>
-          <a href={CONTACT.tel} className={link}>{CONTACT.phone}</a>
-          <a href={CONTACT.tgUrl} target="_blank" rel="noreferrer" className={link}>Telegram: {CONTACT.tg}</a>
-          <a href={`mailto:${CONTACT.email}`} className={link}>{CONTACT.email}</a>
-        </div>
-        {/* Разделы на телефоне не дублируем — они в бургер-меню; документы
-            обязаны быть на каждой странице. */}
-        <nav aria-label="Разделы и документы" className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+        {/* Ревизия 17.09.2026 (по редакции Виктории): в подвале — разделы,
+            документы и копирайт. Логотип здесь был третьим на экране, контакты
+            дублировали строку под формой. Разделы на телефоне не дублируем —
+            они в бургер-меню; документы обязаны быть на каждой странице. */}
+        <nav aria-label="Разделы и документы" className="flex flex-wrap gap-x-4 gap-y-1">
           {NAV_SECONDARY.map(([label, href]) => (
             <a key={href} href={href} className={`hidden md:inline ${link}`}>{label}</a>
           ))}
@@ -1286,7 +1283,12 @@ export function PageShell({ path, children }: { path: string; children: ReactNod
      на hero действие и так одно и видно. */
   const [showBar, setShowBar] = useState(false);
   useEffect(() => {
-    const onScroll = () => setShowBar(window.scrollY > window.innerHeight * 0.6);
+    const onScroll = () => {
+      /* Не показываем поверх самой формы (ревизия 17.09.2026) */
+      const contact = document.getElementById("contact");
+      const formInView = !!contact && contact.getBoundingClientRect().top < window.innerHeight;
+      setShowBar(window.scrollY > window.innerHeight * 0.6 && !formInView);
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -1527,7 +1529,7 @@ export function PageHead({
           <span>{kicker}</span>
         </div>
         {title && (
-          <RevealHeading as="h1" className="t-h1 mt-5 max-w-4xl text-[color:var(--color-text-inverse)]">
+          <RevealHeading as="h1" className="t-h1 mt-6 max-w-4xl text-[color:var(--color-text-inverse)]">
             {title}
           </RevealHeading>
         )}
@@ -1605,7 +1607,7 @@ export function CtaBand({
         <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
           {title ?? "Что будет на разборе"}
         </RevealHeading>
-        <p className="t-body measure mt-5 text-[color:var(--color-text-inverse-2)]">
+        <p className="t-body measure mt-6 text-[color:var(--color-text-inverse-2)]">
           {note ?? (
             <>
               30 минут онлайн: сверим задачу, доступные источники опыта и

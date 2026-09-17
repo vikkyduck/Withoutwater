@@ -298,7 +298,7 @@ export function WhenNeeded() {
       />
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
         <SectionLabel n="02">Когда подключается команда «Без Воды»</SectionLabel>
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
+        <div className="mt-8 grid gap-5 md:grid-cols-3">
           {SITUATIONS.map((it, i) => (
             <motion.div key={it.id} {...reveal(i)}>
               <a href={it.href} className="card-link group block h-full rounded-md">
@@ -760,7 +760,7 @@ export function ReviewsBlock({ bare = false }: { bare?: boolean } = {}) {
             </div>
           </>
         )}
-        <div className={`grid items-stretch gap-6 md:grid-cols-2 ${bare ? "mt-10" : "mt-12"}`}>
+        <div className={`grid items-stretch gap-6 md:grid-cols-2 ${bare ? "mt-8" : "mt-12"}`}>
           {items.map((r, i) => (
             <ReviewCard key={r.slug} r={r} index={i} />
           ))}
@@ -862,10 +862,10 @@ export function NotFit({ n = "07" }: { n?: string } = {}) {
         <RevealHeading className="mt-6 t-h2 max-w-3xl">
           Когда нужен другой подрядчик
         </RevealHeading>
-        <p className="mt-5 max-w-2xl t-body text-[color:var(--color-text-secondary)]">
+        <p className="mt-6 max-w-2xl t-body text-[color:var(--color-text-secondary)]">
           Мы ценим ваше время и готовы порекомендовать наших коллег для следующих задач:
         </p>
-        <ul className="mt-10 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
+        <ul className="mt-8 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
           {items.map((t) => (
             <li key={t} className="flex items-start gap-4 py-4 t-body text-[color:var(--color-text-primary)]">
               <NodeBullet className="mt-[0.55em]" />
@@ -884,7 +884,7 @@ export function NotFit({ n = "07" }: { n?: string } = {}) {
 export function FaqAccordion({ items }: { items: FaqItem[] }) {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <div className="mt-10 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
+    <div className="mt-8 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
       {items.map((item, i) => {
         const isOpen = open === i;
         return (
@@ -893,7 +893,7 @@ export function FaqAccordion({ items }: { items: FaqItem[] }) {
             type="button"
             aria-expanded={isOpen}
             onClick={() => setOpen(isOpen ? null : i)}
-            className={`group flex w-full items-start gap-5 px-2 py-5 text-left transition hover:bg-[color:var(--color-surface)] focus-visible:outline-offset-[-2px] ${isOpen ? "bg-[color:var(--color-surface)]" : ""}`}
+            className={`group flex w-full items-start gap-5 py-5 text-left transition hover:bg-[color:var(--color-surface)] focus-visible:outline-offset-[-2px] ${isOpen ? "bg-[color:var(--color-surface)]" : ""}`}
           >
 
             <Stencil n={i + 1} active={isOpen} className="mt-1 t-small" />
@@ -941,7 +941,7 @@ export function FaqAccordion({ items }: { items: FaqItem[] }) {
 
 /* numbered=false — для /contacts: там секция одна, и порядковый «08»,
    пришедший с главной, выглядел чужим. */
-export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; numbered?: boolean } = {}) {
+export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
   const [sent, setSent] = useState(false);
   const [sending, setSending] = useState(false);
   const [err, setErr] = useState<string | null>(null);
@@ -1058,22 +1058,15 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
       <Scene blobs={[{ className: "-left-40 top-0", tone: "rose", size: 560 }, { className: "right-1/4 top-1/3", tone: "rose", size: 360 }]} />
       <div className="relative mx-auto grid max-w-7xl gap-16 px-5 sec-pad md:px-8 lg:grid-cols-[1fr_1fr]">
         <div>
-          <div className="flex items-center gap-4 t-eyebrow text-[color:var(--color-text-secondary)]">
-            {asH1 || !numbered ? (
-              <span className="tex-chrome h-[2px] w-12 rounded-pill" />
-            ) : (
-              <>
-                <span className="font-display t-label tabular-nums text-[color:var(--color-accent)]">08</span>
-                <span className="h-px w-10 bg-[color:var(--color-line)]" />
-              </>
-            )}
-            <span>Первый шаг</span>
-          </div>
-          <RevealHeading as={asH1 ? "h1" : "h2"} className={`${asH1 ? "t-h1" : "t-h2"} mt-6 max-w-2xl`}>
+          {/* Ревизия 17.09.2026: надзаголовок — общий SectionLabel (номер
+              считается сам), без повтора слов заголовка; логотип из колонки
+              убран (он уже в шапке); один правый край у всех строк. */}
+          <SectionLabel>Первый шаг</SectionLabel>
+          <RevealHeading as={asH1 ? "h1" : "h2"} className={`${asH1 ? "t-h1" : "t-h2"} mt-6 max-w-md`}>
             Первый шаг и форма заявки
           </RevealHeading>
           {/* Тексты Виктории 17.09.2026, слово в слово. */}
-          <p className="mt-8 max-w-md t-body text-[color:var(--color-text-secondary)]">
+          <p className="mt-6 max-w-md t-body text-[color:var(--color-text-secondary)]">
             Обсудим вашу задачу и найдем оптимальное решение. Презентация и подробное ТЗ не требуются. На 30-минутной онлайн-встрече мы:
           </p>
           <ol className="mt-4 max-w-md space-y-2">
@@ -1082,22 +1075,17 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
               "Определим доступные источники опыта и формат его передачи",
               "Рассчитаем сроки, состав команды и план первого этапа",
             ].map((t, i) => (
-              <li key={t} className="flex items-start gap-3 t-body text-[color:var(--color-text-primary)]">
-                <span className="font-display t-label tabular-nums text-[color:var(--color-accent)]">{i + 1}.</span>
+              <li key={t} className="flex items-baseline gap-5 t-body text-[color:var(--color-text-primary)]">
+                <span className="font-display t-label tabular-nums text-[color:var(--color-accent)]">{String(i + 1).padStart(2, "0")}</span>
                 <span>{t}</span>
               </li>
             ))}
           </ol>
-
-
-          <div className="mt-12">
-            <StencilLogo className="logo-lg text-[color:var(--color-text-primary)]" />
-          </div>
         </div>
 
         {/* Форма — единственный темный акцент светлой секции: локальный
             sec-dark сохраняет темные токены внутри карточки. */}
-        <PaperCard className="sec-dark p-8 md:p-10">
+        <PaperCard className="sec-dark p-8">
         <form
           noValidate
           id="form"
@@ -1209,18 +1197,20 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
                   <span>{sending ? "Отправляем…" : "Отправить заявку на разбор"}</span>
                   <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
                 </button>
-                <p className="t-caption text-[color:var(--color-text-inverse-2)]">
-                  Ответим в течение 5 минут в рабочее время.
-                </p>
-                <a
-                  href={CONTACT.tgUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 t-caption text-[color:var(--color-text-inverse-2)] underline underline-offset-2 hover:text-[color:var(--color-text-inverse)]"
-                >
-                  <Send aria-hidden className="h-4 w-4" />
-                  {CONTACT.tg}
-                </a>
+                <div className="space-y-2">
+                  <p className="t-caption text-[color:var(--color-text-inverse-2)]">
+                    Ответим в течение 5 минут в рабочее время.
+                  </p>
+                  <a
+                    href={CONTACT.tgUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-2 t-caption text-[color:var(--color-text-inverse-2)] underline underline-offset-2 hover:text-[color:var(--color-text-inverse)]"
+                  >
+                    <Send aria-hidden className="h-4 w-4" />
+                    {CONTACT.tg}
+                  </a>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>

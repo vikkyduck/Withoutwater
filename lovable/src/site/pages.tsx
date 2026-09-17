@@ -70,7 +70,7 @@ function CasesPage() {
         />
       </section>
       <CasesBlock compactHeader />
-      <Contact numbered={false} />
+      <Contact />
     </PageShell>
   );
 }
@@ -94,7 +94,7 @@ function ReviewsPage() {
           </div>
         </div>
       </section>
-      <Contact numbered={false} />
+      <Contact />
     </PageShell>
   );
 }
@@ -133,7 +133,7 @@ function TeamPage() {
           {/* Основатель — крупная карточка: портрет, должность, факты, слова */}
           <motion.div {...reveal(0)} className="mt-8">
             <PaperCard className="overflow-hidden p-0">
-              <div className="grid gap-0 md:grid-cols-[280px_1fr]">
+              <div className="grid items-center gap-0 md:grid-cols-[280px_1fr]">
                 <PersonPhoto person={founder} />
                 <div className="flex flex-col justify-center p-6 md:p-8">
                   <h2 className="font-display t-body font-semibold">{founder.name}</h2>
@@ -149,15 +149,15 @@ function TeamPage() {
             </PaperCard>
           </motion.div>
 
-          <div className="mt-6 grid items-stretch gap-5 md:grid-cols-3">
+          <div className="mt-5 grid items-stretch gap-5 md:grid-cols-3">
             {others.map((p, i) => (
               <motion.div key={p.slug} {...reveal(i + 1)} className="h-full">
                 <PaperCard className="flex h-full flex-col overflow-hidden p-0">
                   <PersonPhoto person={p} />
-                  <div className="flex flex-1 flex-col p-5">
+                  <div className="flex flex-1 flex-col p-6">
                     <h2 className="font-display t-body font-semibold">{p.name}</h2>
                     <p className="mt-1 t-body text-[color:var(--color-text-secondary)]">{p.role}</p>
-                    <div className="mt-3">
+                    <div className="mt-4">
                       <NodeList items={p.facts} />
                     </div>
                   </div>
@@ -184,7 +184,7 @@ function TeamPage() {
         </div>
       </section>
 
-      <Contact numbered={false} />
+      <Contact />
     </PageShell>
   );
 }
@@ -204,11 +204,12 @@ function HowWeWorkPage() {
       <section className="stage border-b border-[color:var(--color-line)]">
         <Scene blobs={[{ className: "-left-40 top-[30%]", tone: "chrome", size: 520 }]} />
         <PageHead
+          compact
           kicker="Наш подход"
           title={<>Один договор. Одна выделенная команда. Единый контур ответственности.</>}
           lead="Вы взаимодействуете с одним человеком по всем вопросам."
         />
-        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+        <div className="relative mx-auto max-w-7xl px-5 sec-pad-b md:px-8">
           <SectionLabel n="01">Как мы управляем проектом и держим ритм</SectionLabel>
           <div className="mt-8 grid items-stretch gap-4 md:grid-cols-3">
             {rhythm.map(([t, d], i) => (
@@ -222,7 +223,7 @@ function HowWeWorkPage() {
           </div>
         </div>
       </section>
-      <Contact numbered={false} />
+      <Contact />
     </PageShell>
   );
 }
@@ -239,7 +240,7 @@ function FaqPage() {
           <FaqAccordion items={FAQ_ITEMS} />
         </div>
       </section>
-      <Contact numbered={false} />
+      <Contact />
     </PageShell>
   );
 }
@@ -249,10 +250,10 @@ function FaqPage() {
 function ContactsPage() {
   return (
     <PageShell path="/contacts">
-      <Contact asH1 numbered={false} />
+      <Contact asH1 />
       <section className="relative border-b border-[color:var(--color-line)]">
         <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
-          <div className="grid gap-8 t-body md:grid-cols-2">
+          <div className="t-body">
             <div>
               <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Напрямую</div>
               <ul className="mt-4 space-y-2">
@@ -260,13 +261,6 @@ function ContactsPage() {
                 <li><a href={CONTACT.tgUrl} target="_blank" rel="noreferrer" className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">Telegram: {CONTACT.tg}</a></li>
                 <li><a href={`mailto:${CONTACT.email}`} className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">{CONTACT.email}</a></li>
               </ul>
-            </div>
-            <div>
-              <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Реквизиты</div>
-              <p className="mt-4 text-[color:var(--color-text-secondary)]">
-                ИП Уткина Виктория Викторовна<br />
-                ИНН 771586055972
-              </p>
             </div>
           </div>
         </div>

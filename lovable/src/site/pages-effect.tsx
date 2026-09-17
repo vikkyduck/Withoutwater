@@ -114,7 +114,7 @@ function Steps({ items }: { items: ReactNode[] }) {
   return (
     <ol className="max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
       {items.map((t, i) => (
-        <li key={i} className="flex items-start gap-5 py-4">
+        <li key={i} className="flex items-baseline gap-5 py-4">
           <span className="font-display t-label tabular-nums text-[color:var(--color-accent)]">
             {String(i + 1).padStart(2, "0")}
           </span>
@@ -180,9 +180,12 @@ function ProblemEffect({ items }: { items: { title: string; problem: string; eff
   );
 }
 
-const Section = ({ n, label, title, children }: { n: string; label?: string; title?: string; children: ReactNode }) => (
+/* Метка секции всегда с текстом: пустая «01 ———» рядом с полными метками
+   на той же странице читалась как сбой (ревизия 17.09.2026). Где своего
+   слова у секции нет — стоит колонтитул страницы. */
+const Section = ({ n, label, title, children }: { n: string; label: string; title?: string; children: ReactNode }) => (
   <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-    <SectionLabel n={n}>{label ?? ""}</SectionLabel>
+    <SectionLabel n={n}>{label}</SectionLabel>
     {title && <RevealHeading className="t-h2 mt-6 max-w-3xl">{title}</RevealHeading>}
     <div className="mt-8">{children}</div>
   </div>
@@ -246,13 +249,13 @@ export function InternalExpertsPage() {
           }
         />
 
-        <Section n="01" title="Когда актуально масштабирование практик">
+        <Section n="01" label="Распространение подходов" title="Когда актуально масштабирование практик">
           <TitledList items={when} />
         </Section>
       </section>
 
       <section className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
-        <Section n="02" title="Систематизация опыта: от носителя знаний в процессы всей компании">
+        <Section n="02" label="Распространение подходов" title="Систематизация опыта: от носителя знаний в процессы всей компании">
           <p className="max-w-3xl t-body text-[color:var(--color-text-secondary)]">
             В каждой организации критически важные результаты зависят от знаний и умений нескольких ключевых специалистов. Они знают:
           </p>
@@ -271,14 +274,14 @@ export function InternalExpertsPage() {
       {/* «Пример с ИИ агентом» — кейс УрбанТех, как и стоит в редакции */}
       <section className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
         <Section n="03" label="Пример с ИИ агентом">
-          <div className="grid gap-6 md:grid-cols-2">
-            <CaseCard item={caseBy("urbantech")} index={0} />
+          <div className="max-w-3xl">
+            <CaseCard item={caseBy("urbantech")} index={0} teaser />
           </div>
         </Section>
       </section>
 
       <section className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
-        <Section n="04" title="Этапы формализации опыта">
+        <Section n="04" label="Распространение подходов" title="Этапы формализации опыта">
           <Steps
             items={stages.map(([t, d]) => (
               <>
@@ -290,7 +293,7 @@ export function InternalExpertsPage() {
       </section>
 
       <section className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
-        <Section n="05" title="Форматы итоговых образовательных программ и рабочих артефактов">
+        <Section n="05" label="Распространение подходов" title="Форматы итоговых образовательных программ и рабочих артефактов">
           <p className="max-w-3xl t-body text-[color:var(--color-text-secondary)]">
             Состав материалов подбирается под тип и контекст задачи
           </p>
@@ -310,15 +313,16 @@ export function InternalExpertsPage() {
           <p className="mt-6 max-w-3xl t-body text-[color:var(--color-text-inverse-2)]">
             Перед тем, как приступить к активной разработке программ и материалов, мы фиксируем структуру знаний. По итогам этапа у вас будет готовая карта компетенций, и далее решение за вами: разрабатывать материалы нашими силами «Без Воды», передать задачу вашему внутреннему отделу T&D или стороннему подрядчику. Все наработки остаются в вашей собственности.
           </p>
+          {/* Кнопка «Оставить заявку» здесь снята: форма — следующий экран,
+              и её кнопка стояла бы в ста пикселях ниже (ревизия 17.09). */}
           <div className="mt-8 flex flex-col items-start gap-4 sm:flex-row sm:flex-wrap sm:items-center sm:gap-6">
-            <FormButton>Оставить заявку на разбор задачи</FormButton>
             <QuietLink href="/expertise-map">Подробнее о составе Карты экспертности</QuietLink>
             <QuietLink href={BE.internalEffect}>Экономический эффект</QuietLink>
           </div>
         </div>
       </section>
 
-      <Contact numbered={false} />
+      <Contact />
     </PageShell>
   );
 }
@@ -377,7 +381,7 @@ export function InternalExpertsEffectPage() {
       </section>
 
       <section className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
-        <Section n="01" title="Сравнение операционных моделей">
+        <Section n="01" label="Эксперты внутри компании" title="Сравнение операционных моделей">
           <Table3
             head={["Параметр", "Опыт хранится в головах сотрудников", "Опыт оцифрован и передан в систему"]}
             rows={[
@@ -391,12 +395,12 @@ export function InternalExpertsEffectPage() {
       </section>
 
       <section className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
-        <Section n="02" title="Снижение управленческих и финансовых рисков проекта">
+        <Section n="02" label="Эксперты внутри компании" title="Снижение управленческих и финансовых рисков проекта">
           <TitledCards items={risks} />
         </Section>
       </section>
 
-      <Contact numbered={false} />
+      <Contact />
     </PageShell>
   );
 }
@@ -490,7 +494,7 @@ export function TeamSubscriptionPage() {
 
   const Audience = ({ title, items }: { title: string; items: [string, string[]][] }) => (
     <div>
-      <div className="font-display t-body font-semibold">{title}</div>
+      <div className="t-eyebrow text-[color:var(--color-text-secondary)]">{title}</div>
       <div className="mt-4 grid items-stretch gap-4 md:grid-cols-3">
         {items.map(([t, paras], i) => (
           <motion.div key={t} {...reveal(i)} className="h-full">
@@ -522,12 +526,12 @@ export function TeamSubscriptionPage() {
           }
         />
 
-        <Section n="01" title="Какие задачи решает подписка">
+        <Section n="01" label="Подписка" title="Какие задачи решает подписка">
           <div className="space-y-12">
             <Audience title="Для корпоративных клиентов (HR и T&D)" items={corp} />
             <Audience title="Для образовательных компаний и онлайн-университетов / EdTech (CPO, Продюсер, Руководитель направления)" items={edtech} />
             <div>
-              <div className="font-display t-body font-semibold">Экспресс-тестирование новых бизнес-идей и направлений, а также MVP (Product Discovery)</div>
+              <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Экспресс-тестирование новых бизнес-идей и направлений, а также MVP (Product Discovery)</div>
               <p className="mt-4 max-w-3xl t-body text-[color:var(--color-text-secondary)]">
                 Чтобы проверить спрос на новую тему или профессию, создавать полноценный 6-месячный курс со своей штатной командой слишком долго и рискованно. Наша команда за 24 часа собирает группу для производства MVP-продукта (интенсив, микрокурс, серию воркшопов, интерактивный тренажер или марафон) и через 2–3 недели вы можете испытать новую разработку. EdTech тестирует конверсию, собирает обратную связь от первой когорты и принимает решение о запуске нового курса или программы без заморозки внутренних ресурсов.
               </p>
@@ -537,7 +541,7 @@ export function TeamSubscriptionPage() {
       </section>
 
       <section className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
-        <Section n="02" title="Принцип работы: результат вместо человеко-часов">
+        <Section n="02" label="Подписка" title="Принцип работы: результат вместо человеко-часов">
           <TitledCards items={principle} />
         </Section>
       </section>
@@ -549,13 +553,13 @@ export function TeamSubscriptionPage() {
             Подписка от 180 000 ₽ в месяц. Пакет услуг и объем задач выбираете вы
           </RevealHeading>
 
-          <div className="mt-10 space-y-12">
+          <div className="mt-8 space-y-12">
             {SUB_GROUPS.map((g) => (
               <div key={g.title}>
-                <div className="t-eyebrow text-[color:var(--color-accent)]">{g.title}</div>
+                <div className="t-eyebrow text-[color:var(--color-text-secondary)]">{g.title}</div>
                 <ul className="mt-4 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
                   {g.items.map(([t, d, href], i) => (
-                    <li key={t} className="flex items-start gap-4 py-4">
+                    <li key={t} className="flex items-baseline gap-4 py-4">
                       <span className="font-display t-label tabular-nums text-[color:var(--color-accent)]">
                         {String(i + 1).padStart(2, "0")}
                       </span>
@@ -589,18 +593,24 @@ export function TeamSubscriptionPage() {
               </motion.div>
             ))}
           </div>
-          <div className="mt-10 max-w-3xl">
-            <RevealHeading className="t-h2 text-[color:var(--color-text-inverse)]">
+        </div>
+      </section>
+
+      <section className="stage sec-dark grain relative border-b border-[color:var(--color-line-dark)]">
+        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+          <SectionLabel n="05">Личный кабинет</SectionLabel>
+          <div className="max-w-3xl">
+            <RevealHeading className="t-h2 mt-6 text-[color:var(--color-text-inverse)]">
               Прозрачность данных по вашим пакетам
             </RevealHeading>
-            <p className="mt-5 t-body text-[color:var(--color-text-inverse-2)]">
+            <p className="mt-6 t-body text-[color:var(--color-text-inverse-2)]">
               Состав и план работ на месяц фиксируется заранее и виден в личном кабинете: что заказано, что в работе, что принято, каков остаток средств по каждому пакету. Движение показано в единицах результата, а не в часах. При изменении состава работ остаток сразу же пересчитывается.
             </p>
           </div>
         </div>
       </section>
 
-      <Contact numbered={false} />
+      <Contact />
     </PageShell>
   );
 }
@@ -631,7 +641,7 @@ export function TeamSubscriptionEffectPage() {
           }
         />
 
-        <Section n="01" title="Сравним: штатная команда vs Подписка «Без Воды»">
+        <Section n="01" label="Подписка на отдел обучения" title="Сравним: штатная команда vs Подписка «Без Воды»">
           <p className="max-w-3xl t-body text-[color:var(--color-text-secondary)]">
             Для полноценного цикла разработки программы обучения компании требуется как минимум 3 специалиста. Расчет совокупной стоимости штатной команды в сравнении с подпиской БЕЗ ВОДЫ
           </p>
@@ -658,7 +668,7 @@ export function TeamSubscriptionEffectPage() {
       </section>
 
       <section className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
-        <Section n="02" title="Границы экономической целесообразности">
+        <Section n="02" label="Подписка на отдел обучения" title="Границы экономической целесообразности">
           <div className="grid items-stretch gap-4 md:grid-cols-2">
             <PaperCard className="h-full p-6">
               <div className="font-display t-body font-semibold">Когда подписка выгодна:</div>
@@ -687,7 +697,7 @@ export function TeamSubscriptionEffectPage() {
       </section>
 
       <section className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
-        <Section n="03" title="Вы управляете подпиской">
+        <Section n="03" label="Подписка на отдел обучения" title="Вы управляете подпиской">
           <TitledCards items={manage} />
           <p className="mt-8 t-body text-[color:var(--color-text-secondary)]">
             Работаем по договору возмездного оказания услуг с ИП Уткина В. В.
@@ -695,7 +705,7 @@ export function TeamSubscriptionEffectPage() {
         </Section>
       </section>
 
-      <Contact numbered={false} />
+      <Contact />
     </PageShell>
   );
 }
@@ -727,12 +737,12 @@ export function ExternalExpertsPage() {
             </>
           }
         />
-        <Section n="01" title="Скорость решения вашей задачи и ваш комфорт — наши приоритеты">
+        <Section n="01" label="Внешние эксперты" title="Скорость решения вашей задачи и ваш комфорт — наши приоритеты">
           <Steps items={steps} />
         </Section>
       </section>
 
-      <Contact numbered={false} />
+      <Contact />
     </PageShell>
   );
 }
@@ -771,25 +781,21 @@ export function ExternalExpertsEffectPage() {
             </>
           }
         />
-        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-          <div className="space-y-12">
-            {groups.map(([t, items], i) => (
-              <div key={t}>
-                <SectionLabel n={String(i + 1).padStart(2, "0")}>{t}</SectionLabel>
-                <div className="mt-6">
-                  <TitledList items={items} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
+
+      {groups.map(([t, items], i) => (
+        <section key={t} className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
+          <Section n={String(i + 1).padStart(2, "0")} label="Приглашенные эксперты" title={t}>
+            <TitledList items={items} />
+          </Section>
+        </section>
+      ))}
 
       {/* «Пример / КЕЙС» — кейс B2B-компании, как и прежде на этой странице */}
       <section className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
         <Section n="04" label="Пример">
-          <div className="grid gap-6 md:grid-cols-2">
-            <CaseCard item={caseBy("b2b-procurement")} index={0} />
+          <div className="max-w-3xl">
+            <CaseCard item={caseBy("b2b-procurement")} index={0} teaser />
           </div>
           <a href="/cases" className="link-arrow group mt-8 t-body">
             Все кейсы
@@ -798,7 +804,7 @@ export function ExternalExpertsEffectPage() {
         </Section>
       </section>
 
-      <Contact numbered={false} />
+      <Contact />
     </PageShell>
   );
 }
@@ -859,19 +865,15 @@ export function BusinessEffectGeneralPage() {
             </>
           }
         />
-        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-          <div className="space-y-12">
-            {groups.map(([t, items], i) => (
-              <div key={t}>
-                <SectionLabel n={String(i + 1).padStart(2, "0")}>{t}</SectionLabel>
-                <div className="mt-6">
-                  <TitledList items={items} />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
       </section>
+
+      {groups.map(([t, items], i) => (
+        <section key={t} className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
+          <Section n={String(i + 1).padStart(2, "0")} label="Экономический эффект" title={t}>
+            <TitledList items={items} />
+          </Section>
+        </section>
+      ))}
 
       <section className="stage sec-dark grain relative border-b border-[color:var(--color-line-dark)]">
         <Scene blobs={[{ className: "-left-40 top-0", tone: "chrome", size: 420 }]} />
@@ -892,7 +894,7 @@ export function BusinessEffectGeneralPage() {
       </section>
 
       <section className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
-        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+        <Section n="05" label="Экономический эффект">
           <div className="grid gap-4 sm:grid-cols-3">
             {timeline.map(([t, d], i) => (
               <motion.div key={t} {...reveal(i)} className="h-full">
@@ -903,10 +905,10 @@ export function BusinessEffectGeneralPage() {
               </motion.div>
             ))}
           </div>
-        </div>
+        </Section>
       </section>
 
-      <Contact numbered={false} />
+      <Contact />
     </PageShell>
   );
 }
