@@ -104,7 +104,7 @@ export function CasePage({ item }: { item: CaseItem }) {
               а не продолжение рассказа о проекте. */}
           <p className="mt-8 max-w-3xl border-t border-[color:var(--color-line)] pt-4 t-caption text-[color:var(--color-text-secondary)]">
             На основе данных заказчика. Наш продукт — один из факторов, влияющих
-            на эти показатели
+            на эти показатели.
           </p>
 
           {/* Отзыв клиента этого проекта — открывается модальным окном */}
@@ -141,7 +141,7 @@ export function CasePage({ item }: { item: CaseItem }) {
           )}
 
           <div className="mt-14">
-            <a href="/cases" className="link-arrow group t-body">
+            <a href="/cases/" className="link-arrow group t-body">
               Все кейсы
               <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </a>

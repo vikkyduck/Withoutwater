@@ -23,7 +23,7 @@ import { ConstructorPage } from "./pages-constructor";
 import { ExpertiseMapPage } from "./pages-expertise";
 import { CASE_PAGES } from "./pages-case";
 import {
-  BE,
+  BE, BE_LINK,
   BusinessEffectGeneralPage,
   InternalExpertsPage, InternalExpertsEffectPage,
   TeamSubscriptionPage, TeamSubscriptionEffectPage,
@@ -142,7 +142,7 @@ function TeamPage() {
                     <NodeList items={founder.facts} />
                   </div>
                   <blockquote className="mt-6 border-l-2 border-[color:var(--color-accent)] pl-5">
-                    <p className="t-body text-[color:var(--color-text-primary)]">“{FOUNDER_QUOTE.text}”</p>
+                    <p className="t-body text-[color:var(--color-text-primary)]">«{FOUNDER_QUOTE.text}»</p>
                   </blockquote>
                 </div>
               </div>
@@ -195,7 +195,7 @@ function HowWeWorkPage() {
   /* Три тезиса — текст Виктории 17.09.2026. Прежние экраны схемы сроков,
      ритма и гарантий в редакции отсутствуют. */
   const rhythm: [string, string][] = [
-    ["Персональный руководитель проекта: единая точка контакта", "PM управляет сроками, организует работу методистов и решает технические вопросы. Коммуникация ведется в удобном режиме и виде"],
+    ["Персональный руководитель проекта: единая точка контакта", "PM управляет сроками, организует работу методистов и решает технические вопросы. Коммуникация ведется в удобном режиме и виде."],
     ["Еженедельная отчетность (WSR)", "краткая сводка: что выполнено, что находится в производстве, прогресс по задачам"],
     ["Гарантия замены специалистов", "если под изменившиеся вводные требуется другой эксперт, замена проводится в течение 48 часов"],
   ];
@@ -206,7 +206,7 @@ function HowWeWorkPage() {
         <PageHead
           compact
           kicker="Наш подход"
-          title={<>Один договор. Одна выделенная команда. Единый контур ответственности.</>}
+          title={<>Один договор. Одна выделенная команда. Единый контур ответственности</>}
           lead="Взаимодействие с одним человеком по всем вопросам."
         />
         <div className="relative mx-auto max-w-7xl px-5 sec-pad-b md:px-8">
@@ -418,17 +418,17 @@ export const ROUTES: RouteDef[] = [
    чтобы не умерли разосланные ссылки. Якоря, оставшиеся на главной
    (#contact, #cases, #reviews, #when, #book), работают как раньше. */
 export const HASH_REDIRECTS: Record<string, string> = {
-  "#faq": "/faq",
-  "#approach": "/how-we-work",
-  "#firststage": "/how-we-work",
-  "#notfit": "/how-we-work",
+  "#faq": "/faq/",
+  "#approach": "/how-we-work/",
+  "#firststage": "/how-we-work/",
+  "#notfit": "/how-we-work/",
   "#capital": "/#when",
 };
 
 /* Якоря бывших развернутых решений на /tasks (финальная структура 02.08):
    разосланные ссылки /tasks#practice и подобные ведут на продуктовые страницы. */
 export const TASKS_HASH_REDIRECTS: Record<string, string> = {
-  "#practice": BE.internal,
-  "#capacity": BE.team,
-  "#external": BE.external,
+  "#practice": BE_LINK.internal,
+  "#capacity": BE_LINK.team,
+  "#external": BE_LINK.external,
 };

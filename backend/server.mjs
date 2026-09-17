@@ -17,7 +17,7 @@
 //   PUBLIC_BASE        — публичный URL сайта (для ссылки в уведомлении)
 
 import http from 'node:http';
-import { appendFile, mkdir, readFile } from 'node:fs/promises';
+import { appendFile, mkdir, readFile, writeFile } from 'node:fs/promises';
 import { existsSync, readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -116,9 +116,12 @@ try {
 
 /* ── утилиты ── */
 const rate = new Map();
+/* IP берём из X-Real-IP: его ставит nginx из $remote_addr, подделать нельзя.
+   Первый элемент X-Forwarded-For клиент задаёт сам — так лимит обходился
+   одним заголовком (аудит 17.09.2026). Без прокси — адрес сокета. */
 function clientIp(req) {
-  const xff = req.headers['x-forwarded-for'];
-  if (xff) return String(xff).split(',')[0].trim();
+  const real = req.headers['x-real-ip'];
+  if (real) return String(real).trim();
   return req.socket.remoteAddress || 'unknown';
 }
 function rateOk(ip) {
@@ -127,6 +130,14 @@ function rateOk(ip) {
   if (arr.length >= RATE_MAX) { rate.set(ip, arr); return false; }
   arr.push(now); rate.set(ip, arr); return true;
 }
+// карта лимитов не растёт бесконечно: раз в окно выбрасываем остывшие IP
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, arr] of rate) {
+    const live = arr.filter((t) => now - t < RATE_WINDOW_MS);
+    if (live.length) rate.set(ip, live); else rate.delete(ip);
+  }
+}, RATE_WINDOW_MS).unref();
 function clean(v) {
   return String(v == null ? '' : v)
     .replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/g, '')
@@ -143,12 +154,17 @@ function cors(res, origin) {
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, DELETE, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
 }
-function readBody(req) {
+function readBody(req, res) {
   return new Promise((resolve, reject) => {
     let size = 0; const chunks = [];
     req.on('data', (c) => {
       size += c.length;
-      if (size > MAX_BODY) { reject(new Error('too_large')); req.destroy(); return; }
+      if (size > MAX_BODY) {
+        reject(new Error('too_large'));
+        // ответ пишем до destroy, иначе клиент видит обрыв, а не 413
+        if (res && !res.headersSent) { res.writeHead(413, { 'Content-Type': 'application/json; charset=utf-8' }); res.end('{"ok":false,"error":"too_large"}'); }
+        req.destroy(); return;
+      }
       chunks.push(c);
     });
     req.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
@@ -260,8 +276,8 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') { cors(res, origin); res.writeHead(204); res.end(); return; }
 
   if (req.method === 'GET' && path === '/api/health') {
-    const c = db.prepare("SELECT COUNT(*) AS c FROM leads").get().c;
-    return json(res, 200, { ok: true, tg: Boolean(TG_BOT_TOKEN && TG_CHAT_ID), leads: c, admin: Boolean(ADMIN_USER && ADMIN_PASS), mail: MAIL_ENABLED });
+    // без счетчика заявок: эндпоинт публичный, число лидов — не для посторонних
+    return json(res, 200, { ok: true, tg: Boolean(TG_BOT_TOKEN && TG_CHAT_ID), admin: Boolean(ADMIN_USER && ADMIN_PASS), mail: MAIL_ENABLED });
   }
 
   /* ── приём заявки ── */
@@ -271,8 +287,11 @@ const server = http.createServer(async (req, res) => {
     if (!rateOk(ip)) return json(res, 429, { ok: false, error: 'rate_limited' });
 
     let p;
-    try { p = JSON.parse(await readBody(req) || '{}'); }
-    catch (e) { return json(res, e.message === 'too_large' ? 413 : 400, { ok: false, error: 'bad_body' }); }
+    try { p = JSON.parse(await readBody(req, res) || '{}'); }
+    catch (e) {
+      if (e.message === 'too_large') { if (!res.headersSent) json(res, 413, { ok: false, error: 'too_large' }); return; }
+      return json(res, 400, { ok: false, error: 'bad_body' });
+    }
 
     // два формата: новый (name/contact/…) и старый tilda ({fields:{…}}) на переходный период
     let name, contact, company = '', comment = '', legacy = '';
@@ -295,7 +314,7 @@ const server = http.createServer(async (req, res) => {
       consentAds = p.consent_ads === true;
     }
 
-    if (!contact && !name) return json(res, 400, { ok: false, error: 'no_contact' });
+    if (!contact) return json(res, 400, { ok: false, error: 'no_contact' });
     if (!consentPd) return json(res, 400, { ok: false, error: 'no_consent' });
 
     const nowIso = new Date().toISOString();
@@ -345,8 +364,11 @@ const server = http.createServer(async (req, res) => {
     const ip = clientIp(req);
     if (!rateOk(ip)) return json(res, 429, { ok: false, error: 'rate_limited' });
     let p;
-    try { p = JSON.parse(await readBody(req) || '{}'); }
-    catch (e) { return json(res, e.message === 'too_large' ? 413 : 400, { ok: false, error: 'bad_body' }); }
+    try { p = JSON.parse(await readBody(req, res) || '{}'); }
+    catch (e) {
+      if (e.message === 'too_large') { if (!res.headersSent) json(res, 413, { ok: false, error: 'too_large' }); return; }
+      return json(res, 400, { ok: false, error: 'bad_body' });
+    }
     const scenario = clean(p.scenario).slice(0, 80);
     const have = (Array.isArray(p.have) ? p.have : []).map((h) => clean(h).slice(0, 80)).filter(Boolean).slice(0, 8).join(', ');
     const goal = clean(p.goal).slice(0, 80);
@@ -364,7 +386,11 @@ const server = http.createServer(async (req, res) => {
 
   /* ── админка ── */
   if (path === '/admin' || path.startsWith('/admin/')) {
-    if (!adminAuthed(req)) return require401(res);
+    if (!adminAuthed(req)) {
+      // неудачный вход считаем как попытку: перебор упирается в лимит 20/час
+      if (req.headers.authorization && !rateOk(clientIp(req))) return json(res, 429, { ok: false, error: 'rate_limited' });
+      return require401(res);
+    }
 
     if (req.method === 'GET' && (path === '/admin' || path === '/admin/')) {
       try {
@@ -393,7 +419,7 @@ const server = http.createServer(async (req, res) => {
     const mStatus = path.match(/^\/admin\/api\/leads\/(\d+)\/status$/);
     if (req.method === 'POST' && mStatus) {
       let body;
-      try { body = JSON.parse(await readBody(req) || '{}'); } catch { return json(res, 400, { ok: false }); }
+      try { body = JSON.parse(await readBody(req, res) || '{}'); } catch { if (!res.headersSent) json(res, 400, { ok: false }); return; }
       if (!STATUSES.includes(body.status)) return json(res, 400, { ok: false, error: 'bad_status' });
       db.prepare('UPDATE leads SET status = ? WHERE id = ?').run(body.status, Number(mStatus[1]));
       return json(res, 200, { ok: true });
@@ -401,8 +427,20 @@ const server = http.createServer(async (req, res) => {
 
     const mDel = path.match(/^\/admin\/api\/leads\/(\d+)$/);
     if (req.method === 'DELETE' && mDel) {
-      db.prepare('DELETE FROM leads WHERE id = ?').run(Number(mDel[1]));
-      console.log(`[admin] заявка #${mDel[1]} удалена (запрос на удаление ПД или ручная очистка)`);
+      const delId = Number(mDel[1]);
+      db.prepare('DELETE FROM leads WHERE id = ?').run(delId);
+      // резервный журнал тоже чистим: иначе удалённая по запросу субъекта
+      // заявка живёт в jsonl навсегда (аудит 152-ФЗ, 17.09.2026)
+      try {
+        if (existsSync(LEADS_FILE)) {
+          const kept = readFileSync(LEADS_FILE, 'utf8').split('\n').filter((line) => {
+            if (!line.trim()) return false;
+            try { return JSON.parse(line).id !== delId; } catch { return true; }
+          });
+          await writeFile(LEADS_FILE, kept.length ? kept.join('\n') + '\n' : '', 'utf8');
+        }
+      } catch (e) { console.error('[jsonl] не удалось вычистить запись:', e.message); }
+      console.log(`[admin] заявка #${delId} удалена (запрос на удаление ПД или ручная очистка)`);
       return json(res, 200, { ok: true });
     }
 

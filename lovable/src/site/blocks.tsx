@@ -19,11 +19,12 @@ import {
 import {
   BRICKS, BRICK_TASKS, CASE_INDUSTRIES, CASE_SERVICES,
   visibleCases, homeReviews, REVIEWS, SITUATIONS, TEAM,
-  LEAD_ERROR, CONTACT, type FaqItem,
+  LEAD_ERROR, CONTACT, CONSENT_PD_VERSION, type FaqItem,
   type CaseItem, type Review,
 } from "./data";
 
 import type React from "react";
+import { useId } from "react";
 
 const bookCover = { url: "/img/book-cover.webp" };
 
@@ -98,7 +99,7 @@ export function Hero() {
               <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
             </a>
             <a
-              href="/business-effect"
+              href="/business-effect/"
               className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
             >
               Экономический эффект от услуг БЕЗ ВОДЫ
@@ -219,7 +220,7 @@ export function Bricks() {
   return (
     <section className="relative overflow-hidden border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="05">Опыт и портфолио</SectionLabel>
+        <SectionLabel n="04" heading>Опыт и портфолио</SectionLabel>
         <div className="mt-8 flex flex-col gap-x-14 gap-y-4 sm:flex-row">
           {numbers.map(([n, d]) => (
             <div key={n} className="flex items-baseline gap-3">
@@ -297,7 +298,7 @@ export function WhenNeeded() {
         ]}
       />
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="02">Когда подключается команда «Без Воды»</SectionLabel>
+        <SectionLabel n="02" heading>Когда подключается команда «Без Воды»</SectionLabel>
         <div className="mt-8 grid gap-5 md:grid-cols-3">
           {SITUATIONS.map((it, i) => (
             <motion.div key={it.id} {...reveal(i)}>
@@ -460,7 +461,7 @@ export function CaseCard({ item, index, teaser = false }: { item: CaseItem; inde
 
         {/* Карточка ведет на страницу кейса: /cases/<slug> (архитектура 06.08) */}
         {item.slug && (
-          <a href={`/cases/${item.slug}`} className="link-arrow case-body group w-max font-semibold">
+          <a href={`/cases/${item.slug}/`} className="link-arrow case-body group w-max font-semibold">
             Смотреть кейс
             <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
           </a>
@@ -567,7 +568,7 @@ export function TeamBlock() {
       <Scene blobs={[{ className: "-right-40 top-10", tone: "rose", size: 520 }]} />
 
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="04">Ядро команды и отраслевые эксперты</SectionLabel>
+        <SectionLabel n="05" heading>Ядро команды и отраслевые эксперты</SectionLabel>
 
         <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-3">
           {people.map((p, i) => (
@@ -599,6 +600,8 @@ export function PersonPhoto({ person }: { person: { name: string; photo?: string
           src={person.photo}
           alt={person.name}
           loading="lazy"
+          width={1200}
+          height={900}
           className="h-full w-full object-cover object-top grayscale transition duration-500 hover:grayscale-0"
         />
       )}
@@ -613,8 +616,8 @@ export function PersonPhoto({ person }: { person: { name: string; photo?: string
 export function ReviewOpener({ slug, children }: { slug: string; children: React.ReactNode }) {
   return (
     <a
-      href={`/reviews#${slug}`}
-      onClick={reviewLinkHandler(`/reviews#${slug}`)}
+      href={`/reviews/#${slug}`}
+      onClick={reviewLinkHandler(`/reviews/#${slug}`)}
       className="link-arrow group t-body"
     >
       {children}
@@ -629,13 +632,40 @@ export function ReviewModal() {
   const slug = useOpenReview();
   const review = slug ? REVIEWS.find((r) => r.slug === slug) : undefined;
 
+  const boxRef = useRef<HTMLDivElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+
+  /* Как у бургера в core.tsx: фокус на «Закрыть», Tab не выходит из окна,
+     Esc закрывает, фокус возвращается туда, откуда открыли; страница под
+     окном не прокручивается (ревизия 17.09.2026). */
   useEffect(() => {
     if (!slug) return;
+    const opener = document.activeElement as HTMLElement | null;
+    closeRef.current?.focus();
+    document.body.style.overflow = "hidden";
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") closeReview();
+      if (e.key === "Escape") {
+        e.preventDefault();
+        closeReview();
+        return;
+      }
+      if (e.key !== "Tab" || !boxRef.current) return;
+      const items = Array.from(
+        boxRef.current.querySelectorAll<HTMLElement>("a[href], button:not([disabled])"),
+      ).filter((el) => el.offsetParent !== null);
+      if (!items.length) return;
+      const edge = e.shiftKey ? items[0] : items[items.length - 1];
+      if (document.activeElement === edge) {
+        e.preventDefault();
+        (e.shiftKey ? items[items.length - 1] : items[0]).focus();
+      }
     };
     window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = "";
+      opener?.focus?.();
+    };
   }, [slug]);
 
   return (
@@ -656,10 +686,12 @@ export function ReviewModal() {
             animate={{ y: 0 }}
             transition={{ duration: 0.24, ease: REVEAL_EASE }}
             onClick={(e) => e.stopPropagation()}
+            ref={boxRef}
             className="relative my-auto w-full max-w-2xl rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-6 shadow-[var(--shadow-float)] md:p-10"
           >
             <button
               type="button"
+              ref={closeRef}
               onClick={closeReview}
               aria-label="Закрыть"
               className="absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-pill border border-[color:var(--color-line)] text-[color:var(--color-text-secondary)] transition-colors hover:text-[color:var(--color-text-primary)]"
@@ -686,7 +718,7 @@ export function ReviewModal() {
                 <p key={p}>{p}</p>
               ))}
             </blockquote>
-            <a href="/reviews" className="link-arrow group mt-8 t-body">
+            <a href="/reviews/" className="link-arrow group mt-8 t-body">
               Все отзывы
               <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
@@ -743,7 +775,7 @@ export function ReviewsBlock({ bare = false }: { bare?: boolean } = {}) {
     <section id="reviews" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <Scene blobs={[{ className: "-left-40 top-10", tone: "rose", size: 560 }, { className: "-right-40 bottom-10", tone: "chrome", size: 480 }]} />
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        {bare && <SectionLabel n="03">Отзывы клиентов</SectionLabel>}
+        {bare && <SectionLabel n="03" heading>Отзывы клиентов</SectionLabel>}
         {!bare && (
           <>
             <SectionLabel n="04">Отзывы</SectionLabel>
@@ -764,13 +796,13 @@ export function ReviewsBlock({ bare = false }: { bare?: boolean } = {}) {
         </div>
         <div className="mt-8 flex flex-wrap items-center gap-x-8 gap-y-3">
           {bare && (
-            <a href="/cases" className="link-arrow group t-body">
+            <a href="/cases/" className="link-arrow group t-body">
               Все кейсы
               <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
           )}
           <a
-            href="/reviews"
+            href="/reviews/"
             className="link-arrow group t-body"
           >
             Все отзывы
@@ -808,8 +840,8 @@ export function BookSection() {
                   alt="Обложка книги «Эксперт под ключ»"
                   loading="lazy"
                   decoding="async"
-                  width={1200}
-                  height={1600}
+                  width={415}
+                  height={593}
                   className="h-full w-full object-cover"
                 />
               </div>
@@ -838,7 +870,7 @@ export function BookSection() {
 
 /* ------------- NotFit («Когда нужен другой подрядчик») + FAQ ------------- */
 
-export function NotFit({ n = "07" }: { n?: string } = {}) {
+export function NotFit({ n = "06" }: { n?: string } = {}) {
   /* Четыре задачи — текст Виктории 17.09.2026. Заявление про агентство
      ушло из отдельного абзаца в четвертый пункт списка. */
   const items = [
@@ -877,54 +909,72 @@ export function NotFit({ n = "07" }: { n?: string } = {}) {
 
 export function FaqAccordion({ items }: { items: FaqItem[] }) {
   const [open, setOpen] = useState<number | null>(0);
+  const uid = useId();
+  /* Вопрос — кнопка, ответ — соседний region (ревизия 17.09.2026):
+     раньше ответ лежал внутри <button> — невалидно, скринридер читал
+     весь ответ как имя кнопки, а краулер не видел закрытые ответы.
+     Ответы всегда в DOM; закрытый схлопнут по высоте и вырезан из
+     дерева доступности через inert. */
   return (
     <div className="mt-8 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
       {items.map((item, i) => {
         const isOpen = open === i;
+        const qId = `${uid}-q${i}`;
+        const aId = `${uid}-a${i}`;
         return (
-          <button
+          <div
             key={item.q}
-            type="button"
-            aria-expanded={isOpen}
-            onClick={() => setOpen(isOpen ? null : i)}
-            className={`group flex w-full items-start gap-5 py-5 text-left transition hover:bg-[color:var(--color-surface)] focus-visible:outline-offset-[-2px] ${isOpen ? "bg-[color:var(--color-surface)]" : ""}`}
+            className={`group transition hover:bg-[color:var(--color-surface)] ${isOpen ? "bg-[color:var(--color-surface)]" : ""}`}
           >
-
-            <Stencil n={i + 1} active={isOpen} className="mt-1 t-small" />
-            <div className="flex-1">
-              <div className={`font-display t-body font-semibold text-foreground transition ${isOpen ? "" : "group-hover:text-[color:var(--color-accent-text)]"}`}>
+            <button
+              id={qId}
+              type="button"
+              aria-expanded={isOpen}
+              aria-controls={aId}
+              onClick={() => setOpen(isOpen ? null : i)}
+              className="flex w-full items-start gap-5 py-5 text-left focus-visible:outline-offset-[-2px]"
+            >
+              <Stencil n={i + 1} active={isOpen} className="mt-1 t-small" />
+              <span className={`flex-1 font-display t-body font-semibold text-foreground transition ${isOpen ? "" : "group-hover:text-[color:var(--color-accent-text)]"}`}>
                 {item.q}
+              </span>
+              <motion.span animate={{ rotate: isOpen ? 45 : 0 }} transition={{ duration: 0.2 }} className="mt-1 inline-flex">
+                <Plus aria-hidden className="h-4 w-4 text-[color:var(--color-text-secondary)]" />
+              </motion.span>
+            </button>
+            <motion.div
+              id={aId}
+              role="region"
+              aria-labelledby={qId}
+              inert={!isOpen}
+              initial={false}
+              animate={isOpen ? { height: "auto", opacity: 1 } : { height: 0, opacity: 0 }}
+              transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
+              className="overflow-hidden"
+            >
+              {/* Невидимый номер и место под плюс повторяют ряд вопроса:
+                  ответ выравнивается по тексту вопроса без подбора отступов. */}
+              <div className="-mt-3 flex items-start gap-5 pb-5">
+                <Stencil n={i + 1} className="invisible t-small" />
+                <div className="flex-1">
+                  {item.a.map((para) => (
+                    <p key={para} className="mt-2 t-body text-[color:var(--color-text-secondary)]">{para}</p>
+                  ))}
+                  {item.list && (
+                    <ul className="mt-2 space-y-2">
+                      {item.list.map((t) => (
+                        <li key={t} className="flex items-start gap-3 t-body text-[color:var(--color-text-secondary)]">
+                          <NodeBullet className="mt-[0.55em]" />
+                          <span>{t}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+                <span aria-hidden className="h-4 w-4 shrink-0" />
               </div>
-              <AnimatePresence initial={false}>
-                {isOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: "auto", opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
-                    className="overflow-hidden"
-                  >
-                    {item.a.map((para) => (
-                      <p key={para} className="mt-2 t-body text-[color:var(--color-text-secondary)]">{para}</p>
-                    ))}
-                    {item.list && (
-                      <ul className="mt-2 space-y-2">
-                        {item.list.map((t) => (
-                          <li key={t} className="flex items-start gap-3 t-body text-[color:var(--color-text-secondary)]">
-                            <NodeBullet className="mt-[0.55em]" />
-                            <span>{t}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-            <motion.div animate={{ rotate: isOpen ? 45 : 0 }} transition={{ duration: 0.2 }} className="mt-1">
-              <Plus className="h-4 w-4 text-[color:var(--color-text-secondary)]" />
             </motion.div>
-          </button>
+          </div>
         );
       })}
     </div>
@@ -991,7 +1041,6 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
     setErr(null);
     const f = e.currentTarget;
     const data = new FormData(f);
-    const company = String(data.get("company") || "").trim();
     const contact = String(data.get("contact") || "").trim();
     /* Два поля — имя и контакт (ред. Виктории 17.09.2026); поля о задаче
        в форме больше нет. */
@@ -1020,10 +1069,9 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
         body: JSON.stringify({
           name,
           contact,
-          company,
           comment: about,
           consent_pd: true,
-          consent_pd_version: "1.0-2026-07-14",
+          consent_pd_version: CONSENT_PD_VERSION,
           consent_ads: false,
           website: hp,
           page: (() => {
@@ -1055,7 +1103,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
           {/* Ревизия 17.09.2026: надзаголовок — общий SectionLabel (номер
               считается сам), без повтора слов заголовка; логотип из колонки
               убран (он уже в шапке); один правый край у всех строк. */}
-          <SectionLabel>Первый шаг</SectionLabel>
+          <SectionLabel n="07">Первый шаг</SectionLabel>
           <RevealHeading as={asH1 ? "h1" : "h2"} className={`${asH1 ? "t-h1" : "t-h2"} mt-6 max-w-md`}>
             Форма заявки
           </RevealHeading>
@@ -1097,6 +1145,8 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.32, ease: REVEAL_EASE }}
                 className="flex min-h-[420px] flex-col items-start justify-center"
+                role="status"
+                aria-live="polite"
               >
                 <CatMark className="h-24 w-28 text-[color:var(--color-text-inverse)]" strokeWidth={2} />
                 <h3 className="t-body mt-6 text-[color:var(--color-text-inverse)]">
@@ -1131,6 +1181,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                   label="Ваше имя"
                   name="name"
                   placeholder=""
+                  autoComplete="name"
                   dark
                   required
                   inputRef={nameRef}
@@ -1142,6 +1193,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                   label="Контакт для связи"
                   name="contact"
                   placeholder="Email, телефон или Telegram"
+                  autoComplete="on"
                   dark
                   required
                   inputRef={contactRef}
@@ -1167,9 +1219,9 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                   />
                   <span>
                     Согласен(а) на обработку персональных данных —{" "}
-                    <a href="/consent_pd" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-[color:var(--color-accent-glass)]">условия</a>{" "}
+                    <a href="/consent_pd/" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-[color:var(--color-accent-glass)]">условия</a>{" "}
                     и{" "}
-                    <a href="/politics_pd" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-[color:var(--color-accent-glass)]">политика</a>
+                    <a href="/politics_pd/" target="_blank" rel="noreferrer" className="underline underline-offset-2 hover:text-[color:var(--color-accent-glass)]">политика</a>
                   </span>
                 </label>
                 {pdErr && (

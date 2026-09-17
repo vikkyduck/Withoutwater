@@ -5,6 +5,7 @@
 // Клиент (main.tsx) монтирует ту же страницу по location.pathname.
 import { build } from "vite";
 import { readFileSync, writeFileSync, readdirSync, rmSync, mkdirSync } from "node:fs";
+import { execSync } from "node:child_process";
 import { resolve, dirname } from "node:path";
 import { pathToFileURL, fileURLToPath } from "node:url";
 
@@ -25,8 +26,62 @@ const entry = readdirSync(SSR_DIR).find((f) => f.endsWith(".js") || f.endsWith("
 if (!entry) throw new Error("[prerender] SSR-бандл не найден в dist-ssr");
 const mod = await import(pathToFileURL(resolve(SSR_DIR, entry)).href);
 
-const template = readFileSync(resolve(DIST, "index.html"), "utf8");
+let template = readFileSync(resolve(DIST, "index.html"), "utf8");
 if (!template.includes(MARKER)) throw new Error(`[prerender] не найден ${MARKER} в dist/index.html`);
+
+// fonts.css — инлайном: отдельный блокирующий запрос за 1 КБ не нужен.
+// Комментарии вырезаем, сам файл остаётся для 404.html и юрстраниц.
+{
+  const fontsCss = readFileSync(resolve(root, "public/fonts/fonts.css"), "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\n\s*\n/g, "\n")
+    .trim();
+  const link = '<link rel="stylesheet" href="/fonts/fonts.css" />';
+  if (!template.includes(link)) throw new Error("[prerender] не найден тег fonts.css в шаблоне");
+  template = template.replace(link, `<style>${fontsCss}</style>`);
+}
+
+// JSON-LD: организация на главной, FAQPage на /faq, хлебные крошки у кейсов.
+// Только данные, которые уже есть на страницах (CONTACT, FAQ_ITEMS, CASES).
+const ld = (obj) => `<script type="application/ld+json">${JSON.stringify(obj).replace(/</g, "\\u003c")}</script>`;
+function jsonLd(path) {
+  if (path === "/") {
+    return ld({
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      name: "Без Воды",
+      alternateName: "withoutwater",
+      url: ORIGIN + "/",
+      logo: ORIGIN + "/favicon.svg",
+      email: mod.CONTACT.email,
+      telephone: mod.CONTACT.phone,
+      sameAs: [mod.CONTACT.tgUrl],
+    });
+  }
+  if (path === "/faq") {
+    return ld({
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      mainEntity: mod.FAQ_ITEMS.map((it) => ({
+        "@type": "Question",
+        name: it.q,
+        acceptedAnswer: { "@type": "Answer", text: [...it.a, ...(it.list ?? [])].join(" ") },
+      })),
+    });
+  }
+  if (path.startsWith("/cases/")) {
+    const item = mod.CASES.find((c) => c.slug && path === `/cases/${c.slug}`);
+    return ld({
+      "@context": "https://schema.org",
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Кейсы", item: ORIGIN + "/cases/" },
+        { "@type": "ListItem", position: 2, name: item?.title ?? path, item: ORIGIN + path + "/" },
+      ],
+    });
+  }
+  return "";
+}
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
 // $ в строке замены — спецсимвол для String.replace ($&, $1, $`); экранируем
@@ -60,6 +115,8 @@ for (const route of mod.ROUTES) {
     .replace(/(<link rel="canonical" href=")[^"]*(")/, `$1${url}$2`)
     .replace(/(<meta property="og:url" content=")[^"]*(")/, `$1${url}$2`)
     .replace(MARKER, `<div id="root">${rep(appHtml)}</div>`);
+  const structured = jsonLd(route.path);
+  if (structured) html = html.replace("</head>", `${rep(structured)}\n</head>`);
 
   // Страницы вне сайта (route.noindex): не индексируем и не пускаем по ссылкам.
   // Ссылку на такую страницу отправляют клиенту напрямую — см. /constructor.
@@ -77,14 +134,17 @@ for (const route of mod.ROUTES) {
   console.log(`[prerender] ${route.path.padEnd(15)} ${appHtml.length.toLocaleString("ru")} симв. (LCP-фикс: ${unhidden})`);
 }
 
-// sitemap.xml по фактическим маршрутам
-const today = new Date().toISOString().slice(0, 10);
+// sitemap.xml по фактическим маршрутам. lastmod — дата последнего коммита
+// по исходникам сайта, а не день сборки: иначе каждая выкатка объявляла
+// «всё изменилось». Юрстраницы (public/*_pd, pub_oferta) стоят с noindex —
+// в карте им не место.
+let lastmod = new Date().toISOString().slice(0, 10);
+try {
+  lastmod = execSync("git log -1 --format=%cs -- src public index.html", { cwd: root, encoding: "utf8" }).trim() || lastmod;
+} catch {}
 const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${mod.ROUTES.filter((r) => !r.noindex).map((r) => `  <url><loc>${ORIGIN}${r.path === "/" ? "/" : r.path + "/"}</loc><lastmod>${today}</lastmod></url>`).join("\n")}
-  <url><loc>${ORIGIN}/politics_pd/</loc><lastmod>${today}</lastmod></url>
-  <url><loc>${ORIGIN}/consent_pd/</loc><lastmod>${today}</lastmod></url>
-  <url><loc>${ORIGIN}/pub_oferta/</loc><lastmod>${today}</lastmod></url>
+${mod.ROUTES.filter((r) => !r.noindex).map((r) => `  <url><loc>${ORIGIN}${r.path === "/" ? "/" : r.path + "/"}</loc><lastmod>${lastmod}</lastmod></url>`).join("\n")}
 </urlset>
 `;
 writeFileSync(resolve(DIST, "sitemap.xml"), sitemap, "utf8");

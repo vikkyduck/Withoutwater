@@ -109,6 +109,8 @@ function ArtifactCard({ item, index }: { item: Artifact; index: number }) {
             src={img}
             alt={`Разворот документа «${item.title}»`}
             loading="lazy"
+            width={1200}
+            height={900}
             className="aspect-[4/3] w-full object-cover object-top transition duration-500 group-hover:scale-[1.02]"
           />
         </a>

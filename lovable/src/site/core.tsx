@@ -183,7 +183,10 @@ export function StencilLogo({ className = "" }: { className?: string }) {
 }
 
 /* Надзаголовок секции: номер Unbounded, волосяная линия, капитель Golos. */
-export function SectionLabel({ n, children }: { n?: string; children: ReactNode }) {
+/* heading: у секции без своего <h2> метка и есть заголовок — тогда она
+   рендерится как h2 (структура для скринридера и поисковика), вид тот же. */
+export function SectionLabel({ n, heading = false, children }: { n?: string; heading?: boolean; children: ReactNode }) {
+  const Text = heading ? "h2" : "span";
   return (
     <div
       data-seclabel
@@ -191,7 +194,7 @@ export function SectionLabel({ n, children }: { n?: string; children: ReactNode 
     >
       <Stencil n={n ?? "00"} active className="text-[color:var(--color-accent)]" />
       <span className="h-px w-10 bg-[color:var(--color-line)]" />
-      <span>{children}</span>
+      <Text className="t-eyebrow">{children}</Text>
     </div>
   );
 }
@@ -949,7 +952,7 @@ export function CookieBar() {
       <span className="t-caption text-[color:var(--color-text-secondary)]">
         Cookie и Яндекс Метрика ·{" "}
         <a
-          href="/politics_pd"
+          href="/politics_pd/"
           className="underline underline-offset-2 hover:text-[color:var(--color-text-primary)]"
         >
           политика
@@ -969,19 +972,25 @@ export function CookieBar() {
 /* Четыре пункта обычными словами + одна кнопка действия. Кнопка везде одна:
    «Разбор задачи за 30 минут». */
 
+/* Ссылки на страницы — со слешем на конце: так лежат файлы в dist
+   (/faq/index.html), без слеша nginx отвечал 301 на каждый переход.
+   path страницы приходит без слеша (main.tsx normalize), сравниваем через isHere. */
+export const isHere = (path: string, href: string) =>
+  path === (href.length > 1 && href.endsWith("/") ? href.slice(0, -1) : href);
+
 export const NAV_LINKS: [string, string][] = [
   ["Услуги", "/#when"],
-  ["Кейсы", "/cases"],
-  ["Наш подход", "/how-we-work"],
-  ["О нас", "/team"],
+  ["Кейсы", "/cases/"],
+  ["Наш подход", "/how-we-work/"],
+  ["О нас", "/team/"],
 ];
 
 /* Второй уровень: раньше жил в футере, теперь — в меню. */
 export const NAV_SECONDARY: [string, string][] = [
-  ["Экономический эффект", "/business-effect"],
-  ["Отзывы", "/reviews"],
-  ["Частые вопросы", "/faq"],
-  ["Контакты", "/contacts"],
+  ["Экономический эффект", "/business-effect/"],
+  ["Отзывы", "/reviews/"],
+  ["Частые вопросы", "/faq/"],
+  ["Контакты", "/contacts/"],
 ];
 
 
@@ -997,8 +1006,12 @@ export const LK_URL = "https://fin-dohod.ru";
 export const LK_LABEL = "Личный кабинет";
 
 /* Ссылка CTA: на главной — якорь формы, на остальных страницах — /contacts. */
+/* Кнопка «Оставить заявку» ведет к форме на этой же странице: форма стоит
+   внизу каждой страницы, кроме кейсов, карты экспертизы и конструктора —
+   оттуда ведем на /contacts. */
 export function ctaHref(path: string): string {
-  return path === "/" ? "#contact" : "/contacts#form";
+  const noForm = path.startsWith("/cases/") || path === "/expertise-map" || path === "/constructor";
+  return noForm ? "/contacts/#form" : "#contact";
 }
 
 export function Nav({ path = "/" }: { path?: string }) {
@@ -1088,7 +1101,7 @@ export function Nav({ path = "/" }: { path?: string }) {
             меню ощутимо короче; перед этим стоит померить на 1024 px. */}
         <nav aria-label="Основная навигация" className="hidden items-center gap-0.5 t-nav tracking-[0.005em] xl:flex">
           {NAV_LINKS.map(([label, href]) => {
-            const active = path === href;
+            const active = isHere(path, href);
             return (
               <a
                 key={href}
@@ -1129,7 +1142,7 @@ export function Nav({ path = "/" }: { path?: string }) {
             type="button"
             aria-label={open ? "Закрыть меню" : "Открыть меню"}
             aria-expanded={open}
-            aria-haspopup="menu"
+            aria-haspopup="dialog"
             aria-controls="site-menu"
             onClick={() => setOpen((v) => !v)}
             className="inline-flex h-11 w-11 items-center justify-center rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-primary)] transition-colors hover:bg-[color:var(--color-bg-secondary)]"
@@ -1170,7 +1183,7 @@ export function Nav({ path = "/" }: { path?: string }) {
               <a
                 key={href}
                 href={href}
-                aria-current={path === href ? "page" : undefined}
+                aria-current={isHere(path, href) ? "page" : undefined}
                 onClick={() => setOpen(false)}
                 className="flex min-h-[60px] items-center justify-between border-b border-[color:var(--color-line)] py-4 t-body text-[color:var(--color-text-primary)] xl:hidden"
               >
@@ -1185,7 +1198,7 @@ export function Nav({ path = "/" }: { path?: string }) {
                 <a
                   key={href}
                   href={href}
-                  aria-current={path === href ? "page" : undefined}
+                  aria-current={isHere(path, href) ? "page" : undefined}
                   onClick={() => setOpen(false)}
                   className="flex min-h-[52px] items-center justify-between border-b border-[color:var(--color-line)] py-3 t-body text-[color:var(--color-text-primary)]"
                 >
@@ -1198,7 +1211,7 @@ export function Nav({ path = "/" }: { path?: string }) {
               <a
                 key={href}
                 href={href}
-                aria-current={path === href ? "page" : undefined}
+                aria-current={isHere(path, href) ? "page" : undefined}
                 onClick={() => setOpen(false)}
                 className="flex min-h-[60px] items-center justify-between border-b border-[color:var(--color-line)] py-4 t-body text-[color:var(--color-text-primary)]"
               >
@@ -1247,9 +1260,9 @@ export function Footer() {
      строки мелким кеглем: разделы и документы, копирайт. */
   const link = "transition hover:text-[color:var(--color-accent)]";
   const legal: [string, string][] = [
-    ["Политика конфиденциальности", "/politics_pd"],
-    ["Согласие на обработку персональных данных", "/consent_pd"],
-    ["Публичная оферта", "/pub_oferta"],
+    ["Политика конфиденциальности", "/politics_pd/"],
+    ["Согласие на обработку персональных данных", "/consent_pd/"],
+    ["Публичная оферта", "/pub_oferta/"],
   ];
   return (
     <footer className="border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
@@ -1317,8 +1330,13 @@ export function PageShell({ path, children }: { path: string; children: ReactNod
       <div className="min-h-screen bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-primary)]">
         {/* Окно отзыва — одно на страницу, открывается из плиток и кейсов */}
         <ReviewModalSlot />
+        {/* Ссылка «к содержанию» для клавиатуры и скринридера: видна только
+            в фокусе, первая по Tab (ревизия доступности 17.09.2026). */}
+        <a href="#main" className="skip-link">
+          К содержанию
+        </a>
         <Nav path={path} />
-        <main className="pb-20 md:pb-0">{children}</main>
+        <main id="main" tabIndex={-1} className="pb-20 outline-none md:pb-0">{children}</main>
 
         {/* Финал печатной версии: шапка и футер сайта в PDF скрыты, вместо них —
             подпись бюро (брендбук: кот появляется на финальных страницах PDF) */}
@@ -1589,7 +1607,7 @@ export function CtaBand({
 }) {
   const defaultSecondary = (
     <a
-      href="/business-effect"
+      href="/business-effect/"
       className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
     >
       Экономический эффект от услуг БЕЗ ВОДЫ

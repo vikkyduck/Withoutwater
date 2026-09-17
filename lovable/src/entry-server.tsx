@@ -4,8 +4,10 @@
 // <div id="root">. На клиенте main.tsx монтирует интерактивную версию поверх.
 import { renderToStaticMarkup } from "react-dom/server";
 import { ROUTES } from "./site/pages";
+import { FAQ_ITEMS, CONTACT, CASES } from "./site/data";
 
-export { ROUTES };
+/* Данные для JSON-LD в prerender.mjs: Organization, FAQPage, BreadcrumbList */
+export { ROUTES, FAQ_ITEMS, CONTACT, CASES };
 
 export function render(path: string): string {
   const route = ROUTES.find((r) => r.path === path);

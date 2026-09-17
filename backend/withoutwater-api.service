@@ -10,7 +10,7 @@ Group=www-data
 WorkingDirectory=/opt/withoutwater/backend
 EnvironmentFile=/opt/withoutwater/.env
 ExecStart=/usr/bin/node /opt/withoutwater/backend/server.mjs
-Restart=on-failure
+Restart=always
 RestartSec=3
 
 # hardening

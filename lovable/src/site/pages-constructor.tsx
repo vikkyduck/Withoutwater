@@ -20,7 +20,7 @@ import {
   RevealHeading, NodeList, Check, Plus, Minus, SectionLabel, ArrowRight,
   reveal,
 } from "./core";
-import { ABONEMENTS, IPR_UNIT, LEAD_ERROR } from "./data";
+import { ABONEMENTS, IPR_UNIT, LEAD_ERROR, CONSENT_PD_VERSION } from "./data";
 
 /* Минимальный пакет: пока набрано меньше — кнопка «Отправить» не активна
    (требование Виктории 05.08.2026). */
@@ -123,7 +123,7 @@ const PRODUCTS: Unit[] = [
     id: "map",
     title: "Карта экспертности",
     price: 60000,
-    href: "/expertise-map",
+    href: "/expertise-map/",
     what: "Первый этап перед базой знаний и разработки обучения. Результат:",
     list: [
       "Карта знаний: минимум, который необходим человеку без необходимого опыта и логика принятия решений",
@@ -424,7 +424,7 @@ export function ConstructorPage() {
             `Итого: ${money(monthly)} / мес + ${money(once)} разово.`,
           ].join("\n"),
           consent_pd: true,
-          consent_pd_version: "1.0-2026-07-14",
+          consent_pd_version: CONSENT_PD_VERSION,
           consent_ads: false,
           website: hpRef.current?.value || "",
           page: "/constructor",
@@ -643,9 +643,9 @@ export function ConstructorPage() {
                       />
                       <span>
                         Согласен(а) на обработку персональных данных —{" "}
-                        <a href="/consent_pd" target="_blank" rel="noreferrer" className="underline underline-offset-2">условия</a>{" "}
+                        <a href="/consent_pd/" target="_blank" rel="noreferrer" className="underline underline-offset-2">условия</a>{" "}
                         и{" "}
-                        <a href="/politics_pd" target="_blank" rel="noreferrer" className="underline underline-offset-2">политика</a>
+                        <a href="/politics_pd/" target="_blank" rel="noreferrer" className="underline underline-offset-2">политика</a>
                       </span>
                     </label>
 
