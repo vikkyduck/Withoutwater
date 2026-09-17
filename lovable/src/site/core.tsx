@@ -1592,7 +1592,7 @@ export function CtaBand({
       href="/business-effect"
       className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
     >
-      Экономический эффект от наших услуг
+      Экономический эффект от услуг БЕЗ ВОДЫ
       <ArrowUpRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
     </a>
   );

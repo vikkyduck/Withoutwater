@@ -101,7 +101,7 @@ export function Hero() {
               href="/business-effect"
               className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
             >
-              Экономический эффект от наших услуг
+              Экономический эффект от услуг БЕЗ ВОДЫ
               <ArrowUpRight data-arrow className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </a>
           </div>
@@ -320,7 +320,7 @@ export function WhenNeeded() {
                     {it.detail}
                   </p>
                   <p className="mt-3 t-body text-[color:var(--color-text-inverse)]">
-                    Как решаем: {it.solutionTitle}
+                    Решение: {it.solutionTitle}
                   </p>
                   <span className="mt-auto inline-flex items-center gap-1.5 pt-5 t-body font-semibold text-[color:var(--color-text-inverse)] transition group-hover:opacity-80">
                     {it.linkLabel}
@@ -568,9 +568,6 @@ export function TeamBlock() {
 
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
         <SectionLabel n="04">Ядро команды и отраслевые эксперты</SectionLabel>
-        <p className="mt-6 max-w-2xl t-body text-[color:var(--color-text-secondary)]">
-          Мы отвечаем за ведение ваших проектов. Для решения задач на «узкую» тему мы сотрудничаем с практиками из пула внешних экспертов.
-        </p>
 
         <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-3">
           {people.map((p, i) => (
@@ -797,7 +794,7 @@ export function ReviewsBlock({ bare = false }: { bare?: boolean } = {}) {
 export function BookSection() {
   return (
     <div id="book" className="mt-12">
-      <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Наш подход описан и издан</div>
+      <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Подход описан и издан без воды</div>
       <div className="mt-6">
         <PaperCard className="overflow-hidden p-0">
           <div className="grid items-center gap-0 sm:grid-cols-[168px_1fr]">
@@ -862,9 +859,6 @@ export function NotFit({ n = "07" }: { n?: string } = {}) {
         <RevealHeading className="mt-6 t-h2 max-w-3xl">
           Когда нужен другой подрядчик
         </RevealHeading>
-        <p className="mt-6 max-w-2xl t-body text-[color:var(--color-text-secondary)]">
-          Мы ценим ваше время и готовы порекомендовать наших коллег для следующих задач:
-        </p>
         <ul className="mt-8 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
           {items.map((t) => (
             <li key={t} className="flex items-start gap-4 py-4 t-body text-[color:var(--color-text-primary)]">
@@ -1063,11 +1057,11 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
               убран (он уже в шапке); один правый край у всех строк. */}
           <SectionLabel>Первый шаг</SectionLabel>
           <RevealHeading as={asH1 ? "h1" : "h2"} className={`${asH1 ? "t-h1" : "t-h2"} mt-6 max-w-md`}>
-            Первый шаг и форма заявки
+            Форма заявки
           </RevealHeading>
           {/* Тексты Виктории 17.09.2026, слово в слово. */}
           <p className="mt-6 max-w-md t-body text-[color:var(--color-text-secondary)]">
-            Обсудим вашу задачу и найдем оптимальное решение. Презентация и подробное ТЗ не требуются. На 30-минутной онлайн-встрече мы:
+            Обсудим задачу и найдем оптимальное решение. Презентация и подробное ТЗ не требуются. На 30-минутной онлайн-встрече:
           </p>
           <ol className="mt-4 max-w-md space-y-2">
             {[
