@@ -1245,7 +1245,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                 </button>
                 <div className="space-y-2">
                   <p className="t-caption text-[color:var(--color-text-inverse-2)]">
-                    Ответим в течение 5 минут в рабочее время.
+                    Ответим в течение 5 минут.
                   </p>
                   <a
                     href={CONTACT.tgUrl}
