@@ -579,11 +579,16 @@ export function TeamSubscriptionPage() {
           <RevealHeading className="t-h2 mt-6 max-w-3xl">
             Подписка от 180 000 ₽ в месяц
           </RevealHeading>
+          {/* Формулировка Виктории 17.09.2026, дословно; ссылка ведет к перечню ниже */}
           <p className="mt-6 max-w-3xl t-body text-[color:var(--color-text-secondary)]">
-            180 000 ₽ — минимальная сумма услуг в месяц, которую клиент выбирает для себя, чтобы получить услуги по оптовым ценам ниже рынка. Состав пакета и цены — в закрытой карточке, которую отправляем после разбора задачи. Ниже — перечень того, что можно включить в подписку.
+            180 000 ₽ — минимальная сумма услуг в месяц по оптовым ценам; точная стоимость услуг — после разбора.
           </p>
+          <a href="#units-list" className="link-arrow group mt-4 t-body">
+            Перечень возможных услуг
+            <ArrowDown data-arrow="down" className="h-4 w-4 transition-transform duration-300 group-hover:translate-y-0.5" />
+          </a>
 
-          <div className="mt-8 space-y-12">
+          <div id="units-list" className="mt-8 scroll-mt-28 space-y-12">
             {SUB_GROUPS.map((g) => (
               <div key={g.title}>
                 <div className="t-eyebrow text-[color:var(--color-text-secondary)]">{g.title}</div>
@@ -876,7 +881,7 @@ export function BusinessEffectGeneralPage() {
   const timeline: [string, string][] = [
     ["5 минут", "Отвечаем на заявку"],
     ["30 минут", "Обсуждение задачи"],
-    ["24 часа", "Включаемся в работу после подписания договора"],
+    ["24 часа", "Включаемся в работу"],
   ];
 
   return (

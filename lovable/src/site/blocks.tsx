@@ -112,7 +112,7 @@ export function Hero() {
         <div className="relative mt-12 grid max-w-4xl items-stretch gap-4 sm:grid-cols-3 md:mt-16">
           {[
             ["Без ТЗ", "Вводные в любом виде"],
-            ["24 часа", "Включаемся в работу после подписания договора"],
+            ["24 часа", "Включаемся в работу"],
             ["от 180 000 ₽/мес", "Подписка на отдел обучения"],
           ].map(([label, desc], i) => (
             <div
