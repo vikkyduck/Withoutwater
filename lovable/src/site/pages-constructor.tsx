@@ -20,7 +20,7 @@ import {
   RevealHeading, NodeList, Check, Plus, Minus, SectionLabel, ArrowRight,
   reveal,
 } from "./core";
-import { ABONEMENTS, IPR_UNIT, LEAD_ERROR, EXPERTS_NOTE } from "./data";
+import { ABONEMENTS, IPR_UNIT, LEAD_ERROR } from "./data";
 
 /* Минимальный пакет: пока набрано меньше — кнопка «Отправить» не активна
    (требование Виктории 05.08.2026). */
@@ -458,7 +458,7 @@ export function ConstructorPage() {
           </p>
           {/* Общее условие работы — то же, что в шапках страниц решений. */}
           <p className="measure mt-5 border-l-2 border-[color:var(--color-accent)] pl-4 t-body text-[color:var(--color-text-secondary)]">
-            {EXPERTS_NOTE}
+            Мы привлекаем всех необходимых профильных экспертов для реализации проекта.
           </p>
 
           <fieldset className="mt-14 border-0 p-0">

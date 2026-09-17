@@ -5,7 +5,7 @@
    ========================================================================== */
 import {
   motion, AnimatePresence,
-  ArrowUpRight, ArrowRight, Plus, Check, ExternalLink, CookingPot,
+  ArrowUpRight, ArrowRight, Plus, Check, ExternalLink, CookingPot, Send,
   useRef, useState, useEffect,
   ymGoal,
   SectionLabel, GlassCard, PaperCard, Scene, NodeScene, ScrollRing,
@@ -17,9 +17,9 @@ import {
   useOpenReview, openReview, closeReview, reviewLinkHandler, registerReviewModal,
 } from "./core";
 import {
-  BRICKS, BRICK_INDUSTRIES, BRICK_SERVICES, CASE_INDUSTRIES, CASE_SERVICES,
+  BRICKS, BRICK_TASKS, CASE_INDUSTRIES, CASE_SERVICES,
   visibleCases, homeReviews, REVIEWS, SITUATIONS, TEAM,
-  LEAD_ERROR, PRACTICE_PROOF_LC,
+  LEAD_ERROR, CONTACT, type FaqItem,
   type CaseItem, type Review,
 } from "./data";
 
@@ -80,28 +80,28 @@ export function Hero() {
             собственной рамкой. Образ «мощностей» остаётся в надзаголовке.
             Формулировки её, дословно. */}
         <div className="mb-6 [--color-text-secondary:var(--color-text-inverse-2)]">
-          <SectionLabel n="01">Дополнительные мощности T&D</SectionLabel>
+          <SectionLabel n="01">Новые возможности T&D</SectionLabel>
         </div>
         <RevealHeading as="h1" className="t-h1 max-w-[900px] text-[color:var(--color-text-inverse)]">
           Проектное бюро по обучению
         </RevealHeading>
 
         <p className="t-body measure mt-6 text-[color:var(--color-text-inverse)]/85 md:mt-7">
-          Проектируем образовательные решения с привлечением профильных экспертов
+          Проектируем программы обучения с привлечением профильных специалистов
         </p>
 
         {/* Одно главное действие — сразу под смыслом, до всех аргументов */}
         <div className="mt-9 flex flex-col items-start gap-3 md:mt-10">
           <div className="flex w-full flex-col items-start gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-6">
             <a href="#contact" className="btn btn-invert group w-full sm:w-auto">
-              <span>{CTA_LABEL}</span>
+              <span>Оставить заявку на разбор задачи</span>
               <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
             </a>
             <a
               href="/business-effect"
               className="link-arrow group t-eyebrow text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
             >
-              Бизнес-эффект от сотрудничества
+              Экономический эффект от наших услуг
               <ArrowUpRight data-arrow className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
             </a>
           </div>
@@ -111,8 +111,8 @@ export function Hero() {
         <div className="relative mt-12 grid max-w-4xl items-stretch gap-4 sm:grid-cols-3 md:mt-16">
           {[
             ["Без ТЗ", "Вводные в любом виде"],
-            ["24 часа", "Старт проекта"],
-            ["от 180 000 ₽", "Подписка на наши услуги"],
+            ["24 часа", "Включаемся в работу"],
+            ["от 180 000 ₽/мес", "Подписка на услуги БЕЗ ВОДЫ"],
           ].map(([label, desc], i) => (
             <div
               key={label}
@@ -131,22 +131,6 @@ export function Hero() {
             </div>
           ))}
         </div>
-
-
-
-        {/* Явный указатель прокрутки: экран заканчивается, страница — нет */}
-        <a
-          href="#when"
-          className="mt-12 inline-flex items-center gap-3 t-eyebrow text-[color:var(--color-text-inverse-2)] transition-colors hover:text-[color:var(--color-text-inverse)] md:mt-16"
-        >
-          <span
-            aria-hidden
-            className="inline-flex h-8 w-5 items-start justify-center rounded-pill border border-[color:var(--color-line-dark)] pt-1.5"
-          >
-            <span className="scroll-cue block h-1.5 w-px bg-current" />
-          </span>
-          Дальше — когда мы нужны
-        </a>
       </div>
 
     </section>
@@ -223,27 +207,19 @@ function FilterEmpty({ onReset, dark = false }: { onReset: () => void; dark?: bo
    Вордмарки текстовые — заменим на файлы логотипов, когда будут согласованы. */
 
 export function Bricks() {
-  /* Фильтр по отрасли (решение Виктории 06.08). Фильтруем на клиенте:
-     пререндер отдаёт все плитки, поэтому поиск и печать видят полный список. */
-  const [industry, setIndustry] = useState<string | null>(null);
-  const [service, setService] = useState<string | null>(null);
-  const bricks = BRICKS.filter(
-    (b) =>
-      (!industry || b.industries?.includes(industry)) &&
-      (!service || b.services?.includes(service)),
-  );
+  /* Один фильтр — по типу задачи (ред. Виктории 17.09.2026). Фильтруем на
+     клиенте: пререндер отдаёт все плитки, поэтому поиск видит полный список. */
+  const [task, setTask] = useState<string | null>(null);
+  const bricks = task ? BRICKS.filter((b) => b.task === task) : BRICKS;
 
-  /* Цифры опыта переехали сюда из отдельной секции «Наш опыт в цифрах»
-     (решение 03.08): две секции рядом доказывали одно и то же. Тексты
-     дословно из прежней секции. */
   const numbers: [string, string][] = [
-    ["460+", "разработанных продуктов в портфеле команды"],
-    ["30+", "компаний-клиентов"],
+    ["460+", "разработанных обучающих продуктов в портфолио"],
+    ["30+", "корпоративных клиентов"],
   ];
   return (
     <section className="relative overflow-hidden border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="05">Работали с командами</SectionLabel>
+        <SectionLabel n="05">Опыт и портфолио</SectionLabel>
         <div className="mt-8 flex flex-col gap-x-14 gap-y-4 sm:flex-row">
           {numbers.map(([n, d]) => (
             <div key={n} className="flex items-baseline gap-3">
@@ -252,31 +228,19 @@ export function Bricks() {
             </div>
           ))}
         </div>
-        <p className="mt-3 t-caption text-[color:var(--color-text-secondary)]">
-          По данным внутреннего учёта проектов команды.
-        </p>
-        {/* Разбор 04.08: между плитками клиентов и кейсами был провал —
-            логотипы крупные, а кейсы анонимные, и читатель достраивал
-            связь сам. Подпись закрывает разрыв. */}
-        <p className="mt-6 max-w-2xl t-body text-[color:var(--color-text-secondary)]">
-          Проекты этих компаний под NDA — показываем обезличенно. Там, где
-          клиент дал согласие, плитка ведёт на его отзыв.
-        </p>
-        <div className="mt-8 flex flex-col gap-3">
-          <FilterRow label="Отрасль" options={BRICK_INDUSTRIES} value={industry} onChange={setIndustry} />
-          <FilterRow label="Услуга" options={BRICK_SERVICES} value={service} onChange={setService} />
+
+        <div className="mt-8">
+          <FilterRow label="Тип задачи" options={BRICK_TASKS} value={task} onChange={setTask} />
         </div>
 
-        {bricks.length === 0 && (
-          <FilterEmpty dark onReset={() => { setIndustry(null); setService(null); }} />
-        )}
+        {bricks.length === 0 && <FilterEmpty dark onReset={() => setTask(null)} />}
         <div className="mt-5 grid grid-cols-2 gap-px overflow-hidden rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-line)] sm:grid-cols-3">
           {bricks.map((b, i) => {
             const Tag: any = b.href ? motion.a : motion.div;
             return (
               <Tag
                 key={b.name}
-                {...(b.href ? { href: b.href, onClick: reviewLinkHandler(b.href) } : {})}
+                {...(b.href ? { href: b.href } : {})}
                 {...reveal(i)}
                 className={`group relative flex min-h-[92px] flex-col justify-between rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-surface)] p-5 md:min-h-[104px] ${
                   b.href ? "card-link transition-colors duration-300 hover:bg-[color:var(--color-bg-primary)]" : ""
@@ -286,18 +250,12 @@ export function Bricks() {
                   <span className="font-display t-body font-semibold tracking-[-0.01em] text-[color:var(--color-text-primary)]">
                     {b.name}
                   </span>
-                  {b.nda ? (
+                  {b.nda && (
                     <span className="shrink-0 rounded-pill border border-[color:var(--color-line)] px-2 py-0.5 t-label text-[color:var(--color-text-secondary)]">
                       NDA
                     </span>
-                  ) : b.year ? (
-                    <span className="t-caption shrink-0 tabular-nums text-[color:var(--color-steel)]">
-                      {b.year}
-                    </span>
-                  ) : null}
+                  )}
                 </div>
-                {/* Подпись: что за проект. Где публиковать пока нечего —
-                    «Готовим кейс» с иконкой (решение 06.08). */}
                 {b.note && (
                   <p className="mt-2 t-caption text-[color:var(--color-text-secondary)]">
                     {b.note}
@@ -306,15 +264,10 @@ export function Bricks() {
                 {b.pending && (
                   <p className="mt-2 inline-flex items-center gap-2 t-caption text-[color:var(--color-text-secondary)]">
                     <CookingPot aria-hidden className="h-4 w-4 shrink-0 text-[color:var(--color-accent)]" />
-                    Готовим кейс
+                    {b.pending}
                   </p>
                 )}
-                {/* Услуга проекта — подпись внизу карточки (решение 06.08) */}
-                {b.services && b.services.length > 0 && (
-                  <p className="mt-3 t-caption text-[color:var(--color-accent)]">
-                    {b.services.join(" · ")}
-                  </p>
-                )}
+                <p className="mt-3 t-caption text-[color:var(--color-accent)]">{b.task}</p>
                 {b.href && (
                   <span className="mt-3 inline-flex items-center gap-1.5 t-eyebrow text-[color:var(--color-steel)] transition group-hover:text-[color:var(--color-accent)]">
                     Смотреть
@@ -326,106 +279,17 @@ export function Bricks() {
           })}
         </div>
       </div>
-
     </section>
   );
 }
-
-
-
 
 /* ------------------------- Полоса цифр (главная) -------------------------- */
-/* 260+ убрана решением Виктории от 26.07 («нам хватит кейсов поднять вес»).
-   Сноска-источник — черновик, точный период подставит Виктория. */
-
-export function NumbersBand() {
-  const items: [string, string][] = [
-    ["460+", "разработанных продуктов в портфеле команды"],
-    ["30+", "компаний-клиентов"],
-  ];
-  return (
-    <section className="relative overflow-hidden border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
-      <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="04">Наш опыт в цифрах</SectionLabel>
-        <div className="mt-10 grid gap-10 sm:grid-cols-2 sm:gap-6">
-          {items.map(([n, d]) => (
-            <div key={n} className="relative pt-6">
-              <span aria-hidden className="absolute inset-x-0 top-0 h-px bg-[color:var(--color-line)]" />
-              <span aria-hidden className="tex-chrome absolute left-0 top-0 h-[2px] w-12 rounded-pill" />
-              <div className="font-display t-number tabular-nums tracking-[-0.02em]">{n}</div>
-              <p className="mt-4 max-w-xs t-body text-[color:var(--color-text-secondary)]">{d}</p>
-            </div>
-          ))}
-        </div>
-        <p className="mt-8 max-w-xl t-caption text-[color:var(--color-text-secondary)]">
-          По данным внутреннего учёта проектов команды.
-        </p>
-      </div>
-    </section>
-  );
-}
 
 /* --------------------- Производственная система (новый) ------------------- */
-/* По ТЗ v3: блок, который отличает команду от группы фрилансеров. */
-
-export function Production() {
-  const items: [string, string][] = [
-    ["24 рабочих часа", "на типовой курс — от брифа до готовой структуры с материалами*"],
-    ["10–12 проектов", "ведём в параллель без потери сроков: конвейер, а не аврал"],
-    ["Критерии приёмки", "согласуются до старта — вы заранее знаете, что считается результатом"],
-    ["Этапы с результатом", "работа разбита на этапы, каждый завершается самостоятельным результатом"],
-  ];
-  return (
-    <section id="production" className="stage sec-dark grain border-b border-[color:var(--color-line-dark)]">
-      <Scene blobs={[{ className: "-right-40 top-10", tone: "rose", size: 520 }]} />
-      <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <div className="t-eyebrow flex items-center gap-3 text-[color:var(--color-text-inverse-2)]"><span className="font-display tracking-normal text-[color:var(--color-accent-glass)]">02</span><span className="h-px w-10 bg-[color:var(--color-line-dark)]" /><span>Производство</span></div>
-        <RevealHeading className="t-h2 mt-6 max-w-4xl">
-          Как устроено наше производство
-        </RevealHeading>
-        <p className="mt-5 max-w-2xl t-body text-[color:var(--color-text-inverse-2)]">
-          Отличие проектной команды от группы фрилансеров — производственная
-          система: сроки, параллельность и приёмка, о которых договорились заранее.
-        </p>
-        <div className="mt-10 grid gap-4 sm:grid-cols-2">
-          {items.map(([t, d], i) => (
-            <motion.div
-              key={t}
-              {...reveal(i)}
-              className="surface-dark notch rounded-md p-6"
-            >
-              <div className="flex items-center gap-3">
-                <Stencil n={i + 1} active className="t-body" />
-                <span className="h-px w-6 bg-[color:var(--color-line-dark)]" />
-                <LineIcon
-                  name={(["term", "process", "quality", "standard"] as const)[i]}
-                  className="h-5 w-5 text-[color:var(--color-accent-glass)]"
-                />
-              </div>
-              <div className="mt-4 font-display t-body font-semibold tracking-tight">{t}</div>
-              <p className="mt-2.5 t-body text-[color:var(--color-text-inverse-2)]">{d}</p>
-            </motion.div>
-          ))}
-        </div>
-        <p className="mt-6 max-w-2xl t-caption text-[color:var(--color-text-inverse-2)]">
-          * Типовой курс — программа стандартной структуры на подготовленной
-          фактуре заказчика, без исследовательского этапа и продуктовой разработки
-          с нуля.
-        </p>
-      </div>
-    </section>
-  );
-}
-
-/* Блок 3: три ситуации, для которых подход является рабочим.
-   Данные берутся из SITUATIONS (data.tsx), чтобы текст совпадал
-   со страницей «Услуги». Под каждой ситуацией — ссылка
-   на развёрнутое описание решения. */
 
 export function WhenNeeded() {
   return (
     <section id="when" className="stage sec-dark grain relative overflow-hidden border-b border-[color:var(--color-line)]">
-      {/* Под карточки — мягкие пятна материала, чтобы стекло было чему преломлять */}
       <Scene
         blobs={[
           { className: "-left-32 top-[-10%]", tone: "rose", size: 420 },
@@ -433,19 +297,10 @@ export function WhenNeeded() {
         ]}
       />
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="02">Когда мы нужны</SectionLabel>
-        <RevealHeading className="t-h2 mt-6 max-w-3xl text-[color:var(--color-text-inverse)]">
-          Когда нужна команда «Без Воды»
-        </RevealHeading>
-        <p className="mt-5 max-w-2xl t-body text-[color:var(--color-text-inverse-2)]">
-          3 ситуации, для которых наш подход является рабочим
-        </p>
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
+        <SectionLabel n="02">Когда подключается команда «Без Воды»</SectionLabel>
+        <div className="mt-10 grid gap-5 md:grid-cols-3">
           {SITUATIONS.map((it, i) => (
-            <motion.div
-              key={it.id}
-              {...reveal(i)}
-            >
+            <motion.div key={it.id} {...reveal(i)}>
               <a href={it.href} className="card-link group block h-full rounded-md">
                 <div className="surface-dark notch flex h-full flex-col rounded-md p-6 transition-transform duration-300 group-hover:-translate-y-1 md:p-8">
                   <div className="flex items-center justify-between">
@@ -458,11 +313,17 @@ export function WhenNeeded() {
                   <h3 className="mt-3 font-display t-body font-semibold text-[color:var(--color-text-inverse)]">
                     {it.situation}
                   </h3>
+                  {it.intro && (
+                    <p className="mt-3 t-body font-semibold text-[color:var(--color-text-inverse)]">{it.intro}</p>
+                  )}
                   <p className="mt-3 t-body text-[color:var(--color-text-inverse-2)]">
                     {it.detail}
                   </p>
-                  <span className="mt-auto inline-flex items-center gap-1.5 pt-5 t-body font-semibold text-[color:var(--color-text-inverse)] transition group-hover:opacity-80">
+                  <p className="mt-3 t-body text-[color:var(--color-text-inverse)]">
                     Как решаем: {it.solutionTitle}
+                  </p>
+                  <span className="mt-auto inline-flex items-center gap-1.5 pt-5 t-body font-semibold text-[color:var(--color-text-inverse)] transition group-hover:opacity-80">
+                    {it.linkLabel}
                     <ArrowRight data-arrow className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1" />
                   </span>
                 </div>
@@ -470,192 +331,13 @@ export function WhenNeeded() {
             </motion.div>
           ))}
         </div>
-        {/* Выход для того, кто не узнал себя в трёх карточках: самодиагностика
-            не обязательна — её и обещает сам разбор */}
-        <a
-          href="#contact"
-          className="link-arrow group mt-8 t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
-        >
-          Не уверены, какая ситуация ваша — разберём за 30 минут
-          <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-        </a>
       </div>
     </section>
   );
 }
 /* --------------------- Flow (схема взаимодействия) ---------------------- */
-/* Брендбук: плотная сетка на волосяных линиях, трафаретная нумерация,
-   срез угла (notch), без «надутых» макетов и крупных плашек. */
-
-export function Flow({ n = "02" }: { n?: string } = {}) {
-  const stages = [
-    { n: "01", t: "5 минут", d: "отвечаем на заявку" },
-    { n: "02", t: "30 минут", d: "проводим первичный разбор" },
-  ];
-  const branches = [
-    { tag: "Масштабировать внутренний опыт", time: "24 часа", desc: "старт проекта" },
-    { tag: "Привлечь экспертность с рынка", time: "60 минут", desc: PRACTICE_PROOF_LC },
-  ];
-  return (
-    <section className="stage sec-dark grain border-b border-[color:var(--color-line-dark)]">
-      <Scene blobs={[{ className: "-right-56 bottom-0", tone: "rose", size: 280 }]} />
-      <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n={n}>Схема взаимодействия</SectionLabel>
-        <h2 className="t-h2 mt-6 max-w-3xl">
-          Как мы двигаемся от заявки до приёмки этапа
-        </h2>
-
-
-        <div className="mt-7 overflow-hidden rounded-sm border border-[color:var(--color-line)] bg-[color:var(--color-surface)]">
-          {/* Общий путь — компактный рельс */}
-          <ol className="relative grid gap-0 sm:grid-cols-2">
-            {stages.map((s, i) => (
-              <motion.li
-                key={s.n}
-                {...reveal(i)}
-                className={[
-                  "flex items-center gap-3 px-4 py-3.5 md:px-5",
-                  i === 0
-                    ? "border-b border-[color:var(--color-line)] sm:border-b-0 sm:border-r"
-                    : "",
-                ].join(" ")}
-              >
-                <span className="stencil flex-none t-small text-[color:var(--color-accent)]">
-                  {s.n}
-                </span>
-                <span
-                  aria-hidden
-                  className="h-px w-4 flex-none bg-[color:var(--color-line)]"
-                />
-                <div className="min-w-0 flex items-baseline gap-2 flex-wrap">
-                  <span className="font-display t-body font-semibold tracking-tight">
-                    {s.t}
-                  </span>
-                  <span className="t-caption text-[color:var(--color-text-secondary)]">
-                    — {s.d}
-                  </span>
-                </div>
-              </motion.li>
-            ))}
-          </ol>
-
-          {/* Развилка */}
-          <div className="flex items-center gap-2.5 border-y border-[color:var(--color-line)] bg-[color:var(--color-bg)] px-4 py-2 md:px-5">
-            <span className="h-1.5 w-1.5 flex-none rounded-pill bg-[color:var(--color-accent)]" />
-            <div className="t-eyebrow text-[color:var(--color-text-secondary)]">
-              дальше — зависит от задачи
-            </div>
-            <span
-              aria-hidden
-              className="ml-1 hidden h-px flex-1 sm:block"
-              style={{
-                background:
-                  "linear-gradient(to right, color-mix(in oklab, var(--color-accent) 35%, transparent), transparent)",
-              }}
-            />
-          </div>
-
-          {/* Две ветки */}
-          <div className="grid sm:grid-cols-2">
-            {branches.map((b, i) => (
-              <motion.div
-                key={b.tag}
-                {...reveal(i + 1)}
-                className={[
-                  "px-4 py-4 md:px-5",
-                  i === 0
-                    ? "border-b border-[color:var(--color-line)] sm:border-b-0 sm:border-r"
-                    : "",
-                ].join(" ")}
-              >
-                <div className="flex items-center gap-2">
-                  <NodeBullet />
-                  <div className="t-eyebrow min-w-0 truncate text-[color:var(--color-text-secondary)]">
-                    {b.tag}
-                  </div>
-                </div>
-                <div className="mt-2 flex items-baseline gap-2 flex-wrap">
-                  <span className="font-display t-body font-semibold tracking-tight text-foreground">
-                    {b.time}
-                  </span>
-                  <span className="t-caption text-[color:var(--color-text-secondary)]">
-                    — {b.desc}
-                  </span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-
-          {/* Общий финал: обе ветки сходятся в один результат */}
-          <div className="flex items-start gap-3 border-t border-[color:var(--color-line)] bg-[color:var(--color-bg)] px-4 py-3.5 md:px-5">
-            <span className="stencil flex-none t-small text-[color:var(--color-accent)]">03</span>
-            <span aria-hidden className="mt-[0.7em] h-px w-4 flex-none bg-[color:var(--color-line)]" />
-            <div className="min-w-0 flex items-baseline gap-2 flex-wrap">
-              <span className="font-display t-body font-semibold tracking-tight">
-                Старт работы и приёмка этапа
-              </span>
-              <span className="t-caption text-[color:var(--color-text-secondary)]">
-                — этап закрывается по критериям, зафиксированным до начала работы
-              </span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
 
 /* --------------------------- Ритм работы (как идёт) ------------------------ */
-/* Схема заканчивалась на старте; клиенту нужен ответ, что происходит дальше:
-   кто контакт, как часто статус, чем закрывается этап и что при отклонении. */
-
-export function WorkRhythm({ n = "02" }: { n?: string } = {}) {
-  const rows: [string, string][] = [
-    [
-      "Одно контактное лицо",
-      "руководитель проекта с нашей стороны отвечает за сроки и результат; общение — в вашем канале (почта, Telegram или ваш таск-трекер)",
-    ],
-    [
-      "Статус — раз в неделю",
-      "короткая сводка: что сделано, что в работе, что нужно от вас и где риск по срокам",
-    ],
-    [
-      "Приёмка — по этапам",
-      "каждый этап закрывается материалом, который можно использовать самостоятельно, и сверкой с критериями приёмки",
-    ],
-    [
-      "Отклонение — наша зона",
-      "если результат этапа не совпал с критериями, дорабатываем за свой счёт; замена эксперта в проекте — тоже на нашей стороне",
-    ],
-  ];
-  return (
-    <section className="stage border-b border-[color:var(--color-line)]">
-      <Scene blobs={[{ className: "-right-40 top-10", tone: "chrome", size: 420 }]} />
-      <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n={n}>Как идёт работа</SectionLabel>
-        <RevealHeading className="t-h2 mt-6 max-w-3xl">
-          Что происходит после старта
-        </RevealHeading>
-        <ul className="mt-10 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
-          {rows.map(([t, d], i) => (
-            <motion.li key={t} {...reveal(i)} className="py-5">
-              <div className="flex items-start gap-4">
-                <NodeBullet className="mt-[0.55em]" />
-                <div className="min-w-0">
-                  <div className="font-display t-body font-semibold text-foreground">{t}</div>
-                  <p className="mt-1.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
-                </div>
-              </div>
-            </motion.li>
-          ))}
-        </ul>
-      </div>
-    </section>
-  );
-}
-
-
-
 
 /* -------------------------------- Кейсы ----------------------------------- */
 /* Карточка кейса из сборки Lovable + обязательная строка «что изменилось
@@ -879,67 +561,53 @@ export function CasesBlock({
    и ссылка на /team. Развёрнутый экран живёт на отдельной странице. */
 
 export function TeamBlock() {
-  const founder = TEAM.find((p) => p.founder)!;
-  const others = TEAM.filter((p) => !p.founder);
-  const people = [founder, ...others];
+  const people = TEAM.filter((p) => p.homeRole);
   return (
     <section id="team" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <Scene blobs={[{ className: "-right-40 top-10", tone: "rose", size: 520 }]} />
 
       <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="04">О нас</SectionLabel>
-        <div className="mt-6 flex flex-col justify-between gap-6 md:flex-row md:items-end">
-          <RevealHeading className="t-h2 max-w-3xl">
-            Команда и сеть экспертов
-          </RevealHeading>
-          <p className="t-body max-w-md text-[color:var(--color-text-secondary)]">
-            Четыре человека отвечают за результат, за ними — сеть практиков.
-          </p>
-        </div>
+        <SectionLabel n="04">Ядро команды и отраслевые эксперты</SectionLabel>
+        <p className="mt-6 max-w-2xl t-body text-[color:var(--color-text-secondary)]">
+          Мы отвечаем за ведение ваших проектов. Для решения задач на «узкую» тему мы сотрудничаем с практиками из пула внешних экспертов.
+        </p>
 
-        <div className="mt-10 grid items-stretch gap-5 grid-cols-2 sm:grid-cols-3 lg:grid-cols-5">
+        <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-3">
           {people.map((p, i) => (
             <motion.div key={p.slug} {...reveal(i)} className="h-full">
               <PaperCard className="flex h-full flex-col overflow-hidden p-0">
-                <div className="aspect-[4/5] w-full overflow-hidden bg-[color:var(--color-bg-secondary)]">
-                  <img
-                    src={p.photo}
-                    alt={p.name}
-                    loading="lazy"
-                    className="h-full w-full object-cover object-top grayscale transition duration-500 hover:grayscale-0"
-                  />
-                </div>
+                <PersonPhoto person={p} />
                 <div className="p-5">
                   <div className="font-display t-body font-semibold">{p.name}</div>
-                  <p className="mt-1 t-eyebrow text-[color:var(--color-text-secondary)]">{p.role}</p>
+                  <p className="mt-1 t-body text-[color:var(--color-text-secondary)]">{p.homeRole}</p>
                 </div>
               </PaperCard>
             </motion.div>
           ))}
-          {/* Пятая плитка — сеть практиков за командой (портретов на неё нет) */}
-          <motion.a href="/team" {...reveal(people.length)} className="h-full">
-            <PaperCard className="card-link group flex h-full flex-col justify-between p-5">
-              <span className="font-display t-h2 tabular-nums tracking-[-0.02em]">30+</span>
-              <div>
-                <div className="font-display t-body font-semibold">Сеть практиков</div>
-                <p className="mt-1 t-eyebrow text-[color:var(--color-text-secondary)]">
-                  Подключаем под задачу
-                </p>
-              </div>
-            </PaperCard>
-          </motion.a>
         </div>
 
-
-        <a href="/team" className="link-arrow group mt-8 t-body">
-          Подробнее о команде и сети экспертов
-          <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" />
-        </a>
+        <BookSection />
       </div>
     </section>
   );
 }
 
+/* Портрет в карточке. Фото есть не у всех (Дарья Жданова, 17.09.2026) —
+   без фото карточка держит те же пропорции пустой плашкой. */
+export function PersonPhoto({ person }: { person: { name: string; photo?: string } }) {
+  return (
+    <div className="aspect-[4/5] w-full overflow-hidden bg-[color:var(--color-bg-secondary)]">
+      {person.photo && (
+        <img
+          src={person.photo}
+          alt={person.name}
+          loading="lazy"
+          className="h-full w-full object-cover object-top grayscale transition duration-500 hover:grayscale-0"
+        />
+      )}
+    </div>
+  );
+}
 
 /* -------------------------------- Отзывы ---------------------------------- */
 /* Компактные карточки 3 в ряд (вёрстка согласована 26.07), без карусели. */
@@ -1077,7 +745,8 @@ export function ReviewsBlock({ bare = false }: { bare?: boolean } = {}) {
   return (
     <section id="reviews" className="stage border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
       <Scene blobs={[{ className: "-left-40 top-10", tone: "rose", size: 560 }, { className: "-right-40 bottom-10", tone: "chrome", size: 480 }]} />
-      <div className={`relative mx-auto max-w-7xl px-5 md:px-8 ${bare ? "sec-pad-b pt-10 md:pt-12" : "sec-pad"}`}>
+      <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+        {bare && <SectionLabel n="03">Отзывы клиентов</SectionLabel>}
         {!bare && (
           <>
             <SectionLabel n="04">Отзывы</SectionLabel>
@@ -1091,7 +760,7 @@ export function ReviewsBlock({ bare = false }: { bare?: boolean } = {}) {
             </div>
           </>
         )}
-        <div className={`grid items-stretch gap-6 md:grid-cols-2 ${bare ? "" : "mt-12"}`}>
+        <div className={`grid items-stretch gap-6 md:grid-cols-2 ${bare ? "mt-10" : "mt-12"}`}>
           {items.map((r, i) => (
             <ReviewCard key={r.slug} r={r} index={i} />
           ))}
@@ -1127,62 +796,59 @@ export function ReviewsBlock({ bare = false }: { bare?: boolean } = {}) {
 
 export function BookSection() {
   return (
-    <section id="book" className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
-      <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-        <SectionLabel n="06">Методология издана</SectionLabel>
-        <div className="mt-8">
-          <PaperCard className="overflow-hidden p-0">
-            <div className="grid items-center gap-0 sm:grid-cols-[168px_1fr]">
-              <div className="flex items-center justify-center bg-[color:var(--color-chrome)]/10 p-6">
-                <div
-                  className="relative aspect-[3/4] w-full max-w-[120px] overflow-hidden rounded-r-md rounded-l-sm"
-                  style={{ boxShadow: "10px 14px 30px -14px rgba(0,0,0,0.35)" }}
-                >
-                  <img
-                    src={bookCover.url}
-                    alt="Обложка книги «Эксперт под ключ»"
-                    loading="lazy"
-                    decoding="async"
-                    width={1200}
-                    height={1600}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-              </div>
-
-              <div className="flex flex-col justify-center gap-3 p-6 md:p-8">
-                <div className="font-display t-body font-semibold">
-                  Книга «Эксперт под ключ»
-                </div>
-                <p className="measure t-body text-[color:var(--color-text-secondary)]">
-                  Методология команды: как извлекаем знания экспертов-практиков и
-                  собираем из них продукты обучения с измеримым результатом. Литрес, 2025.
-                </p>
-                <a
-                  href="https://www.litres.ru/book/viktoriya-utkina/ekspert-pod-kluch-kak-izvlech-i-upakovat-znaniya-dlya-biz-72669850/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="link-arrow group w-max t-body"
-                >
-                  Читать на Литрес
-                  <ExternalLink data-arrow className="h-4 w-4 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-                </a>
+    <div id="book" className="mt-12">
+      <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Наш подход описан и издан</div>
+      <div className="mt-6">
+        <PaperCard className="overflow-hidden p-0">
+          <div className="grid items-center gap-0 sm:grid-cols-[168px_1fr]">
+            <div className="flex items-center justify-center bg-[color:var(--color-chrome)]/10 p-6">
+              <div
+                className="relative aspect-[3/4] w-full max-w-[120px] overflow-hidden rounded-r-md rounded-l-sm"
+                style={{ boxShadow: "10px 14px 30px -14px rgba(0,0,0,0.35)" }}
+              >
+                <img
+                  src={bookCover.url}
+                  alt="Обложка книги «Эксперт под ключ»"
+                  loading="lazy"
+                  decoding="async"
+                  width={1200}
+                  height={1600}
+                  className="h-full w-full object-cover"
+                />
               </div>
             </div>
-          </PaperCard>
-        </div>
+
+            <div className="flex flex-col justify-center gap-3 p-6 md:p-8">
+              <p className="measure t-body text-[color:var(--color-text-primary)]">
+                Книга <span className="font-semibold">«Эксперт под ключ»</span> (Литрес, 2025) — прикладное руководство по извлечению практических знаний и их переработке в программы с измеримым бизнес-результатом.
+              </p>
+              <a
+                href="https://www.litres.ru/book/viktoriya-utkina/ekspert-pod-kluch-kak-izvlech-i-upakovat-znaniya-dlya-biz-72669850/"
+                target="_blank"
+                rel="noreferrer"
+                className="link-arrow group w-max t-body"
+              >
+                Читать на Литрес
+                <ExternalLink data-arrow className="h-4 w-4 transition group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+              </a>
+            </div>
+          </div>
+        </PaperCard>
       </div>
-    </section>
+    </div>
   );
 }
 
 /* ------------- NotFit («Когда нужен другой подрядчик») + FAQ ------------- */
 
 export function NotFit({ n = "07" }: { n?: string } = {}) {
+  /* Четыре задачи — текст Виктории 17.09.2026. Заявление про агентство
+     ушло из отдельного абзаца в четвёртый пункт списка. */
   const items = [
-    "требуется подбор сотрудника в штат или аутстаффинг",
-    "требуется внедрение организационных изменений за пределами образовательного проекта",
-    "нужна организация и логистика мероприятия",
+    "подбор сотрудника в штат или аутстаффинг",
+    "внедрение организационных изменений за пределами образовательного проекта",
+    "организация и логистика мероприятия",
+    "посредническая (агентская) деятельность по поиску подрядчиков",
   ];
 
   return (
@@ -1197,10 +863,9 @@ export function NotFit({ n = "07" }: { n?: string } = {}) {
           Когда нужен другой подрядчик
         </RevealHeading>
         <p className="mt-5 max-w-2xl t-body text-[color:var(--color-text-secondary)]">
-          Три задачи, за которые мы не беремся — честнее сказать это до старта.
+          Мы ценим ваше время и готовы порекомендовать наших коллег для следующих задач:
         </p>
         <ul className="mt-10 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
-
           {items.map((t) => (
             <li key={t} className="flex items-start gap-4 py-4 t-body text-[color:var(--color-text-primary)]">
               <NodeBullet className="mt-[0.55em]" />
@@ -1208,19 +873,6 @@ export function NotFit({ n = "07" }: { n?: string } = {}) {
             </li>
           ))}
         </ul>
-        {/* Текст Виктории 10.08.2026, слово в слово. Стоит после списка и до
-            мягкого «напишите всё равно»: сначала формальная граница, потом
-            приглашение. Точки в конце второго абзаца в оригинале нет. */}
-        <div className="mt-8 max-w-3xl border-l-2 border-[color:var(--color-accent)] pl-5">
-          <p className="t-body text-[color:var(--color-text-primary)]">
-            Не являемся агентством по подбору персонала, не оказываем услуги аутстаффинга
-            и не осуществляем посредническую (агентскую) деятельность по поиску подрядчиков.
-          </p>
-          <p className="mt-4 t-body text-[color:var(--color-text-primary)]">
-            Наша услуга — консалтинг, разработка методологии и реализация образовательных
-            проектов «под ключ», где мы являемся гарантом результата
-          </p>
-        </div>
       </div>
     </section>
   );
@@ -1229,7 +881,7 @@ export function NotFit({ n = "07" }: { n?: string } = {}) {
 
 /* ------------------------------ FAQ-аккордеон ------------------------------ */
 
-export function FaqAccordion({ items }: { items: { q: string; a: string }[] }) {
+export function FaqAccordion({ items }: { items: FaqItem[] }) {
   const [open, setOpen] = useState<number | null>(0);
   return (
     <div className="mt-10 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
@@ -1251,15 +903,27 @@ export function FaqAccordion({ items }: { items: { q: string; a: string }[] }) {
               </div>
               <AnimatePresence initial={false}>
                 {isOpen && (
-                  <motion.p
+                  <motion.div
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
                     transition={{ duration: 0.25, ease: [0.2, 0.8, 0.2, 1] }}
-                    className="mt-2 overflow-hidden t-body text-[color:var(--color-text-secondary)]"
+                    className="overflow-hidden"
                   >
-                    {item.a}
-                  </motion.p>
+                    {item.a.map((para) => (
+                      <p key={para} className="mt-2 t-body text-[color:var(--color-text-secondary)]">{para}</p>
+                    ))}
+                    {item.list && (
+                      <ul className="mt-2 space-y-2">
+                        {item.list.map((t) => (
+                          <li key={t} className="flex items-start gap-3 t-body text-[color:var(--color-text-secondary)]">
+                            <NodeBullet className="mt-[0.55em]" />
+                            <span>{t}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </motion.div>
                 )}
               </AnimatePresence>
             </div>
@@ -1284,6 +948,7 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
   const [fieldErr, setFieldErr] = useState<{ name?: string | null; contact?: string | null }>({});
   const [pdErr, setPdErr] = useState<string | null>(null);
   const contactRef = useRef<HTMLInputElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
   const pdRef = useRef<HTMLInputElement>(null);
   const [pd, setPd] = useState(false);
 
@@ -1334,18 +999,18 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
     const data = new FormData(f);
     const company = String(data.get("company") || "").trim();
     const contact = String(data.get("contact") || "").trim();
-    /* Имя отдельным полем не спрашиваем (приёмка 05.08): в поле контакта
-       человек пишет и как его зовут, и куда ответить. В API имя обязательно —
-       отправляем ту же строку. */
-    const name = contact;
-    const about = String(data.get("about") || "").trim();
+    /* Два поля — имя и контакт (ред. Виктории 17.09.2026); поля о задаче
+       в форме больше нет. */
+    const name = String(data.get("name") || "").trim();
+    const about = "";
     const hp = String(data.get("website") || "");
+    const nameMsg = validate("name", name);
     const contactMsg = validate("contact", contact);
     const pdMsg = pd ? null : "Отметьте согласие на обработку персональных данных.";
-    setFieldErr({ contact: contactMsg });
+    setFieldErr({ name: nameMsg, contact: contactMsg });
     setPdErr(pdMsg);
-    if (contactMsg || pdMsg) {
-      const target = contactMsg ? contactRef.current : pdRef.current;
+    if (nameMsg || contactMsg || pdMsg) {
+      const target = nameMsg ? nameRef.current : contactMsg ? contactRef.current : pdRef.current;
       /* На мобильном поле может уйти под липкую шапку — сначала центрируем. */
       target?.scrollIntoView({ block: "center", behavior: "smooth" });
       target?.focus({ preventScroll: true });
@@ -1402,23 +1067,27 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
                 <span className="h-px w-10 bg-[color:var(--color-line)]" />
               </>
             )}
-            <span>Контакты</span>
+            <span>Первый шаг</span>
           </div>
           <RevealHeading as={asH1 ? "h1" : "h2"} className={`${asH1 ? "t-h1" : "t-h2"} mt-6 max-w-2xl`}>
-            30 минут, без подготовки, с планом на выходе
+            Первый шаг и форма заявки
           </RevealHeading>
+          {/* Тексты Виктории 17.09.2026, слово в слово. */}
           <p className="mt-8 max-w-md t-body text-[color:var(--color-text-secondary)]">
-            Расскажите, что должно измениться в работе компании и к какому
-            сроку. Готовить презентацию и подробное ТЗ не нужно.
+            Обсудим вашу задачу и найдем оптимальное решение. Презентация и подробное ТЗ не требуются. На 30-минутной онлайн-встрече мы:
           </p>
-          <p className="mt-4 max-w-md t-body text-[color:var(--color-text-secondary)]">
-            На встрече сверим задачу, доступные источники опыта и возможный
-            результат первого этапа.
-          </p>
-          <p className="mt-4 max-w-md t-body text-[color:var(--color-text-secondary)]">
-            Готовитесь выступать на конференции для HR или T&D? Поможем собрать
-            выступление — бесплатно. Напишите об этом в заявке.
-          </p>
+          <ol className="mt-4 max-w-md space-y-2">
+            {[
+              "Сверим понимание бизнес-цели и образ результата",
+              "Определим доступные источники опыта и формат его передачи",
+              "Рассчитаем сроки, состав команды и план первого этапа",
+            ].map((t, i) => (
+              <li key={t} className="flex items-start gap-3 t-body text-[color:var(--color-text-primary)]">
+                <span className="font-display t-label tabular-nums text-[color:var(--color-accent)]">{i + 1}.</span>
+                <span>{t}</span>
+              </li>
+            ))}
+          </ol>
 
 
           <div className="mt-12">
@@ -1477,9 +1146,20 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
                 className="flex flex-col gap-5"
               >
                 <Field
-                  label="Как к вам обращаться и куда ответить"
+                  label="Ваше имя"
+                  name="name"
+                  placeholder=""
+                  dark
+                  required
+                  inputRef={nameRef}
+                  error={fieldErr.name}
+                  onBlur={checkField("name")}
+                  onInput={clearOnInput("name")}
+                />
+                <Field
+                  label="Контакт для связи"
                   name="contact"
-                  placeholder="Ирина, name@company.ru или @irina"
+                  placeholder="Email, телефон или Telegram"
                   dark
                   required
                   inputRef={contactRef}
@@ -1487,25 +1167,6 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
                   onBlur={checkField("contact")}
                   onInput={clearOnInput("contact")}
                 />
-
-                <div>
-
-                  {/* Поле необязательное (решение Виктории 06.08): контакта
-                      достаточно, задачу разберём на встрече. */}
-                  <label htmlFor="f-about" className="t-label mb-2 block text-[color:var(--color-text-inverse-2)]">
-                    Запрос на разбор — не обязательно
-                  </label>
-                  {/* Цвета — как у Field dark. Прежний text-background внутри
-                      sec-dark резолвился в уголь: человек печатал запрос
-                      УГЛЁМ ПО УГЛЮ и не видел собственных букв. */}
-                  <textarea
-                    id="f-about"
-                    rows={3}
-                    name="about"
-                    placeholder="Что должно измениться и к какому сроку"
-                    className="w-full resize-none rounded-sm border border-[color:var(--color-line-dark)] bg-white/5 px-4 py-3 t-body text-[color:var(--color-text-inverse)] outline-none transition placeholder:text-[color:var(--color-text-inverse-2)]/50 focus:border-[color:var(--color-accent-glass)] focus:bg-white/10"
-                  />
-                </div>
                 <p className="hidden" aria-hidden="true">
                   <label>
                     Не заполняйте это поле
@@ -1549,8 +1210,17 @@ export function Contact({ asH1 = false, numbered = true }: { asH1?: boolean; num
                   <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
                 </button>
                 <p className="t-caption text-[color:var(--color-text-inverse-2)]">
-                  Без рассылок и звонков. Данные видит только команда «Без Воды».
+                  Ответим в течение 5 минут в рабочее время.
                 </p>
+                <a
+                  href={CONTACT.tgUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 t-caption text-[color:var(--color-text-inverse-2)] underline underline-offset-2 hover:text-[color:var(--color-text-inverse)]"
+                >
+                  <Send aria-hidden className="h-4 w-4" />
+                  {CONTACT.tg}
+                </a>
               </motion.div>
             )}
           </AnimatePresence>

@@ -8,18 +8,17 @@
 import type { ReactElement } from "react";
 import {
   motion,
-  ArrowUpRight, ArrowRight, ArrowDown, Check,
-  PageShell, PageHead, SectionLabel, PaperCard, Scene, CtaBand,
-  RevealHeading, NodeBullet, NodeList, Stencil, CatMark, Swash, HandArrow, LineIcon,
+  ArrowRight,
+  PageShell, PageHead, SectionLabel, PaperCard, Scene,
+  NodeList,
   reveal,
 } from "./core";
 import {
-  Hero, Bricks, WhenNeeded, Flow, WorkRhythm, TeamBlock,
-  CasesBlock, ReviewsBlock, ReviewCard, BookSection, NotFit, Contact,
+  Hero, Bricks, WhenNeeded, TeamBlock, PersonPhoto,
+  CasesBlock, ReviewsBlock, ReviewCard, NotFit, Contact,
   FaqAccordion,
 } from "./blocks";
-import { FAQ_ITEMS, TEAM, FOUNDER_QUOTE, visibleReviews, SITUATIONS } from "./data";
-import { EXPERTS_NOTE, PRACTICE_PROOF_LC } from "./data";
+import { FAQ_ITEMS, TEAM, FOUNDER_QUOTE, visibleReviews, CONTACT } from "./data";
 import { ConstructorPage } from "./pages-constructor";
 import { ExpertiseMapPage } from "./pages-expertise";
 import { CASE_PAGES } from "./pages-case";
@@ -31,117 +30,28 @@ import {
   ExternalExpertsPage, ExternalExpertsEffectPage,
 } from "./pages-effect";
 
-/* Следующий логичный шаг страницы — одна ссылка в финальной полосе
-   (приёмка, п. 6). Ставится вместо дефолтной «Бизнес-эффект». */
-function NextLink({ href, children }: { href: string; children: string }) {
-  return (
-    <a
-      href={href}
-      className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
-    >
-      {children}
-      <ArrowUpRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-    </a>
-  );
-}
-
 /* -------------------------------- Главная -------------------------------- */
 
 function HomePage() {
+  /* Порядок секций — по редакции Виктории 17.09.2026: обложка → когда
+     подключается команда → отзывы → опыт и портфолио → команда и книга →
+     границы → первый шаг и форма. Блока кейсов на главной больше нет. */
   return (
     <PageShell path="/">
       <Hero />
-      {/* Порядок приёмки 05.08: сначала зачем мы нужны и доказательства,
-          лица — после. Кейсы и отзывы — одна полоса доказательств. */}
       <WhenNeeded />
-      <CasesBlock limit={2} moreHref="/cases" teaser proofHeader />
       <ReviewsBlock bare />
-      <TeamBlock />
-      {/* «Наш опыт в цифрах» слит с «Работали с командами» (внутри Bricks):
-          две соседние секции доказывали одно и то же */}
       <Bricks />
-      <BookSection />
+      <TeamBlock />
       <NotFit />
       <Contact />
-
     </PageShell>
   );
 }
 
-/* -------------------------------- Услуги ---------------------------------- */
-/* Хаб (финальная структура 02.08): три карточки-входа — заголовок ситуации,
-   текст ситуации, «Как решаем: …» и кнопка «Подробнее» на продуктовую
-   страницу. Ничего больше: развёрнутые решения живут на продуктовых
-   страницах. Старые якоря #practice/#capacity/#external перенаправляются
-   скриптом (main.tsx → TASKS_HASH_REDIRECTS). */
-
-function TasksPage() {
-  return (
-    <PageShell path="/tasks">
-      <section className="stage border-b border-[color:var(--color-line)]">
-        <Scene blobs={[{ className: "-right-40 top-[30%]", tone: "rose", size: 480 }, { className: "-left-52 bottom-[10%]", tone: "chrome", size: 520 }]} />
-        <PageHead
-          kicker="Услуги"
-          title={<>Какие ваши задачи готовы взять на&nbsp;себя</>}
-          lead="Три типовые ситуации T&D-команд и то, чем мы закрываем каждую из них: от описания внутренних практик до подключения внешних экспертов."
-          guide="Выберите ситуацию, похожую на вашу, — дальше кейсы с результатами."
-          note={EXPERTS_NOTE}
-          chips={[
-            ["Без ТЗ", "приходите с задачей — рамку проекта соберём вместе"],
-            ["7–14 дней", "срок, за который закрываем дефицит компетенции рыночной практикой"],
-          ]}
-        />
-
-        {/* Три карточки-входа — на бумаге (приёмка 03.08): /tasks была
-            единственной страницей, где уголь шёл от шапки до футера без
-            передышки. Чередование секций — правило системы (разд. 3). */}
-        <div className="relative bg-[color:var(--color-bg-primary)]">
-          <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
-            <div className="grid gap-5 md:grid-cols-3">
-              {SITUATIONS.map((it, i) => (
-                <motion.a
-                  key={it.id}
-                  href={it.href}
-                  {...reveal(i)}
-                  className="card-link card group flex h-full flex-col rounded-md p-6 md:p-7"
-                >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="font-display t-label tabular-nums text-[color:var(--color-accent)]">
-                      0{i + 1}
-                    </div>
-                    <span
-                      aria-hidden
-                      className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-pill border border-[color:var(--color-line)] text-[color:var(--color-text-primary)]"
-                    >
-                      <ArrowRight data-arrow className="h-4 w-4" />
-                    </span>
-                  </div>
-                  <h2 className="t-body mt-3 font-display font-semibold text-[color:var(--color-text-primary)] [overflow-wrap:break-word]">
-                    {it.situation}
-                  </h2>
-                  <p className="mt-4 t-body text-[color:var(--color-text-secondary)]">{it.detail}</p>
-                  <p className="mt-4 t-body font-semibold text-[color:var(--color-text-primary)]">
-                    Как решаем: {it.solutionTitle}
-                  </p>
-                  {/* Не кнопка: залитый пилюль здесь выглядел ровно как
-                      «Разбор задачи за 30 минут» — три навигационные ссылки
-                      спорили с единственным действием сайта. */}
-                  <span className="link-arrow mt-auto pt-6 t-body">
-                    Подробнее
-                    <ArrowRight data-arrow className="h-4 w-4" />
-                  </span>
-                </motion.a>
-              ))}
-            </div>
-          </div>
-        </div>
-      </section>
-      <CtaBand path="/tasks" secondary={<NextLink href="/cases">Посмотреть кейсы</NextLink>} />
-    </PageShell>
-  );
-}
-
-/* --------------------------------- Кейсы ---------------------------------- */
+/* Хаб /tasks снят 17.09.2026 (ред. Виктории): трёх карточек на главной
+   достаточно, они ведут прямо на страницы услуг. Пункт меню «Услуги» ведёт
+   на этот блок главной (#when); адрес /tasks отдаёт 301 в nginx. */
 
 function CasesPage() {
   return (
@@ -160,7 +70,7 @@ function CasesPage() {
         />
       </section>
       <CasesBlock compactHeader />
-      <CtaBand path="/cases" secondary={<NextLink href="/reviews">Читать отзывы клиентов</NextLink>} />
+      <Contact numbered={false} />
     </PageShell>
   );
 }
@@ -175,16 +85,7 @@ function ReviewsPage() {
         <Scene blobs={[{ className: "-left-40 top-10", tone: "rose", size: 560 }]} />
         {/* Компактная шапка (06.08): лид и строка про подход сведены в одну
             фразу, отступы вдвое меньше — отзывы начинаются сразу. */}
-        <PageHead
-          compact
-          kicker="Отзывы"
-          title={<>Что говорят клиенты</>}
-          lead="Дословно. Отзывы отражают наш подход к работе"
-          chips={[
-            ["Без правок", "публикуем ровно то, что написали клиенты"],
-            ["Проекты под NDA", "часть работ не показываем — только с письменного согласия"],
-          ]}
-        />
+        <PageHead compact kicker="Отзывы" title={<>Отзывы наших клиентов</>} />
         <div className="relative mx-auto max-w-7xl px-5 sec-pad-b md:px-8">
           <div className="mt-8 grid items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3">
             {items.map((r, i) => (
@@ -193,7 +94,7 @@ function ReviewsPage() {
           </div>
         </div>
       </section>
-      <CtaBand path="/reviews" secondary={<NextLink href="/how-we-work">Как мы работаем</NextLink>} />
+      <Contact numbered={false} />
     </PageShell>
   );
 }
@@ -203,178 +104,128 @@ function ReviewsPage() {
 function TeamPage() {
   const founder = TEAM.find((p) => p.founder)!;
   const others = TEAM.filter((p) => !p.founder);
+  /* Сеть отраслевых экспертов — четыре тезиса, текст Виктории 17.09.2026. */
   const network: [string, string][] = [
-    ["Отбор до подключения", "Каждый практик проходит проверку опыта до того, как попадает в проект: что именно человек делал руками и какие результаты за этим стоят. Механику отбора описали в книге «Эксперт под ключ»."],
-    ["Один договор", "Вы не ведёте переговоры с каждым специалистом: договор один — с командой «Без Воды», координация и договорённости на нашей стороне."],
-    ["Методолог рядом с практиком", "Практик отвечает за опыт, методолог — за то, чтобы опыт превратился в применимый материал: структуру, задания, проверку знаний."],
+    ["Действующие практики", "C-level руководители и предприниматели с подтвержденным опытом"],
+    ["Тандем «Методолог + Эксперт»", "эксперт разъясняет контекст и логику решений, а методолог переводит эти знания в понятные материалы, благодаря чему информация от эксперта будет полноценно усваиваться сотрудниками"],
+    ["Единый договор и прозрачный документооборот", "все взаиморасчеты и юридические обязательства бюро закрывает через один рамочный договор, что бережет время"],
+    ["Защита данных (NDA)", "эксперты работают по соглашению о неразглашении, поэтому данные клиента не уйдут конкурентам и не появятся в открытом доступе"],
   ];
   return (
     <PageShell path="/team">
       <section className="stage border-b border-[color:var(--color-line)]">
-        <Scene blobs={[{ className: "-right-40 top-0", tone: "rose", size: 520 }]} />
+        <Scene blobs={[{ className: "-right-40 top-[20%]", tone: "rose", size: 520 }]} />
         <PageHead
           kicker="О нас"
           title={<>Команда и сеть экспертов</>}
-          lead="Люди, которые отвечают за результат вашего проекта, и профессиональная сеть практиков за ними."
-          guide="Сначала — кто ведёт проекты, ниже — как устроена сеть практиков."
-          chips={[
-            ["Отбор до подключения", "проверяем опыт практика до того, как он попадает в проект"],
-            ["60 минут", PRACTICE_PROOF_LC],
-          ]}
+          lead="Мы отвечаем за разработку методологии и реализацию образовательных проектов и являемся гарантом результата"
+          actions={
+            <a href="#contact" className="btn btn-invert group w-full sm:w-auto">
+              <span>Оставить заявку на разбор задачи</span>
+              <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
+            </a>
+          }
         />
 
-        {/* Карточка владелицы + слова от первого лица */}
-        <div className="relative mx-auto max-w-7xl px-5 sec-pad-b md:px-8">
-          <PaperCard className="mt-8 overflow-hidden p-0">
-            <div className="grid items-stretch md:grid-cols-[320px_1fr]">
-              <div className="relative min-h-[320px] bg-[color:var(--color-chrome)]/10 md:min-h-0">
-                <img
-                  src={founder.photo}
-                  alt={founder.name}
-                  loading="lazy"
-                  className="absolute inset-0 h-full w-full object-cover object-top grayscale"
-                />
-              </div>
-              <div className="p-7 md:p-10">
-                <div className="t-eyebrow text-[color:var(--color-accent)]">
-                  Владелица агентства
-                </div>
-                <h2 className="mt-2 font-display t-body font-semibold">{founder.name}</h2>
-                <p className="mt-1 t-body text-[color:var(--color-text-secondary)]">{founder.role} · {founder.fact}</p>
-                {/* Слова от первого лица — фрагмент её книги (решение
-                    Виктории 04.08). Цитата дословная, см. FOUNDER_QUOTE. */}
-                <blockquote className="mt-6 border-l-[3px] border-[color:var(--color-accent)] pl-5">
-                  <p className="t-body text-[color:var(--color-text-primary)]">{FOUNDER_QUOTE.text}</p>
-                  <footer className="mt-3 t-caption text-[color:var(--color-text-secondary)]">
-                    {FOUNDER_QUOTE.source}
-                  </footer>
-                </blockquote>
-              </div>
-            </div>
-          </PaperCard>
+        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+          <SectionLabel n="01">Наша команда</SectionLabel>
 
-          {/* Три лица команды */}
-          <div className="mt-10 grid items-stretch gap-5 sm:grid-cols-3">
-            {others.map((p, i) => (
-              <motion.div
-                key={p.slug}
-                {...reveal(i)}
-                className="h-full"
-              >
-                <PaperCard className="flex h-full flex-col overflow-hidden p-0">
-                  <div className="aspect-[4/3] w-full overflow-hidden bg-[color:var(--color-bg-secondary)]">
-                    <img
-                      src={p.photo}
-                      alt={p.name}
-                      loading="lazy"
-                      className="h-full w-full object-cover object-top grayscale transition duration-500 hover:grayscale-0"
-                    />
+          {/* Основатель — крупная карточка: портрет, должность, факты, слова */}
+          <motion.div {...reveal(0)} className="mt-8">
+            <PaperCard className="overflow-hidden p-0">
+              <div className="grid gap-0 md:grid-cols-[280px_1fr]">
+                <PersonPhoto person={founder} />
+                <div className="flex flex-col justify-center p-6 md:p-8">
+                  <h2 className="font-display t-body font-semibold">{founder.name}</h2>
+                  <p className="mt-1 t-body text-[color:var(--color-text-secondary)]">{founder.role}</p>
+                  <div className="mt-4">
+                    <NodeList items={founder.facts} />
                   </div>
-                  <div className="p-6">
-                    <div className="font-display t-body font-semibold">{p.name}</div>
-                    <p className="mt-1 t-eyebrow text-[color:var(--color-text-secondary)]">{p.role}</p>
-                    <p className="mt-3 t-body text-[color:var(--color-text-primary)]">{p.fact}</p>
+                  <blockquote className="mt-6 border-l-2 border-[color:var(--color-accent)] pl-5">
+                    <p className="t-body text-[color:var(--color-text-primary)]">“{FOUNDER_QUOTE.text}”</p>
+                  </blockquote>
+                </div>
+              </div>
+            </PaperCard>
+          </motion.div>
+
+          <div className="mt-6 grid items-stretch gap-5 md:grid-cols-3">
+            {others.map((p, i) => (
+              <motion.div key={p.slug} {...reveal(i + 1)} className="h-full">
+                <PaperCard className="flex h-full flex-col overflow-hidden p-0">
+                  <PersonPhoto person={p} />
+                  <div className="flex flex-1 flex-col p-5">
+                    <h2 className="font-display t-body font-semibold">{p.name}</h2>
+                    <p className="mt-1 t-body text-[color:var(--color-text-secondary)]">{p.role}</p>
+                    <div className="mt-3">
+                      <NodeList items={p.facts} />
+                    </div>
                   </div>
                 </PaperCard>
               </motion.div>
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Как устроена сеть */}
+      <section className="relative border-b border-[color:var(--color-line)] bg-[color:var(--color-bg-primary)]">
         <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-          <SectionLabel n="01">Сеть экспертов</SectionLabel>
-          <RevealHeading className="t-h2 mt-6 max-w-3xl">
-            Как устроена профессиональная сеть команды
-          </RevealHeading>
-          <div className="mt-10 grid items-stretch gap-8 md:grid-cols-3 md:gap-10">
-            {network.map(([t, d]) => (
-              <PaperCard key={t} className="h-full p-6">
-                <div className="font-display t-body font-semibold">{t}</div>
-                <p className="mt-3 t-body text-[color:var(--color-text-secondary)]">{d}</p>
-              </PaperCard>
+          <SectionLabel n="02">Сеть отраслевых экспертов</SectionLabel>
+          <div className="mt-8 grid items-stretch gap-4 sm:grid-cols-2">
+            {network.map(([t, d], i) => (
+              <motion.div key={t} {...reveal(i)} className="h-full">
+                <PaperCard className="h-full p-6">
+                  <div className="font-display t-body font-semibold">{t}</div>
+                  <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
+                </PaperCard>
+              </motion.div>
             ))}
           </div>
-          <p className="mt-10 max-w-2xl t-body text-[color:var(--color-text-secondary)]">
-            Фотографии и имена экспертов сети мы не публикуем: у многих действуют
-            соглашения о неразглашении с работодателями, а прямой контакт в обход
-            проектной рамки обесценил бы работу для всех сторон. На проекте вы
-            знакомитесь с экспертами лично.
-          </p>
         </div>
       </section>
-      <BookSection />
-      <CtaBand path="/team" secondary={<NextLink href="/cases">Посмотреть кейсы</NextLink>} />
+
+      <Contact numbered={false} />
     </PageShell>
   );
 }
 
-/* ----------------------------- Как мы работаем ----------------------------- */
+/* ------------------------------ Наш подход -------------------------------- */
 
 function HowWeWorkPage() {
-  /* Первые две гарантии — коммерческие обязательства, их выносим крупно;
-     остальные две — условия работы, спокойным рядом. */
-  const core: [string, string][] = [
-    ["Критерии приёмки — до старта", "объём работ, этапы, сроки и критерии приёмки фиксируются до начала работы"],
-    ["Доработка без доплаты", "если результат этапа не соответствует согласованным критериям — дорабатываем за свой счёт"],
-  ];
-  const secondary: [string, string][] = [
-    ["Этап с самостоятельным результатом", "первый этап завершается моделью решения и дорожной картой; продолжать можно с нами или своими силами"],
-    ["Конфиденциальность", "NDA; обезличенные фрагменты — только с письменного согласия; часть проектов не показываем вовсе"],
+  /* Три тезиса — текст Виктории 17.09.2026. Прежние экраны схемы сроков,
+     ритма и гарантий в редакции отсутствуют. */
+  const rhythm: [string, string][] = [
+    ["Персональный руководитель проекта: единая точка контакта", "PM управляет сроками, организует работу методистов и решает технические вопросы. Коммуникация ведется в удобном для вас режиме и виде"],
+    ["Еженедельная отчетность (WSR)", "краткая сводка: что выполнено, что находится в производстве, прогресс по задачам"],
+    ["Гарантия замены специалистов", "если под изменившиеся вводные требуется другой эксперт, замена проводится в течение 48 часов"],
   ];
   return (
     <PageShell path="/how-we-work">
-      <section className="stage">
-        <Scene blobs={[{ className: "-right-44 top-1/4", tone: "chrome", size: 520 }]} />
-        <PageHead
-          kicker="Как мы работаем"
-          title={<>Один договор. Одна команда. Одна точка ответственности.</>}
-          lead="Принцип одного окна: всю дальнейшую работу с пулом разных экспертов мы забираем на себя — для вас процесс остаётся бесшовным."
-          guide="Ниже — этапы, ритм работы и гарантии; дальше выберите свою задачу."
-          chips={[
-            ["Одна точка ответственности", "руководитель проекта с нашей стороны отвечает за сроки и результат"],
-            ["Критерии приёмки — до старта", "объём, этапы и сроки фиксируются в договоре до начала работы"],
-          ]}
-        />
-      </section>
-      <Flow n="01" />
-      <WorkRhythm n="02" />
       <section className="stage border-b border-[color:var(--color-line)]">
-        <Scene blobs={[{ className: "-left-40 top-0", tone: "rose", size: 460 }]} />
-        <div className="relative z-10 mx-auto max-w-7xl px-5 sec-pad md:px-8">
-          <SectionLabel n="03">Ваши гарантии</SectionLabel>
-          <RevealHeading className="t-h2 mt-6 max-w-3xl">
-            Что защищает ваш результат
-          </RevealHeading>
-
-          <div className="mt-10 grid gap-4 sm:grid-cols-2">
-            {core.map(([t, d]) => (
-              <PaperCard key={t} className="border-l-[3px] border-l-[color:var(--color-accent)] p-7">
-                <div className="font-display case-title">{t}</div>
-                <p className="mt-3 t-body text-[color:var(--color-text-primary)]">{d}</p>
-              </PaperCard>
+        <Scene blobs={[{ className: "-left-40 top-[30%]", tone: "chrome", size: 520 }]} />
+        <PageHead
+          kicker="Наш подход"
+          title={<>Один договор. Одна выделенная команда. Единый контур ответственности.</>}
+          lead="Вы взаимодействуете одним человеком по всем вопросам."
+        />
+        <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
+          <SectionLabel n="01">Как мы управляем проектом и держим ритм</SectionLabel>
+          <div className="mt-8 grid items-stretch gap-4 md:grid-cols-3">
+            {rhythm.map(([t, d], i) => (
+              <motion.div key={t} {...reveal(i)} className="h-full">
+                <PaperCard className="h-full p-6">
+                  <div className="font-display t-body font-semibold">{t}</div>
+                  <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
+                </PaperCard>
+              </motion.div>
             ))}
           </div>
-
-          <ul className="mt-8 max-w-3xl divide-y divide-border border-y border-[color:var(--color-line)]">
-            {secondary.map(([t, d]) => (
-              <li key={t} className="flex items-start gap-3 py-4">
-                <Check className="mt-[0.35em] h-4 w-4 flex-none text-[color:var(--color-accent)]" />
-                <div>
-                  <div className="font-display t-body font-semibold">{t}</div>
-                  <p className="mt-1.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
-                </div>
-              </li>
-            ))}
-          </ul>
         </div>
       </section>
-      <NotFit n="04" />
-      <CtaBand path="/how-we-work" secondary={<NextLink href="/tasks">Услуги</NextLink>} />
+      <Contact numbered={false} />
     </PageShell>
   );
 }
-
 
 /* ---------------------------------- FAQ ------------------------------------ */
 
@@ -382,63 +233,32 @@ function FaqPage() {
   return (
     <PageShell path="/faq">
       <section className="stage border-b border-[color:var(--color-line)]">
-        <Scene blobs={[{ className: "-right-40 top-1/3", tone: "rose", size: 460 }, { className: "-left-40 bottom-0", tone: "chrome", size: 420 }]} />
-        <PageHead
-          kicker="Вопросы и ответы"
-          title={<>Частые вопросы</>}
-          lead="Не обещаем того, что не проверено на последних проектах: сроки, стоимость, конфиденциальность и формат работы — как есть."
-          guide="Ответы на частые вопросы; если вашего нет — напишите напрямую."
-          chips={[
-            ["5 минут", "среднее время ответа на заявку или вопрос"],
-            ["Без обязательств", "разбор задачи за 30 минут ни к чему вас не обязывает"],
-          ]}
-        />
+        <Scene blobs={[{ className: "-right-40 top-[20%]", tone: "rose", size: 480 }]} />
+        <PageHead compact kicker="Вопросы и ответы" title={<>Частые вопросы</>} />
         <div className="relative mx-auto max-w-7xl px-5 sec-pad-b md:px-8">
           <FaqAccordion items={FAQ_ITEMS} />
-          <p className="mt-8 max-w-2xl t-body text-[color:var(--color-text-secondary)]">
-            Не нашли свой вопрос? <a href="/contacts#form" className="font-semibold text-[color:var(--color-accent)] underline underline-offset-2 hover:text-foreground">Спросите напрямую</a> — ответим в течение 5 минут.
-          </p>
         </div>
       </section>
-      <CtaBand path="/faq" secondary={<NextLink href="/contacts#form">Написать напрямую</NextLink>} />
+      <Contact numbered={false} />
     </PageShell>
   );
 }
 
-/* -------------------------------- Контакты --------------------------------- */
+/* ------------------------------- Контакты ---------------------------------- */
 
 function ContactsPage() {
   return (
     <PageShell path="/contacts">
-      <section className="stage border-b border-[color:var(--color-line)]">
-        <Scene blobs={[{ className: "-right-40 top-1/4", tone: "rose", size: 520 }]} />
-        {/* Чипы обложки — прямые каналы (решение 03.08): написать или
-            позвонить можно, не докручивая до формы. «5 минут» здесь
-            был третьим повтором обещания на одной странице. */}
-        <PageHead
-          kicker="Контакты"
-          title={<>Разберём вашу задачу за 30 минут</>}
-          lead="Оставьте заявку или напишите напрямую — ответим в течение 5 минут."
-          guide="Форма ниже: два поля и одна строка о задаче — этого достаточно."
-          chips={[
-            ["Telegram: @vikky_duck", "если удобнее — напишите напрямую, без формы"],
-            ["+7 964 584 22 25", "или позвоните: разбор задачи ни к чему вас не обязывает"],
-          ]}
-        />
-      </section>
-      <Contact numbered={false} />
+      <Contact asH1 numbered={false} />
       <section className="relative border-b border-[color:var(--color-line)]">
-
         <div className="mx-auto max-w-7xl px-5 sec-pad md:px-8">
-          {/* Колонка «Обязательство» убрана: «отвечаем в течение 5 минут
-              часов» читалось на странице третий раз (решение 03.08) */}
           <div className="grid gap-8 t-body md:grid-cols-2">
             <div>
               <div className="t-eyebrow text-[color:var(--color-text-secondary)]">Напрямую</div>
               <ul className="mt-4 space-y-2">
-                <li><a href="tel:+79645842225" className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">+7 964 584 22 25</a></li>
-                <li><a href="https://t.me/vikky_duck" target="_blank" rel="noreferrer" className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">Telegram: @vikky_duck</a></li>
-                <li><a href="mailto:vu@withoutwater.ru" className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">vu@withoutwater.ru</a></li>
+                <li><a href={CONTACT.tel} className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">{CONTACT.phone}</a></li>
+                <li><a href={CONTACT.tgUrl} target="_blank" rel="noreferrer" className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">Telegram: {CONTACT.tg}</a></li>
+                <li><a href={`mailto:${CONTACT.email}`} className="text-[color:var(--color-text-primary)] transition hover:text-[color:var(--color-accent)]">{CONTACT.email}</a></li>
               </ul>
             </div>
             <div>
@@ -451,9 +271,6 @@ function ContactsPage() {
           </div>
         </div>
       </section>
-      {/* Финальный блок «Разберём вашу задачу за 30 минут» здесь убран:
-          его заголовок дословно повторял заголовок страницы, а кнопка вела
-          на эту же страницу — человек уже стоит перед формой. */}
     </PageShell>
   );
 }
@@ -476,63 +293,56 @@ export const ROUTES: RouteDef[] = [
     path: "/",
     title: "БЕЗ ВОДЫ — проектное бюро по обучению",
     description:
-      "Проектное бюро по обучению: проектируем образовательные решения с привлечением профильных экспертов. Берем на себя реализацию T&D-проектов — перевод ваших рабочих практик в обучающие материалы, управление проектами и сборку готовых продуктов обучения.",
+      "Проектное бюро по обучению: проектируем программы обучения с привлечением профильных специалистов.",
     Component: HomePage,
   },
   {
     path: BE.general,
-    title: "Бизнес-эффект от сотрудничества — БЕЗ ВОДЫ",
+    title: "Экономический эффект: ROI обучения — БЕЗ ВОДЫ",
     description:
-      "Результат в компании создают люди — мы переводим их опыт в инструменты: пять принципов, гарантии, стоимость и скорость старта.",
+      "Инвестиции в создание собственных нематериальных активов при одновременном сокращении затрат на внешних подрядчиков до 40%.",
     Component: BusinessEffectGeneralPage,
   },
   {
-    path: "/tasks",
-    title: "Услуги — БЕЗ ВОДЫ",
-    description:
-      "Три ситуации и решения к ним: результат держится на одном-двух ключевых сотрудниках, инициатив больше, чем ресурсов команды, нужна практика, которой нет внутри.",
-    Component: TasksPage,
-  },
-  {
     path: BE.internal,
-    title: "Опыт ключевых сотрудников в работе всей команды — БЕЗ ВОДЫ",
+    title: "Перевод неявного опыта ключевых сотрудников в системные инструменты компании — БЕЗ ВОДЫ",
     description:
-      "Как опыт ключевых сотрудников становится рабочим инструментом команды: путь от практики к рабочей системе, форматы и первый шаг — карта экспертности.",
+      "Превращаем практический опыт, методы и логику решений ведущих специалистов в прикладные рабочие материалы.",
     Component: InternalExpertsPage,
   },
   {
     path: BE.internalEffect,
-    title: "Бизнес-эффект · Внутренние эксперты — БЕЗ ВОДЫ",
+    title: "Экономический и операционный эффект: эксперты внутри компании — БЕЗ ВОДЫ",
     description:
-      "Что меняется для бизнеса, когда практика ключевых сотрудников становится рабочим инструментом команды: пример федеральной ювелирной сети и снижение рисков.",
+      "Высвобождение до 30–40% рабочего времени ключевых сотрудников, сокращение срока адаптации новичков в 2–2,5 раза, снижение операционных ошибок и риска потери знаний.",
     Component: InternalExpertsEffectPage,
   },
   {
     path: BE.team,
-    title: "Реализация большого объёма обучения без потери качества — БЕЗ ВОДЫ",
+    title: "Подписка на отдел обучения — БЕЗ ВОДЫ",
     description:
-      "План обучения выполняется, а штат не растет: подписка на наши услуги, состав из единиц результата и разбор объема на квартал.",
+      "Проектная команда для отделов обучения и EdTech-компаний. Решаем задачи по разработке образовательных программ, реализации тренингов и передаче готового продукта в распоряжение клиента без увеличения вашего постоянного штата.",
     Component: TeamSubscriptionPage,
   },
   {
     path: BE.teamEffect,
-    title: "Бизнес-эффект · Подписка на наши услуги — БЕЗ ВОДЫ",
+    title: "Экономический эффект: подписка на отдел обучения — БЕЗ ВОДЫ",
     description:
-      "Что меняется для бизнеса с подпиской на наши услуги: сравнение со стоимостью той же мощности внутри и устройство работы в течение года.",
+      "Сравним: штатная команда vs подписка «Без Воды» — расчет совокупной стоимости штатной команды из трех специалистов в сравнении с подпиской от 180 000 ₽.",
     Component: TeamSubscriptionEffectPage,
   },
   {
     path: BE.external,
-    title: "Ускорение запуска новых направлений в бизнесе — БЕЗ ВОДЫ",
+    title: "Практики, опробованные в реальных условиях — БЕЗ ВОДЫ",
     description:
-      `Практика, которой внутри нет — без долгого поиска и консалтинга: ${PRACTICE_PROOF_LC} — за 60 минут, бесплатно, опыт остается у вас по окончании проекта.`,
+      "Знания и навыки, которыми не владеют специалисты внутри компании, вы сможете получить без долгого поиска и обращений к консалтинговым агентствам.",
     Component: ExternalExpertsPage,
   },
   {
     path: BE.externalEffect,
-    title: "Бизнес-эффект · Внешние эксперты — БЕЗ ВОДЫ",
+    title: "Экономический эффект: приглашенные эксперты — БЕЗ ВОДЫ",
     description:
-      "Что меняется, когда опыт практика с рынка становится материалами компании: пример B2B-компании и снижение оттока на 16% по данным заказчика.",
+      "Сокращение сроков запуска, оптимизация бюджета и ФОТ, сохранение и защита знаний внутри компании.",
     Component: ExternalExpertsEffectPage,
   },
   {
@@ -544,36 +354,36 @@ export const ROUTES: RouteDef[] = [
   },
   {
     path: "/reviews",
-    title: "Отзывы клиентов — БЕЗ ВОДЫ",
-    description: "Что говорят клиенты о работе методологов «Без Воды» — дословно, без редактуры.",
+    title: "Отзывы наших клиентов — БЕЗ ВОДЫ",
+    description: "Отзывы клиентов о работе проектного бюро «Без Воды».",
     Component: ReviewsPage,
   },
   {
     path: "/team",
     title: "Команда и сеть экспертов — БЕЗ ВОДЫ",
     description:
-      "Кто отвечает за результат вашего проекта и как устроена профессиональная сеть практиков: отбор до подключения, один договор, методолог рядом с практиком.",
+      "Мы отвечаем за разработку методологии и реализацию образовательных проектов и являемся гарантом результата.",
     Component: TeamPage,
   },
   {
     path: "/how-we-work",
-    title: "Как мы работаем — БЕЗ ВОДЫ",
+    title: "Наш подход — БЕЗ ВОДЫ",
     description:
-      "Лестница сроков от заявки до старта, критерии приёмки до начала работы, доработка без доплаты и границы применимости.",
+      "Один договор. Одна выделенная команда. Единый контур ответственности. Как мы управляем проектом и держим ритм.",
     Component: HowWeWorkPage,
   },
   {
     path: "/faq",
     title: "Частые вопросы — БЕЗ ВОДЫ",
     description:
-      "Ответы на частые вопросы: работа без ТЗ, конфиденциальность, время экспертов, права на материалы, субподряд.",
+      "Ответы на частые вопросы: старт без ТЗ, сроки, время экспертов, авторские права, NDA, White Label, совместимость с LMS.",
     Component: FaqPage,
   },
   {
     path: "/contacts",
     title: "Контакты — БЕЗ ВОДЫ",
     description:
-      "Форма заявки, телефон, Telegram и почта. Отвечаем в течение 5 минут.",
+      "Форма заявки, телефон, Telegram и почта. Ответим в течение 5 минут в рабочее время.",
     Component: ContactsPage,
   },
   /* Страница продукта «Карта экспертности» (06.08.2026): на неё ведут все
@@ -618,7 +428,7 @@ export const HASH_REDIRECTS: Record<string, string> = {
   "#approach": "/how-we-work",
   "#firststage": "/how-we-work",
   "#notfit": "/how-we-work",
-  "#capital": "/tasks",
+  "#capital": "/#when",
 };
 
 /* Якоря бывших развёрнутых решений на /tasks (финальная структура 02.08):

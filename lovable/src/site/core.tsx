@@ -18,11 +18,11 @@ import {
   AnimatePresence,
   MotionConfig,
 } from "motion/react";
-import { ArrowUpRight, ArrowRight, ArrowDown, Plus, Minus, Check, ExternalLink, Calendar, CookingPot } from "lucide-react";
+import { ArrowUpRight, ArrowRight, ArrowDown, Plus, Minus, Check, ExternalLink, Calendar, CookingPot, Send } from "lucide-react";
 import { CONTACT } from "./data";
 
 export { motion, AnimatePresence };
-export { ArrowUpRight, ArrowRight, ArrowDown, Plus, Minus, Check, ExternalLink, Calendar, CookingPot };
+export { ArrowUpRight, ArrowRight, ArrowDown, Plus, Minus, Check, ExternalLink, Calendar, CookingPot, Send };
 export { useRef, useState, useEffect };
 export type { ReactNode, CSSProperties };
 
@@ -970,9 +970,9 @@ export function CookieBar() {
    «Разбор задачи за 30 минут». */
 
 export const NAV_LINKS: [string, string][] = [
-  ["Услуги", "/tasks"],
+  ["Услуги", "/#when"],
   ["Кейсы", "/cases"],
-  ["Как мы работаем", "/how-we-work"],
+  ["Наш подход", "/how-we-work"],
   ["О нас", "/team"],
 ];
 
