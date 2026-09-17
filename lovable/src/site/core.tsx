@@ -93,7 +93,7 @@ function ReviewModalSlot() {
 /* Решение Виктории 06.08.2026: отзыв открывается крупным окном поверх
    страницы, а не уводит человека с кейса. Ссылки вида /reviews#slug
    продолжают работать (SEO, «открыть в новой вкладке»), но обычный клик
-   перехватывается и показывает окно. Витрина /reviews остаётся. */
+   перехватывается и показывает окно. Витрина /reviews остается. */
 
 const reviewListeners = new Set<() => void>();
 let openReviewSlug: string | null = null;
@@ -150,7 +150,7 @@ function useMediaQuery(query: string): boolean {
 
 /* --------- Активный сценарий: карточки Hero ↔ табы секции Scenarios --------- */
 /* Секция Scenarios регистрирует свой setActive здесь при монтировании.        */
-/* Состояние остаётся локальным useState — это важно: с useSyncExternalStore    */
+/* Состояние остается локальным useState — это важно: с useSyncExternalStore    */
 /* AnimatePresence(mode="wait") зависал (старый блок не размонтировался).        */
 
 /* Микро-цели Яндекс Метрики. Имена целей (создать в интерфейсе Метрики как
@@ -163,14 +163,14 @@ export function ymGoal(goal: string, params?: Record<string, unknown>) {
 
 
 /* ----------------------------- Логотип и метки --------------------------- */
-/* Срез — фирменный приём: горизонтальный пропил, «лишнее отсечено».
-   В логотипе он живёт на слове ВОДЫ. Один срез на макет — поэтому в
-   заголовках страниц приём не повторяется. */
+/* Срез — фирменный прием: горизонтальный пропил, «лишнее отсечено».
+   В логотипе он живет на слове ВОДЫ. Один срез на макет — поэтому в
+   заголовках страниц прием не повторяется. */
 
 export function StencilLogo({ className = "" }: { className?: string }) {
   return (
     <div className={`inline-flex flex-col ${className}`}>
-      {/* Логотип остаётся на Unbounded даже после перевода типографики
+      {/* Логотип остается на Unbounded даже после перевода типографики
           на новостной строй 05.08.2026: это знак, а не набор. */}
       <span className="font-logo text-[1.6em] font-medium tracking-[-0.02em]">
         БЕЗ <span className="cut">ВОДЫ</span>
@@ -199,8 +199,8 @@ export function SectionLabel({ n, children }: { n?: string; children: ReactNode 
 
 /* ------------------------- Линза преломления ----------------------------- */
 /* Один SVG-фильтр обслуживает элементы любого размера: карта смещения
-   растягивается под элемент за счёт preserveAspectRatio="none". Разметка
-   кладётся один раз в начало страницы (см. PageShell). */
+   растягивается под элемент за счет preserveAspectRatio="none". Разметка
+   кладется один раз в начало страницы (см. PageShell). */
 
 const LENS_MAP =
   "data:image/svg+xml;utf8," +
@@ -294,7 +294,7 @@ export function GlassPointer() {
         raf = 0;
         el.style.setProperty("--mx", px.toFixed(1) + "%");
         el.style.setProperty("--my", py.toFixed(1) + "%");
-        /* угол световой полосы идёт за курсором — стекло ловит свет */
+        /* угол световой полосы идет за курсором — стекло ловит свет */
         el.style.setProperty("--sheen", (90 + (px - 50) * 1.1).toFixed(1) + "deg");
         const dx = px / 100 - 0.5;
         const dy = py / 100 - 0.5;
@@ -340,7 +340,7 @@ export function GlassPointer() {
    розового стекла и хрома. Никаких капель и сфер. */
 
 /* Узлы — графическая сцена под стекло: одна локальная композиция, а не
-   паттерн-обои. Живёт в правой части секции, гаснет к тексту. Круги
+   паттерн-обои. Живет в правой части секции, гаснет к тексту. Круги
    остаются круглыми: viewBox без растяжения. */
 
 const NODES: [number, number, number, boolean][] = [
@@ -451,7 +451,7 @@ export function Scene({
 
 
 /* ------------------------------ GlassCard -------------------------------- */
-/* Обёртка над материалом .lg. Стекло кладётся только на графическую сцену;
+/* Обертка над материалом .lg. Стекло кладется только на графическую сцену;
    на ровном фоне используется .card — бумажная поверхность. */
 
 export function GlassCard({
@@ -517,7 +517,7 @@ export function NodeDivider({ className = "" }: { className?: string }) {
 /* ==========================================================================
    Элементы фирменного стиля из брендбука: кот-росчерк, подчерк, стрелка
    от руки, маркеры-узлы, трафаретная нумерация, линейные иконки.
-   Все графемы рисуются одним росчерком: только контур, скруглённые концы,
+   Все графемы рисуются одним росчерком: только контур, скругленные концы,
    без заливок и «мультяшности».
    ========================================================================== */
 
@@ -550,7 +550,7 @@ export function CatMark({
         strokeWidth={strokeWidth}
         strokeLinecap="round"
       />
-      {/* хвост: свободный росчерк с петлёй */}
+      {/* хвост: свободный росчерк с петлей */}
       <path
         d="M48 106c-14 4-30 1-32-10-1.6-9 10-14 15-7 4.6 6.4-1 13.6-8 12"
         stroke="currentColor"
@@ -630,7 +630,7 @@ export function NodeBullet({
   );
 }
 
-/* Список с маркерами-узлами — единый приём для всех перечислений. */
+/* Список с маркерами-узлами — единый прием для всех перечислений. */
 export function NodeList({
   items,
   className = "",
@@ -908,7 +908,7 @@ export function Field({
 
 /* --------------------------------- Page --------------------------------- */
 
-/* Переключатель «Меньше анимаций» удалён из интерфейса (решение Виктории
+/* Переключатель «Меньше анимаций» удален из интерфейса (решение Виктории
    03.08 — «исторически остался»). Автоматика жива: useCalm стартует от
    prefers-reduced-motion, calm-режим по-прежнему гасит framer и линзу. */
 
@@ -925,7 +925,7 @@ export function CookieBar() {
     }
   }, []);
   /* Плашка фиксирована у нижней кромки и на мобильном перекрывала последнюю
-     строку карточек. Пока она видна — резервируем под неё место в потоке. */
+     строку карточек. Пока она видна — резервируем под нее место в потоке. */
   useEffect(() => {
     const el = document.documentElement;
     if (show) el.setAttribute("data-cookie-open", "");
@@ -938,9 +938,9 @@ export function CookieBar() {
   };
   if (!mounted || !show) return null;
 
-  /* Раньше вся полоса была <div role="button"> без tabindex: с клавиатуры её
+  /* Раньше вся полоса была <div role="button"> без tabindex: с клавиатуры ее
      нельзя было закрыть в принципе, а текст не сообщал, что клик = согласие.
-     Теперь полоса — обычный текст со ссылкой, а закрывает её настоящая кнопка. */
+     Теперь полоса — обычный текст со ссылкой, а закрывает ее настоящая кнопка. */
   return (
     <div
       data-cookie-bar
@@ -978,7 +978,7 @@ export const NAV_LINKS: [string, string][] = [
 
 /* Второй уровень: раньше жил в футере, теперь — в меню. */
 export const NAV_SECONDARY: [string, string][] = [
-  ["Бизнес-эффект", "/business-effect"],
+  ["Экономический эффект", "/business-effect"],
   ["Отзывы", "/reviews"],
   ["Частые вопросы", "/faq"],
   ["Контакты", "/contacts"],
@@ -1004,7 +1004,7 @@ export function ctaHref(path: string): string {
 export function Nav({ path = "/" }: { path?: string }) {
   const [open, setOpen] = useState(false);
   const [progress, setProgress] = useState(0);
-  /* На главной первый экран уже несёт главную кнопку: в шапке до ухода hero
+  /* На главной первый экран уже несет главную кнопку: в шапке до ухода hero
      держим вторичный вес, чтобы не было двух primary одновременно. */
   const [pastHero, setPastHero] = useState(path !== "/");
   const headRef = useRef<HTMLElement | null>(null);
@@ -1076,7 +1076,7 @@ export function Nav({ path = "/" }: { path?: string }) {
           <StencilLogo className="logo-sm" />
         </a>
         {/* Пункты меню не переносятся никогда: перенос ломает высоту шапки
-            и рвёт названия. Полное меню — от 1280 px, ниже его заменяет
+            и рвет названия. Полное меню — от 1280 px, ниже его заменяет
             бургер: четыре русских пункта, вход в кабинет и действие в одну
             строку уже, чем в 1280 px, не помещаются. Порог можно опустить —
             10.08.2026 самый длинный пункт «Задачи и решения» стал «Услуги»,
@@ -1107,7 +1107,7 @@ export function Nav({ path = "/" }: { path?: string }) {
           })}
         </nav>
         <div className="flex shrink-0 items-center gap-2 md:gap-3">
-          {/* Шапка первого касания несёт только навигацию и действие
+          {/* Шапка первого касания несет только навигацию и действие
               (решение Виктории 03.08): «Личный кабинет» уехал в футер и
               мобильное меню, переключатель анимаций убран совсем —
               автоматика prefers-reduced-motion осталась. */}
@@ -1160,7 +1160,7 @@ export function Nav({ path = "/" }: { path?: string }) {
         >
           <nav aria-label="Меню сайта" className="mx-auto w-full max-w-3xl flex-1 overflow-y-auto overscroll-contain px-5 pb-4 pt-2 md:px-8">
             {/* От 1280 px первые четыре пункта уже стоят строкой в шапке —
-                в меню остаётся только второй уровень. */}
+                в меню остается только второй уровень. */}
             {NAV_LINKS.slice(0, 3).map(([label, href]) => (
               <a
                 key={href}
@@ -1237,39 +1237,39 @@ export function Nav({ path = "/" }: { path?: string }) {
 /* -------------------------------- Footer --------------------------------- */
 
 export function Footer() {
+  /* Подвал ужат по замечанию Виктории 17.09.2026: на телефоне он занимал
+     59% экрана (13 строк столбиком с большими отступами). Теперь три
+     строки мелким кеглем: логотип и контакты, разделы и документы,
+     копирайт. Состав тот же. */
+  const link = "transition hover:text-[color:var(--color-accent)]";
+  const legal: [string, string][] = [
+    ["Политика конфиденциальности", "/politics_pd"],
+    ["Согласие на обработку персональных данных", "/consent_pd"],
+    ["Публичная оферта", "/pub_oferta"],
+  ];
   return (
     <footer className="border-t border-[color:var(--color-line)] bg-[color:var(--color-bg-secondary)]">
-      <div className="mx-auto max-w-7xl px-5 py-8 md:px-8">
-        {/* Основная навигация живёт в шапке. Второй уровень (NAV_SECONDARY)
-            до 10.08.2026 существовал только в бургер-меню, которое рендерится
-            по клику: в статичном HTML на /faq не вело ни одной ссылки —
-            страница была сиротой для поисковика. Теперь уровень продублирован
-            здесь, в футере. */}
-        <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <a href="/" className="flex items-center gap-3 text-[color:var(--color-text-primary)]" aria-label="БЕЗ ВОДЫ — на главную">
-            <CatMark className="h-8 w-auto text-[color:var(--color-text-primary)]/70" strokeWidth={2} />
+      <div className="mx-auto max-w-7xl px-5 py-4 text-xs leading-5 text-[color:var(--color-text-secondary)] md:px-8 md:py-5 md:text-sm md:leading-6">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
+          <a href="/" className="flex items-center gap-2 text-[color:var(--color-text-primary)]" aria-label="БЕЗ ВОДЫ — на главную">
+            <CatMark className="h-5 w-auto text-[color:var(--color-text-primary)]/70" strokeWidth={2} />
             <StencilLogo className="logo-sm" />
           </a>
-          <ul className="flex flex-wrap gap-x-6 gap-y-2 t-body">
-            <li><a href={CONTACT.tel} className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">{CONTACT.phone}</a></li>
-            <li><a href={CONTACT.tgUrl} target="_blank" rel="noreferrer" className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">Telegram: {CONTACT.tg}</a></li>
-            <li><a href={`mailto:${CONTACT.email}`} className="text-[color:var(--color-text-secondary)] transition hover:text-[color:var(--color-accent)]">{CONTACT.email}</a></li>
-            {/* «Личный кабинет» живёт только в меню шапки */}
-          </ul>
+          <a href={CONTACT.tel} className={link}>{CONTACT.phone}</a>
+          <a href={CONTACT.tgUrl} target="_blank" rel="noreferrer" className={link}>Telegram: {CONTACT.tg}</a>
+          <a href={`mailto:${CONTACT.email}`} className={link}>{CONTACT.email}</a>
         </div>
-        <div className="mt-6 flex flex-col gap-3 border-t border-[color:var(--color-line)] pt-5 t-caption text-[color:var(--color-text-secondary)]">
-          <nav aria-label="Разделы" className="flex flex-wrap gap-x-5 gap-y-2">
-            {NAV_SECONDARY.map(([label, href]) => (
-              <a key={href} href={href} className="transition hover:text-[color:var(--color-accent)]">{label}</a>
-            ))}
-          </nav>
-          <div className="flex flex-wrap gap-x-5 gap-y-2">
-            <a href="/politics_pd" className="transition hover:text-[color:var(--color-accent)]">Политика конфиденциальности</a>
-            <a href="/consent_pd" className="transition hover:text-[color:var(--color-accent)]">Согласие на обработку персональных данных</a>
-            <a href="/pub_oferta" className="transition hover:text-[color:var(--color-accent)]">Публичная оферта</a>
-          </div>
-          <div>© {new Date().getFullYear()} БЕЗ ВОДЫ · withoutwater · ИП Уткина Виктория Викторовна · ИНН 771586055972</div>
-        </div>
+        {/* Разделы на телефоне не дублируем — они в бургер-меню; документы
+            обязаны быть на каждой странице. */}
+        <nav aria-label="Разделы и документы" className="mt-2 flex flex-wrap gap-x-4 gap-y-1">
+          {NAV_SECONDARY.map(([label, href]) => (
+            <a key={href} href={href} className={`hidden md:inline ${link}`}>{label}</a>
+          ))}
+          {legal.map(([label, href]) => (
+            <a key={href} href={href} className={link}>{label}</a>
+          ))}
+        </nav>
+        <div className="mt-2">© {new Date().getFullYear()} БЕЗ ВОДЫ · withoutwater · ИП Уткина Виктория Викторовна · ИНН 771586055972</div>
       </div>
     </footer>
   );
@@ -1277,7 +1277,7 @@ export function Footer() {
 
 
 /* ------------------------------ PageShell -------------------------------- */
-/* Общая обёртка каждой страницы: шапка, футер, калм-переключатель, cookie-бар,
+/* Общая обертка каждой страницы: шапка, футер, калм-переключатель, cookie-бар,
    липкая мобильная CTA. */
 
 export function PageShell({ path, children }: { path: string; children: ReactNode }) {
@@ -1309,7 +1309,7 @@ export function PageShell({ path, children }: { path: string; children: ReactNod
 
   return (
     <MotionConfig reducedMotion={calm ? "always" : "user"}>
-      {/* Линза кладётся один раз на страницу и обслуживает всё стекло */}
+      {/* Линза кладется один раз на страницу и обслуживает все стекло */}
       <LensFilter />
       <GlassPointer />
       <div className="min-h-screen bg-[color:var(--color-bg-primary)] text-[color:var(--color-text-primary)]">
@@ -1340,7 +1340,7 @@ export function PageShell({ path, children }: { path: string; children: ReactNod
           }`}
           aria-hidden={!showBar}
         >
-          {/* Пилюля с подписью: безымянный кружок с календарём не читался
+          {/* Пилюля с подписью: безымянный кружок с календарем не читался
               как «оставить заявку» (решение 03.08) */}
           <a
             href={ctaHref(path)}
@@ -1476,7 +1476,7 @@ export function PageHead({
   chips?: [string, string][];
   actions?: ReactNode;
   /* Общее условие работы, одинаковое для всех решений (06.08.2026):
-     профильных экспертов привлекаем мы. Идёт отдельной строкой под лидом. */
+     профильных экспертов привлекаем мы. Идет отдельной строкой под лидом. */
   note?: ReactNode;
   /* Компактная шапка: половинные вертикальные отступы. Нужна там, где
      страница — это сразу содержимое, а не обещание (отзывы, 06.08.2026). */
@@ -1536,7 +1536,7 @@ export function PageHead({
             {lead}
           </p>
         )}
-        {/* Строка-ориентир: как читать страницу и куда идти дальше (приёмка, п. 6). */}
+        {/* Строка-ориентир: как читать страницу и куда идти дальше (приемка, п. 6). */}
         {guide && (
           <p className="t-eyebrow mt-5 text-[color:var(--color-text-inverse-2)]">{guide}</p>
         )}
@@ -1590,7 +1590,7 @@ export function CtaBand({
       href="/business-effect"
       className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
     >
-      Бизнес-эффект от сотрудничества
+      Экономический эффект от наших услуг
       <ArrowUpRight data-arrow className="h-4 w-4 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
     </a>
   );

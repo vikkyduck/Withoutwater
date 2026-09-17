@@ -2,15 +2,15 @@
    pages-constructor.tsx — /constructor, страница-конструктор задач.
 
    ВАЖНО: страница НЕ прикреплена к сайту (решение Виктории 05.08.2026).
-   Её нет ни в шапке, ни в подвале, ни в sitemap.xml; в мете noindex,nofollow.
-   Живёт на том же домене и в той же дизайн-системе, чтобы ссылку можно было
+   Ее нет ни в шапке, ни в подвале, ни в sitemap.xml; в мете noindex,nofollow.
+   Живет на том же домене и в той же дизайн-системе, чтобы ссылку можно было
    отправить клиенту напрямую.
 
    ⚠️ ТЕКСТ ВИКТОРИИ — СЛОВО В СЛОВО. Требование от 05.08.2026 после того,
-   как я самовольно «причесал» её формулировки. Ничего не исправлять:
+   как я самовольно «причесал» ее формулировки. Ничего не исправлять:
    ни «Состав работ и фиксируется», ни «процесса процесса», ни
    «Структурированная , пригодную», ни «SCORM пакет», ни «Github»,
-   ни «бизнес кейсах», ни «100$». Это не опечатки для нас — это её текст.
+   ни «бизнес кейсах», ни «100$». Это не опечатки для нас — это ее текст.
    Никаких своих пояснений, вводок и приписок на странице тоже быть не должно.
    ========================================================================== */
 import { useMemo, useRef, useState } from "react";
@@ -88,7 +88,7 @@ const SUBSCRIPTION: Unit[] = [
     what: "Регулярная актуализация действующих программ и материалов: обновление контента под изменения в процессах и продуктах. Задачи формулируем в начале каждого месяца",
   },
   /* Цена не сумма, а доля (25% от бюджета): в итог не считается — price 0,
-     fixed без счётчика; условие оплаты отдельным абзацем (реш. 06.08). */
+     fixed без счетчика; условие оплаты отдельным абзацем (реш. 06.08). */
   { ...IPR_UNIT, price: 0, fixed: true },
   {
     id: "designer",
@@ -166,7 +166,7 @@ const PRODUCTS: Unit[] = [
 const money = (n: number) => n.toLocaleString("ru-RU").replace(/ /g, " ") + " ₽";
 
 /* Сколько одинаковых единиц можно набрать в одной позиции. Потолок нужен,
-   чтобы случайный зажатый «+» не увёл смету в миллиарды. */
+   чтобы случайный зажатый «+» не увел смету в миллиарды. */
 const MAX_QTY = 20;
 
 /* Шаг количества: появляется только у выбранной позиции. Стоит вне <label>
@@ -350,7 +350,7 @@ function UnitCard({
 }
 
 export function ConstructorPage() {
-  /* Ключ — позиция, значение — количество. Позиции нет в объекте, пока её не
+  /* Ключ — позиция, значение — количество. Позиции нет в объекте, пока ее не
      выбрали: так «Выбрано» и чипы считаются по одному источнику. */
   const [picked, setPicked] = useState<Record<string, number>>({});
   const toggle = (id: string) =>
@@ -368,7 +368,7 @@ export function ConstructorPage() {
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [err, setErr] = useState<string | null>(null);
-  /* На мобильном полоса тоже липкая, но свёрнутая: строка итога + разворот. */
+  /* На мобильном полоса тоже липкая, но свернутая: строка итога + разворот. */
   const [barOpen, setBarOpen] = useState(false);
   const contactRef = useRef<HTMLInputElement>(null);
   const hpRef = useRef<HTMLInputElement>(null);
@@ -503,7 +503,7 @@ export function ConstructorPage() {
         </div>
       </section>
 
-      {/* Итог и отправка. Липкая полоса и на мобильном: свёрнутая строка с
+      {/* Итог и отправка. Липкая полоса и на мобильном: свернутая строка с
           суммой, разворот — полный чек и форма. */}
       <div className="pointer-events-none sticky bottom-0 z-40 px-3 pb-4 md:px-6 md:pb-6">
         <div className="pointer-events-auto mx-auto max-h-[70vh] max-w-3xl overflow-y-auto rounded-md border border-[color:var(--color-line)] bg-[color:var(--color-bg-dark)] px-5 py-4 text-[color:var(--color-text-inverse)] shadow-[var(--shadow-soft)]">
@@ -528,7 +528,7 @@ export function ConstructorPage() {
               <div className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
                 <span aria-live="polite" className="flex flex-wrap items-baseline gap-x-6 gap-y-1">
                   {count === 0 ? (
-                    /* Пустое состояние — одна строка, без счётчика (приёмка, п. 4). */
+                    /* Пустое состояние — одна строка, без счетчика (приемка, п. 4). */
                     <span className="t-body text-[color:var(--color-text-inverse-2)]">
                       Выберите позиции · минимальный пакет {money(MIN_TOTAL)}
                     </span>
