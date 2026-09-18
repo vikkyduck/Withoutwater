@@ -3,8 +3,15 @@ import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import path from "node:path";
 
-export default defineConfig(({ isSsrBuild }) => ({
-  plugins: [react(), tailwindcss()],
+export default defineConfig(({ isSsrBuild, command }) => ({
+  plugins: [react(), tailwindcss(), {
+    name: "review-mode",
+    transformIndexHtml(html) {
+      const preview = command === "serve" || process.env.VITE_PREVIEW === "true";
+      if (!preview) return html;
+      return html.replace("<head>", '<head><meta name="robots" content="noindex, nofollow" /><script>window.BV_PREVIEW=true;</script>');
+    },
+  }],
   resolve: { alias: { "@": path.resolve(__dirname, "src") } },
   build: {
     outDir: "dist",

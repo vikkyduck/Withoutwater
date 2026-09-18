@@ -1,3 +1,4 @@
+import { IS_PREVIEW, submitLead } from "./preview";
 /* ============================================================================
    blocks.tsx — секции страниц. Дизайн-код перенесен 1:1 из сборки Lovable
    Виктории; новые блоки (кирпичики клиентов, производство, полоса цифр,
@@ -76,10 +77,7 @@ export function Hero() {
       {/* Кольцо прогресса убрано (см. комментарий в core.tsx → PageHead) */}
 
       <div className="hero-pad relative z-10 mx-auto max-w-7xl px-5 md:px-8">
-        {/* Заголовок первого экрана — «Проектное бюро по обучению»
-            (решение Виктории 10.08): не «ваша команда», а подрядчик с
-            собственной рамкой. Образ «мощностей» остается в надзаголовке.
-            Формулировки ее, дословно. */}
+        {/* Защищенный офер: действующая редакция в docs/PROJECT-CONTEXT.md. */}
         <div className="mb-6 [--color-text-secondary:var(--color-text-inverse-2)]">
           <SectionLabel n="01">Для HR, T&D и EdTech</SectionLabel>
         </div>
@@ -92,32 +90,11 @@ export function Hero() {
           Вместо найма: отдел по цене 1 сотрудника в месяц. Программы, тренинги и курсы в LMS под задачу клиента
         </p>
 
-        {/* Одно главное действие — сразу под смыслом, до всех аргументов */}
-        <div className="mt-9 flex flex-col items-start gap-3 md:mt-10">
-          <div className="flex w-full flex-col items-start gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-6">
-            <a href="#contact" className="btn btn-invert group w-full sm:w-auto">
-              <span>Оставить заявку на разбор задачи</span>
-              <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
-            </a>
-            <a
-              href="/business-effect/"
-              className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
-            >
-              Экономический эффект от услуг БЕЗ ВОДЫ
-              <ArrowUpRight data-arrow className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-            </a>
-          </div>
-          {/* Гарантия — сразу под действием (снятие риска) */}
-          <p className="t-caption text-[color:var(--color-text-inverse-2)]">
-            Постоплата по актам. Проект считается закрытым только после успешного пилота.
-          </p>
-        </div>
-
         {/* Три плитки жидкого стекла: цена → старт → гибкость */}
         <div className="relative mt-12 grid max-w-4xl items-stretch gap-4 sm:grid-cols-3 md:mt-16">
           {[
             ["от 180 000 ₽/мес", "Подписка"],
-            ["24 часа", "Старт"],
+            ["24 часа", "Старт после согласования плана и вводных"],
             ["48 часов", "Перестройка группы под новые вводные"],
           ].map(([label, desc], i) => (
             <div
@@ -137,6 +114,19 @@ export function Hero() {
             </div>
           ))}
         </div>
+        {/* I-021: повторная заявка убрана; контактная кнопка остается в шапке. */}
+        <div className="mt-9 flex flex-col items-start gap-3 md:mt-10">
+          <div className="flex w-full flex-col items-start gap-3 sm:w-auto sm:flex-row sm:items-center sm:gap-6">
+            <a
+              href="/tasks/team-subscription/"
+              className="link-arrow group t-body text-[color:var(--color-text-inverse-2)] hover:text-[color:var(--color-text-inverse)]"
+            >
+              Как устроена подписка
+              <ArrowUpRight data-arrow className="h-3.5 w-3.5 transition-transform duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </a>
+          </div>
+        </div>
+
       </div>
 
     </section>
@@ -1068,10 +1058,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
 
     setSending(true);
     try {
-      const r = await fetch("/api/lead", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+      await submitLead({
           name,
           contact,
           comment: about,
@@ -1088,9 +1075,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
             } catch {}
             return (window.location.pathname || "/") + srcQ;
           })(),
-        }),
-      });
-      if (!r.ok) throw new Error(String(r.status));
+        });
       setSent(true);
       ymGoal("lead_sent");
     } catch {
@@ -1110,17 +1095,17 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
               убран (он уже в шапке); один правый край у всех строк. */}
           <SectionLabel n="07">Первый шаг</SectionLabel>
           <RevealHeading as={asH1 ? "h1" : "h2"} className={`${asH1 ? "t-h1" : "t-h2"} mt-6 max-w-md`}>
-            Форма заявки
+            Обсудить задачу
           </RevealHeading>
           {/* Тексты Виктории 17.09.2026, слово в слово. */}
           <p className="mt-6 max-w-md t-body text-[color:var(--color-text-secondary)]">
-            Обсудим задачу и найдем оптимальное решение. Презентация и подробное ТЗ не требуются. На 30-минутной онлайн-встрече:
+            30 минут онлайн: задача, сроки и первый этап. Для встречи достаточно описания задачи.
           </p>
           <ol className="mt-4 max-w-md space-y-2">
             {[
-              "Сверим понимание бизнес-цели и образ результата",
-              "Определим доступные источники опыта и формат его передачи",
-              "Рассчитаем сроки, состав команды и план первого этапа",
+              "Определить рабочую задачу и результат обучения",
+              "Уточнить исходные материалы, участие экспертов и ограничения",
+              "Определить первый этап и данные для расчета стоимости",
             ].map((t, i) => (
               <li key={t} className="flex items-baseline gap-5 t-body text-[color:var(--color-text-primary)]">
                 <span className="font-display t-label tabular-nums text-[color:var(--color-accent)]">{String(i + 1).padStart(2, "0")}</span>
@@ -1155,14 +1140,14 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
               >
                 <CatMark className="h-24 w-28 text-[color:var(--color-text-inverse)]" strokeWidth={2} />
                 <h3 className="t-body mt-6 text-[color:var(--color-text-inverse)]">
-                  Спасибо!
+                  {IS_PREVIEW ? "Тестовая заявка проверена" : "Спасибо!"}
                 </h3>
                 <p className="mt-3 text-[color:var(--color-text-inverse-2)]">
-                  Следующие шаги:
+                  {IS_PREVIEW ? "Данные никуда не отправлены. В рабочей версии заявка поступит руководителю проекта для согласования встречи." : "Следующие шаги:"}
                 </p>
 
-                <ol className="mt-4 space-y-2 t-body text-[color:var(--color-text-inverse-2)]">
-                  <li className="flex gap-3"><span className="node-dot node-dot-active mt-2" />Ответим в течение 5 минут и предложим время.</li>
+                <ol hidden={IS_PREVIEW} className="mt-4 space-y-2 t-body text-[color:var(--color-text-inverse-2)]">
+                  <li className="flex gap-3"><span className="node-dot node-dot-active mt-2" />Руководитель проекта свяжется и предложит время встречи.</li>
                   <li className="flex gap-3"><span className="node-dot node-dot-active mt-2" />30 минут онлайн: сверим задачу и определим следующий шаг.</li>
                   <li className="flex gap-3"><span className="node-dot node-dot-active mt-2" />Готовиться не нужно — презентация и ТЗ не требуются.</li>
                 </ol>
@@ -1183,7 +1168,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                 className="flex flex-col gap-5"
               >
                 <Field
-                  label="Ваше имя"
+                  label="Имя"
                   name="name"
                   placeholder=""
                   autoComplete="name"
@@ -1250,7 +1235,7 @@ export function Contact({ asH1 = false }: { asH1?: boolean } = {}) {
                 </button>
                 <div className="space-y-2">
                   <p className="t-caption text-[color:var(--color-text-inverse-2)]">
-                    Ответим в течение 5 минут.
+                    Ответим и согласуем время встречи.
                   </p>
                   <a
                     href={CONTACT.tgUrl}

@@ -1,3 +1,5 @@
+import { PAGE_REDIRECTS } from "./site/redirects";
+import { useEffect } from "react";
 import { createRoot } from "react-dom/client";
 import "./styles.css";
 import { ROUTES, HASH_REDIRECTS, TASKS_HASH_REDIRECTS } from "./site/pages";
@@ -17,15 +19,26 @@ const normalize = (p: string) => {
 const hash = window.location.hash;
 const page = normalize(window.location.pathname);
 const target =
-  page === "/" ? HASH_REDIRECTS[hash]
-  : page === "/tasks" ? TASKS_HASH_REDIRECTS[hash]
-  : undefined;
+  (page === "/" ? HASH_REDIRECTS[hash] : page === "/tasks" ? TASKS_HASH_REDIRECTS[hash] : undefined) ?? PAGE_REDIRECTS[page];
 if (target) {
   /* сохраняем query: разосланные ссылки вида /?utm_source=…#faq не должны
      терять атрибуцию при редиректе */
-  window.location.replace(target + window.location.search);
+  const destination = new URL(target, window.location.origin);
+  destination.search = window.location.search;
+  if (!destination.hash) destination.hash = hash;
+  window.location.replace(destination.href);
 } else {
   const route = ROUTES.find((r) => r.path === page) ?? ROUTES[0];
   const Page = route.Component;
-  createRoot(document.getElementById("root")!).render(<Page />);
+  function MountedPage() {
+    useEffect(() => {
+      if (!window.location.hash) return;
+      let id: string;
+      try { id = decodeURIComponent(window.location.hash.slice(1)); } catch { return; }
+      const frame = requestAnimationFrame(() => document.getElementById(id)?.scrollIntoView({ behavior: "instant" }));
+      return () => cancelAnimationFrame(frame);
+    }, []);
+    return <Page />;
+  }
+  createRoot(document.getElementById("root")!).render(<MountedPage />);
 }

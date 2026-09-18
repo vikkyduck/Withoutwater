@@ -36,6 +36,7 @@
          согласием — сразу. Без согласия счетчик не грузится, cookie не ставятся. -->
     <script type="text/javascript">
     window.bvMetrika = function () {
+      if (window.BV_PREVIEW || !["withoutwater.ru", "www.withoutwater.ru"].includes(location.hostname)) return;
       if (window.YM_ID) return;
       (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
       m[i].l=1*new Date();
@@ -45,7 +46,7 @@
       ym(110744367, "init", {ssr:true, webvisor:true, clickmap:true, accurateTrackBounce:true, trackLinks:true});
       window.YM_ID = 110744367;
     };
-    try { if (window.localStorage.getItem("bv-cookie-ok")) window.bvMetrika(); } catch (e) {}
+    try { if (window.localStorage.getItem("bv-cookie-ok") === "1") window.bvMetrika(); } catch (e) {}
     </script>
   </head>
   <body>

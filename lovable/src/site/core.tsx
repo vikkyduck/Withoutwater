@@ -1,3 +1,4 @@
+import { IS_PREVIEW } from "./preview";
 /* ============================================================================
    core.tsx — ядро сайта на дизайн-системе 2.4 «Сухой остаток».
    Материалы системы: жидкое стекло (линза + перелив), графическая сцена из
@@ -157,7 +158,7 @@ function useMediaQuery(query: string): boolean {
    «JavaScript-событие»): scenario_selected, form_started, chip_toggled, lead_sent. */
 export function ymGoal(goal: string, params?: Record<string, unknown>) {
   const w = window as unknown as { ym?: (...a: unknown[]) => void; YM_ID?: number };
-  if (w.ym && w.YM_ID) w.ym(w.YM_ID, "reachGoal", goal, params);
+  if (!IS_PREVIEW && w.ym && w.YM_ID) w.ym(w.YM_ID, "reachGoal", goal, params);
 }
 
 
@@ -938,8 +939,33 @@ export function CookieBar() {
   const accept = () => {
     try { window.localStorage.setItem("bv-cookie-ok", "1"); } catch {}
     /* Метрика подключается только отсюда (index.html): до согласия счетчика нет */
-    try { (window as unknown as { bvMetrika?: () => void }).bvMetrika?.(); } catch {}
+    try { if (!IS_PREVIEW) (window as unknown as { bvMetrika?: () => void }).bvMetrika?.(); } catch {}
     setShow(false);
+  };
+  useEffect(() => {
+    const open = () => setShow(true);
+    window.addEventListener("bv-cookie-settings", open);
+    return () => window.removeEventListener("bv-cookie-settings", open);
+  }, []);
+  const decline = () => {
+    let previouslyAccepted = false;
+    try {
+      previouslyAccepted = window.localStorage.getItem("bv-cookie-ok") === "1";
+      window.localStorage.setItem("bv-cookie-ok", "0");
+    } catch {}
+    setShow(false);
+    if (previouslyAccepted) {
+      const w = window as unknown as { ym?: (...args: unknown[]) => void; YM_ID?: number };
+      try { if (w.ym && w.YM_ID) w.ym(w.YM_ID, "destruct"); } catch {}
+      document.cookie.split(";").forEach(c => {
+        const name = c.split("=")[0].trim();
+        if (name.startsWith("_ym")) {
+          for (const domain of ["", `; domain=${location.hostname}`, `; domain=.${location.hostname}`])
+            document.cookie = `${name}=; Max-Age=0; path=/${domain}`;
+        }
+      });
+      window.location.reload();
+    }
   };
   if (!mounted || !show) return null;
 
@@ -967,6 +993,7 @@ export function CookieBar() {
       >
         Принять
       </button>
+      <button type="button" onClick={decline} className="px-3 py-2 t-caption underline underline-offset-4">Без аналитики</button>
     </div>
   );
 }
@@ -981,10 +1008,10 @@ export const isHere = (path: string, href: string) =>
   path === (href.length > 1 && href.endsWith("/") ? href.slice(0, -1) : href);
 
 export const NAV_LINKS: [string, string][] = [
-  ["Услуги", "/#when"],
+  ["Подписка", "/tasks/team-subscription/"],
+  ["Задачи", "/#when"],
   ["Кейсы", "/cases/"],
-  ["Наш подход", "/how-we-work/"],
-  ["О нас", "/team/"],
+  ["Команда", "/team/"],
 ];
 
 /* Второй уровень: раньше жил в футере, теперь — в меню. */
@@ -1280,6 +1307,7 @@ export function Footer() {
           {legal.map(([label, href]) => (
             <a key={href} href={href} className={link}>{label}</a>
           ))}
+          <button type="button" className={link} onClick={() => window.dispatchEvent(new Event("bv-cookie-settings"))}>Настройки cookie</button>
         </nav>
         <div className="mt-2">© {new Date().getFullYear()} БЕЗ ВОДЫ · withoutwater · ИП Уткина Виктория Викторовна · ИНН 771586055972</div>
       </div>
@@ -1338,7 +1366,7 @@ export function PageShell({ path, children }: { path: string; children: ReactNod
           К содержанию
         </a>
         <Nav path={path} />
-        <main id="main" tabIndex={-1} className="pb-20 outline-none md:pb-0">{children}</main>
+        <main id="main" tabIndex={-1} className="pb-20 outline-none md:pb-0">{IS_PREVIEW && <aside className="preview-notice" aria-label="Тестовая версия">Тестовая версия для согласования · заявки не отправляются</aside>}{children}</main>
 
         {/* Финал печатной версии: шапка и футер сайта в PDF скрыты, вместо них —
             подпись бюро (брендбук: кот появляется на финальных страницах PDF) */}
@@ -1641,7 +1669,7 @@ export function CtaBand({
             <ArrowRight data-arrow className="h-4 w-4 transition-transform duration-500 group-hover:translate-x-1" />
           </a>
           <span className="t-body text-[color:var(--color-text-inverse-2)]">
-            Ответим в течение 5 минут
+            Ответим и согласуем время
           </span>
           {secondary === null ? null : secondary ?? defaultSecondary}
         </div>

@@ -13,7 +13,7 @@ const root = dirname(fileURLToPath(import.meta.url));
 const SSR_DIR = resolve(root, "dist-ssr");
 const DIST = resolve(root, "dist");
 const MARKER = '<div id="root"></div>';
-const ORIGIN = "https://withoutwater.ru";
+const ORIGIN = process.env.SITE_ORIGIN || "https://withoutwater.ru";
 
 // 1. SSR-сборка (в отдельный dist-ssr, клиентский dist не трогаем)
 await build({
@@ -132,6 +132,14 @@ for (const route of mod.ROUTES) {
   writeFileSync(resolve(outDir, "index.html"), html, "utf8");
   totalPages++;
   console.log(`[prerender] ${route.path.padEnd(15)} ${appHtml.length.toLocaleString("ru")} симв. (LCP-фикс: ${unhidden})`);
+}
+
+// Static fallback for shared legacy URLs. nginx supplies 301 in production.
+for (const [from, to] of Object.entries(mod.PAGE_REDIRECTS)) {
+  const output = resolve(DIST, from.slice(1));
+  mkdirSync(output, { recursive: true });
+  const target = JSON.stringify(to).replace(/</g, "\\u003c");
+  writeFileSync(resolve(output, "index.html"), `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="robots" content="noindex,follow"><title>Страница перемещена — БЕЗ ВОДЫ</title><link rel="canonical" href="${ORIGIN}${esc(to)}"><script>const u=new URL(${target},location.origin);u.search=location.search;if(!u.hash)u.hash=location.hash;location.replace(u.href);</script></head><body><p>Содержание объединено с основным разделом.</p><a href="${esc(to)}">Перейти к разделу</a></body></html>`);
 }
 
 // sitemap.xml по фактическим маршрутам. lastmod — дата последнего коммита

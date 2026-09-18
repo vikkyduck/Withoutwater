@@ -15,3 +15,5 @@ export function render(path: string): string {
   const Page = route.Component;
   return renderToStaticMarkup(<Page />);
 }
+
+export { PAGE_REDIRECTS } from "./site/redirects";

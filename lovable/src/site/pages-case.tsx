@@ -103,7 +103,7 @@ export function CasePage({ item }: { item: CaseItem }) {
               Отдельным абзацем с линейкой сверху: это сноска к показателям,
               а не продолжение рассказа о проекте. */}
           <p className="mt-8 max-w-3xl border-t border-[color:var(--color-line)] pt-4 t-caption text-[color:var(--color-text-secondary)]">
-            На основе данных заказчика. Наш продукт — один из факторов, влияющих
+            На основе данных заказчика. Учебный продукт — один из факторов, влияющих
             на эти показатели.
           </p>
 

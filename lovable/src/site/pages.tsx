@@ -22,13 +22,9 @@ import { FAQ_ITEMS, TEAM, FOUNDER_QUOTE, visibleReviews, CONTACT } from "./data"
 import { ConstructorPage } from "./pages-constructor";
 import { ExpertiseMapPage } from "./pages-expertise";
 import { CASE_PAGES } from "./pages-case";
-import {
-  BE, BE_LINK,
-  BusinessEffectGeneralPage,
-  InternalExpertsPage, InternalExpertsEffectPage,
-  TeamSubscriptionPage, TeamSubscriptionEffectPage,
-  ExternalExpertsPage, ExternalExpertsEffectPage,
-} from "./pages-effect";
+import { BE, BE_LINK } from "./pages-effect";
+import { BusinessEffectGeneralPage, InternalExpertsPage, TeamSubscriptionPage, ExternalExpertsPage,
+  SubscriptionOverview, CompactTeam, SelectedCases } from "./subscription";
 
 /* -------------------------------- Главная -------------------------------- */
 
@@ -40,10 +36,9 @@ function HomePage() {
     <PageShell path="/">
       <Hero />
       <WhenNeeded />
-      <ReviewsBlock bare />
-      <Bricks />
-      <TeamBlock />
-      <NotFit />
+      <SubscriptionOverview compact />
+      <SelectedCases home />
+      <CompactTeam />
       <Contact />
     </PageShell>
   );
@@ -60,12 +55,10 @@ function CasesPage() {
         <Scene blobs={[{ className: "-left-40 top-1/3", tone: "chrome", size: 480 }]} />
         <PageHead
           kicker="Кейсы"
-          title={<>Что мы уже сделали</>}
-          lead="Корпоративные проекты и запуски под NDA: что сделали, как посчитали результат и что изменилось в работе заказчика."
-          guide="Здесь — результаты в цифрах; слова самих клиентов — в отзывах."
+          title={<>Реализованные проекты</>}
+          lead="Задачи, состав работ и результаты корпоративных и образовательных проектов."
           chips={[
-            ["Считаем результат", "каждый кейс — с метрикой, а не с описанием процесса"],
-            ["Проекты под NDA", "часть работ показываем только с письменного согласия"],
+            ["Проекты под NDA", "публикация — с письменного согласия заказчика"],
           ]}
         />
       </section>
@@ -85,7 +78,7 @@ function ReviewsPage() {
         <Scene blobs={[{ className: "-left-40 top-10", tone: "rose", size: 560 }]} />
         {/* Компактная шапка (06.08): лид и строка про подход сведены в одну
             фразу, отступы вдвое меньше — отзывы начинаются сразу. */}
-        <PageHead compact kicker="Отзывы" title={<>Отзывы наших клиентов</>} />
+        <PageHead compact kicker="Отзывы" title={<>Отзывы клиентов</>} />
         <div className="relative mx-auto max-w-7xl px-5 sec-pad-b md:px-8">
           <div className="mt-8 grid items-stretch gap-5 md:grid-cols-2 lg:grid-cols-3">
             {items.map((r, i) => (
@@ -107,18 +100,18 @@ function TeamPage() {
   /* Сеть отраслевых экспертов — четыре тезиса, текст Виктории 17.09.2026. */
   const network: [string, string][] = [
     ["Действующие практики", "C-level руководители и предприниматели с подтвержденным опытом"],
-    ["Тандем «Методолог + Эксперт»", "эксперт разъясняет контекст и логику решений, а методолог переводит эти знания в понятные материалы, благодаря чему информация от эксперта будет полноценно усваиваться сотрудниками"],
-    ["Единый договор и прозрачный документооборот", "все взаиморасчеты и юридические обязательства бюро закрывает через один рамочный договор, что бережет время"],
-    ["Защита данных (NDA)", "эксперты работают по соглашению о неразглашении, поэтому данные клиента не уйдут конкурентам и не появятся в открытом доступе"],
+    ["Эксперт и методолог", "эксперт объясняет рабочие ситуации и логику решений; методолог готовит учебные материалы и задания"],
+    ["Один договор", "расчеты и обязательства всех привлеченных специалистов включены в рамочный договор с БЕЗ ВОДЫ"],
+    ["Защита данных (NDA)", "до передачи конфиденциальных материалов согласуем NDA, состав участников и порядок доступа к данным"],
   ];
   return (
     <PageShell path="/team">
       <section className="stage border-b border-[color:var(--color-line)]">
         <Scene blobs={[{ className: "-right-40 top-[20%]", tone: "rose", size: 520 }]} />
         <PageHead
-          kicker="О нас"
+          kicker="БЕЗ ВОДЫ"
           title={<>Команда и сеть экспертов</>}
-          lead="Мы отвечаем за разработку методологии и реализацию образовательных проектов и отвечаем за результат: принятые по акту программы и материалы"
+          lead="Методологи, тренеры и отраслевые эксперты разрабатывают программы и проводят обучение."
           actions={
             <a href="#contact" className="btn btn-invert group w-full sm:w-auto">
               <span>Оставить заявку на разбор задачи</span>
@@ -128,7 +121,7 @@ function TeamPage() {
         />
 
         <div className="relative mx-auto max-w-7xl px-5 sec-pad md:px-8">
-          <SectionLabel n="01">Наша команда</SectionLabel>
+          <SectionLabel n="01">Команда</SectionLabel>
 
           {/* Основатель — крупная карточка: портрет, должность, факты, слова */}
           <motion.div {...reveal(0)} className="mt-8">
@@ -184,45 +177,6 @@ function TeamPage() {
         </div>
       </section>
 
-      <Contact />
-    </PageShell>
-  );
-}
-
-/* ------------------------------ Наш подход -------------------------------- */
-
-function HowWeWorkPage() {
-  /* Три тезиса — текст Виктории 17.09.2026. Прежние экраны схемы сроков,
-     ритма и гарантий в редакции отсутствуют. */
-  const rhythm: [string, string][] = [
-    ["Персональный руководитель проекта: единая точка контакта", "PM управляет сроками, организует работу методистов и решает технические вопросы. Коммуникация ведется в удобном режиме и виде."],
-    ["Еженедельная отчетность (WSR)", "краткая сводка: что выполнено, что находится в производстве, прогресс по задачам"],
-    ["Перестройка рабочей группы под новые вводные", "если под изменившиеся вводные требуется другой опыт, состав рабочей группы меняется в течение 48 часов"],
-  ];
-  return (
-    <PageShell path="/how-we-work">
-      <section className="stage border-b border-[color:var(--color-line)]">
-        <Scene blobs={[{ className: "-left-40 top-[30%]", tone: "chrome", size: 520 }]} />
-        <PageHead
-          compact
-          kicker="Наш подход"
-          title={<>Один договор. Одна команда. Единый контур ответственности</>}
-          lead="Взаимодействие с одним человеком по всем вопросам."
-        />
-        <div className="relative mx-auto max-w-7xl px-5 sec-pad-b md:px-8">
-          <SectionLabel n="01">Подход БЕЗ ВОДЫ в управлении проектом</SectionLabel>
-          <div className="mt-8 grid items-stretch gap-4 md:grid-cols-3">
-            {rhythm.map(([t, d], i) => (
-              <motion.div key={t} {...reveal(i)} className="h-full">
-                <PaperCard className="h-full p-6">
-                  <div className="font-display t-body font-semibold">{t}</div>
-                  <p className="mt-2.5 t-body text-[color:var(--color-text-secondary)]">{d}</p>
-                </PaperCard>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
       <Contact />
     </PageShell>
   );
@@ -292,9 +246,9 @@ export const ROUTES: RouteDef[] = [
   },
   {
     path: BE.general,
-    title: "Экономический эффект: ROI обучения — БЕЗ ВОДЫ",
+    title: "Экономика подписки на отдел обучения — БЕЗ ВОДЫ",
     description:
-      "Инвестиции в создание собственных нематериальных активов при одновременном сокращении затрат на внешних подрядчиков до 40%.",
+      "Как сравнить подписку, штат и отдельных подрядчиков на одинаковом объеме работ. Бюджет, сроки, результат и условия для согласования.",
     Component: BusinessEffectGeneralPage,
   },
   {
@@ -305,13 +259,6 @@ export const ROUTES: RouteDef[] = [
     Component: InternalExpertsPage,
   },
   {
-    path: BE.internalEffect,
-    title: "Экономический эффект: тиражирование практик — БЕЗ ВОДЫ",
-    description:
-      "Высвобождение рабочего времени ключевых сотрудников, сокращение срока адаптации новичков, снижение операционных ошибок и риска потери знаний.",
-    Component: InternalExpertsEffectPage,
-  },
-  {
     path: BE.team,
     title: "Подписка на отдел обучения — БЕЗ ВОДЫ",
     description:
@@ -319,25 +266,11 @@ export const ROUTES: RouteDef[] = [
     Component: TeamSubscriptionPage,
   },
   {
-    path: BE.teamEffect,
-    title: "Экономический эффект: подписка на отдел обучения — БЕЗ ВОДЫ",
-    description:
-      "Штатная команда vs подписка на отдел обучения: расчет совокупной стоимости трех специалистов в штате в сравнении с подпиской от 180 000 ₽.",
-    Component: TeamSubscriptionEffectPage,
-  },
-  {
     path: BE.external,
     title: "Привлечение внешних экспертов — БЕЗ ВОДЫ",
     description:
       "Знания и навыки, которыми не владеют специалисты внутри компании, можно получить без долгого поиска и обращений к консалтинговым агентствам.",
     Component: ExternalExpertsPage,
-  },
-  {
-    path: BE.externalEffect,
-    title: "Экономический эффект: привлечение внешних экспертов — БЕЗ ВОДЫ",
-    description:
-      "Сокращение сроков запуска, оптимизация бюджета и ФОТ, сохранение и защита знаний внутри компании.",
-    Component: ExternalExpertsEffectPage,
   },
   {
     path: "/cases",
@@ -348,7 +281,7 @@ export const ROUTES: RouteDef[] = [
   },
   {
     path: "/reviews",
-    title: "Отзывы наших клиентов — БЕЗ ВОДЫ",
+    title: "Отзывы клиентов — БЕЗ ВОДЫ",
     description: "Отзывы клиентов о работе проектного бюро БЕЗ ВОДЫ.",
     Component: ReviewsPage,
   },
@@ -356,15 +289,8 @@ export const ROUTES: RouteDef[] = [
     path: "/team",
     title: "Команда и сеть экспертов — БЕЗ ВОДЫ",
     description:
-      "Мы отвечаем за разработку методологии и реализацию образовательных проектов и отвечаем за результат: принятые по акту программы и материалы.",
+      "Команда разрабатывает методологию и реализует образовательные проекты. Результат работы — программы и материалы, принятые по акту.",
     Component: TeamPage,
-  },
-  {
-    path: "/how-we-work",
-    title: "Наш подход — БЕЗ ВОДЫ",
-    description:
-      "Один договор. Одна команда. Единый контур ответственности. Подход БЕЗ ВОДЫ в управлении проектом.",
-    Component: HowWeWorkPage,
   },
   {
     path: "/faq",
@@ -377,7 +303,7 @@ export const ROUTES: RouteDef[] = [
     path: "/contacts",
     title: "Контакты — БЕЗ ВОДЫ",
     description:
-      "Форма заявки, телефон, Telegram и почта. Ответим в течение 5 минут.",
+      "Разбор задачи обучения за 30 минут: исходные материалы, результат и первый этап. Контакты руководителя проекта.",
     Component: ContactsPage,
   },
   /* Страница продукта «Карта экспертности» (06.08.2026): на нее ведут все
@@ -406,9 +332,9 @@ export const ROUTES: RouteDef[] = [
      ссылки, когда она присылает /constructor в мессенджере. */
   {
     path: "/constructor",
-    title: "Подписка на наши услуги: конструктор — БЕЗ ВОДЫ",
+    title: "Подписка на услуги: конструктор — БЕЗ ВОДЫ",
     description:
-      "Выберите задачи и нажмите на кнопку «Отправить», когда соберете пакет услуг, мы напишем вам в течение 5 минут.",
+      "Выберите задачи и отправьте расчет для согласования объема работ.",
     Component: ConstructorPage,
     noindex: true,
   },
@@ -419,9 +345,8 @@ export const ROUTES: RouteDef[] = [
    (#contact, #cases, #reviews, #when, #book), работают как раньше. */
 export const HASH_REDIRECTS: Record<string, string> = {
   "#faq": "/faq/",
-  "#approach": "/how-we-work/",
-  "#firststage": "/how-we-work/",
-  "#notfit": "/how-we-work/",
+  "#approach": "/tasks/team-subscription/#process",
+  "#firststage": "/tasks/team-subscription/#process",
   "#capital": "/#when",
 };
 

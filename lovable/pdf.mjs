@@ -25,13 +25,10 @@ import { tmpdir } from "node:os";
 
 const root = dirname(fileURLToPath(import.meta.url));
 const DIST = resolve(root, "dist");
-const ORIGIN = "https://withoutwater.ru";
+const ORIGIN = process.env.SITE_ORIGIN || "https://withoutwater.ru";
 
 const TARGETS = [
   ["/business-effect/", "bez-vody-business-effect.pdf"],
-  ["/tasks/internal-experts/business-effect/", "bez-vody-internal-experts.pdf"],
-  ["/tasks/team-subscription/business-effect/", "bez-vody-team-subscription.pdf"],
-  ["/tasks/external-experts/business-effect/", "bez-vody-external-experts.pdf"],
 ];
 
 if (process.env.SKIP_PDF === "1") {
